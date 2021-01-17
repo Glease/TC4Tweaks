@@ -1,0 +1,16 @@
+[
+{
+  "modid": "tcscrolling",
+  "name": "Thaumcraft 4 Scrolling",
+  "description": "Magic with ease",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["glee8e"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": ["Thaumcraft"]
+}
+]

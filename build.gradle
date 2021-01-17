@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+        maven {
+            name = "jitpack"
+            url = "https://jitpack.io"
+        }
+    }
+    dependencies {
+        classpath 'com.github.GTNH2:ForgeGradle:FG_1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "1.1.2"
+group= "net.glease"
+archivesBaseName = "Thaumcraft4Tweaks"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    replaceIn "TC4Tweak.java"
+	replace '${version}', project.version
+    runDir = "run"
+}
+
+jar {
+    manifest {
+        attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
+        attributes "FMLCorePluginContainsFMLMod": true
+    }
+}
+
+repositories {
+    maven {
+        name = "gt"
+        url = "http://gregtech.overminddl1.com/"
+    }
+}
+
+dependencies {
+    compile "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
+    compile "thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev"
+    compileOnly "minetweaker:MineTweaker3:1.7.10-3.0.10:dev-full"
+}
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+sourceSets {
+    main { output.resourcesDir = output.classesDir }
+}
