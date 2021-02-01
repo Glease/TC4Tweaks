@@ -30,7 +30,8 @@ public class TC4Transformer implements IClassTransformer {
 		transformers.put("thaumcraft.common.tiles.TileMagicWorkbench", TileMagicWorkbenchVisitor::new);
 		transformers.put("thaumcraft.client.fx.other.FXSonic", FXSonicVisitor::new);
 		serverTransformers.put("thaumcraft.api.research.ResearchCategories", ResearchCategoriesVisitor::new);
-		serverTransformers.put("thaumcraft.common.lib.research.ScanManager", ScanManagerVisitor::new);
+		if (!LoadingPlugin.gt6)
+			serverTransformers.put("thaumcraft.common.lib.research.ScanManager", ScanManagerVisitor::new);
 	}
 
 	@Override

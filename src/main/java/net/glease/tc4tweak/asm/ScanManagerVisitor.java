@@ -14,7 +14,7 @@ public class ScanManagerVisitor extends ClassVisitor {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		final MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-		if (LoadingPlugin.gt6 || !name.equals("generateItemHash") || !desc.equals("(Lnet/minecraft/item/Item;I)I")) {
+		if (!name.equals("generateItemHash") || !desc.equals("(Lnet/minecraft/item/Item;I)I")) {
 			return mv;
 		}
 		TC4Transformer.log.debug("Replacing {}", name);
