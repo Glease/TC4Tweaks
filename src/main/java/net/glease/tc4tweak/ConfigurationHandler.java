@@ -32,7 +32,8 @@ public enum ConfigurationHandler {
 
 	private void loadConfig() {
 		inverted = config.getBoolean("inverted", "general", false, "Flip it if you find the scrolling unintuitive");
-		updateInterval = config.getInt("updateInterval", "general", 4, 0, 20, "How often should Arcane Workbench update displayed crafting result.");
+		updateInterval = config.getInt("updateInterval", "general", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
+		config.save();
 	}
 
 	public boolean isInverted() {

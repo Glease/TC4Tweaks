@@ -1,7 +1,7 @@
 [
 {
-  "modid": "tcscrolling",
-  "name": "Thaumcraft 4 Scrolling",
+  "modid": "tc4tweak",
+  "name": "TC4 Tweak",
   "description": "Magic with ease",
   "version": "${version}",
   "mcversion": "${mcversion}",
