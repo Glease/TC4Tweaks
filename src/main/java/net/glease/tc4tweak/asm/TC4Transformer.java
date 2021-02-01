@@ -20,31 +20,53 @@ import java.util.function.BiFunction;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 public class TC4Transformer implements IClassTransformer {
+	private static class TransformerFactory {
+		private final BiFunction<Integer, ClassVisitor, ClassVisitor> factory;
+
+		private TransformerFactory(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
+			this.factory = factory;
+		}
+		public static TransformerFactory of(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
+			return new TransformerFactory(factory);
+		}
+
+		public boolean isActive() {
+			return true;
+		}
+
+		public final ClassVisitor apply(int api, ClassVisitor downstream) {
+			return factory.apply(api, downstream);
+		}
+	}
 	static final Logger log = LogManager.getLogger("TC4TweakTransformer");
 	private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
-	private final Map<String, BiFunction<Integer, ClassVisitor, ClassVisitor>> transformers = new HashMap<>();
-	private final Map<String, BiFunction<Integer, ClassVisitor, ClassVisitor>> serverTransformers = new HashMap<>();
+	private final Map<String, TransformerFactory> transformers = new HashMap<>();
+	private final Map<String, TransformerFactory> serverTransformers = new HashMap<>();
 
 	{
-		transformers.put("thaumcraft.client.gui.GuiResearchTable", GuiResearchTableVisitor::new);
-		transformers.put("thaumcraft.common.tiles.TileMagicWorkbench", TileMagicWorkbenchVisitor::new);
-		transformers.put("thaumcraft.client.fx.other.FXSonic", FXSonicVisitor::new);
-		serverTransformers.put("thaumcraft.api.research.ResearchCategories", ResearchCategoriesVisitor::new);
-		if (!LoadingPlugin.gt6)
-			serverTransformers.put("thaumcraft.common.lib.research.ScanManager", ScanManagerVisitor::new);
+		transformers.put("thaumcraft.client.gui.GuiResearchTable", TransformerFactory.of(GuiResearchTableVisitor::new));
+		transformers.put("thaumcraft.common.tiles.TileMagicWorkbench", TransformerFactory.of(TileMagicWorkbenchVisitor::new));
+		transformers.put("thaumcraft.client.fx.other.FXSonic", TransformerFactory.of(FXSonicVisitor::new));
+		serverTransformers.put("thaumcraft.api.research.ResearchCategories", TransformerFactory.of(ResearchCategoriesVisitor::new));
+		serverTransformers.put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
+			@Override
+			public boolean isActive() {
+				return !LoadingPlugin.gt6;
+			}
+		});
 	}
 
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
-		BiFunction<Integer, ClassVisitor, ClassVisitor> factory = serverTransformers.get(name);
-		if (factory == null) {
+		TransformerFactory factory = serverTransformers.get(name);
+		if (factory == null || !factory.isActive()) {
 			/*
 			 query transformers first as a hack to not load FMLCommonHandler too early
 			 otherwise you need to do an expensive class lookup to determine if said class is initialized
 			 and potentially screw up early class loading order
 			*/
 			factory = transformers.get(name);
-			if (factory == null || isServerSide())
+			if (factory == null || !factory.isActive() || isServerSide())
 				return basicClass;
 		}
 		log.info("Transforming class {}", name);
