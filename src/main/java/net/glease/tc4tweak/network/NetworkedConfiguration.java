@@ -20,6 +20,6 @@ public class NetworkedConfiguration {
 	@SubscribeEvent
 	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent e) {
 		if (e.player instanceof EntityPlayerMP && !ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes())
-			TC4Tweak.INSTANCE.CHANNEL.sendTo(new MessageSendConfiguration(false), (EntityPlayerMP) e.player);
+			TC4Tweak.INSTANCE.CHANNEL.sendTo(new MessageSendConfiguration(), (EntityPlayerMP) e.player);
 	}
 }

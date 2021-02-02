@@ -37,6 +37,7 @@ public enum ConfigurationHandler {
 		checkWorkbenchRecipes = config.getBoolean("checkWorkbenchRecipes", "general", true, "When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken.");
 		// if allow checking (vanilla behavior) no need to force client to have this mod
 		TC4Tweak.INSTANCE.setAllowAll(!checkWorkbenchRecipes);
+		TC4Tweak.INSTANCE.detectAndSendConfigChanges();
 		config.save();
 	}
 
