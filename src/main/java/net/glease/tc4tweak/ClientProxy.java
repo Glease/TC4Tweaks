@@ -5,6 +5,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
+import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
@@ -13,6 +14,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import org.lwjgl.input.Mouse;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.gui.GuiResearchTable;
@@ -96,6 +98,12 @@ public class ClientProxy extends CommonProxy {
 	public void onTooltip(ItemTooltipEvent e) {
 		if (e.itemStack != null && e.itemStack.getItem() == ConfigItems.itemResearchNotes)
 			e.toolTip.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("tcscrolling.enabled"));
+	}
+
+	@SubscribeEvent
+	public void onDisconnect(WorldEvent.Unload e) {
+		if (e.world.isRemote)
+			NetworkedConfiguration.resetCheckWorkbenchRecipes();
 	}
 
 	public static class FMLEventHandler {

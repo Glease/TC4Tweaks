@@ -4,7 +4,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
-import static org.objectweb.asm.Opcodes.*;
 
 public class ScanManagerVisitor extends ClassVisitor {
 	public ScanManagerVisitor(int api, ClassVisitor cv) {
@@ -20,13 +19,7 @@ public class ScanManagerVisitor extends ClassVisitor {
 		TC4Transformer.log.debug("Replacing {}", name);
 		mv.visitParameter("item", 0);
 		mv.visitParameter("meta", 0);
-		mv.visitCode();
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitVarInsn(ILOAD, 1);
-		mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, name, desc, false);
-		mv.visitInsn(IRETURN);
-		mv.visitMaxs(2,2);
-		mv.visitEnd();
+		ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
 		return null;
 	}
 }
