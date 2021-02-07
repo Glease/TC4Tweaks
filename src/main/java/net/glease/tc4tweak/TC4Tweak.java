@@ -18,7 +18,7 @@ import java.util.Map;
 @Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "${version}", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory", canBeDeactivated = false)
 public class TC4Tweak {
 	public static final String MOD_ID = "tc4tweak";
-	private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0,)");
+	private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
 
 	@SidedProxy(serverSide = "net.glease.tc4tweak.CommonProxy", clientSide = "net.glease.tc4tweak.ClientProxy")
 	static CommonProxy proxy;
