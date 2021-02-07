@@ -2,6 +2,7 @@ package net.glease.tc4tweak;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
@@ -94,10 +95,14 @@ public class ClientProxy extends CommonProxy {
 		}
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onTooltip(ItemTooltipEvent e) {
-		if (e.itemStack != null && e.itemStack.getItem() == ConfigItems.itemResearchNotes)
-			e.toolTip.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("tcscrolling.enabled"));
+		if (e.itemStack != null) {
+			if (e.itemStack.getItem() == ConfigItems.itemResearchNotes)
+				e.toolTip.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("tc4tweaks.enabled_scrolling"));
+			else if (e.itemStack.getItem() == ConfigItems.itemWandCasting)
+				e.toolTip.add(EnumChatFormatting.RED + StatCollector.translateToLocal("tc4tweaks.disable_vanilla"));
+		}
 	}
 
 	@SubscribeEvent
