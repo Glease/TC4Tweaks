@@ -2,6 +2,7 @@ package net.glease.tc4tweak.asm;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -188,7 +189,8 @@ public class ASMCallhookServer {
 	 */
 	@Callhook
 	public static void onArcaneWorkbenchChanged(TileArcaneWorkbench tileEntity, InventoryPlayer ip) {
-		if (ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes()) {
+		// only check synced config if in remote world
+		if (ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes() && (!tileEntity.getWorldObj().isRemote || NetworkedConfiguration.isCheckWorkbenchRecipes())) {
 			InventoryCrafting ic = new InventoryCrafting(new ContainerDummy(), 3, 3);
 			for (int a = 0; a < 9; ++a) {
 				ic.setInventorySlotContents(a, tileEntity.getStackInSlot(a));

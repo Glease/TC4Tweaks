@@ -15,7 +15,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import org.lwjgl.input.Mouse;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.gui.GuiResearchTable;
@@ -100,15 +99,12 @@ public class ClientProxy extends CommonProxy {
 		if (e.itemStack != null) {
 			if (e.itemStack.getItem() == ConfigItems.itemResearchNotes)
 				e.toolTip.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("tc4tweaks.enabled_scrolling"));
-			else if (e.itemStack.getItem() == ConfigItems.itemWandCasting)
-				e.toolTip.add(EnumChatFormatting.RED + StatCollector.translateToLocal("tc4tweaks.disable_vanilla"));
+			else if (e.itemStack.getItem() == ConfigItems.itemWandCasting) {
+				if (!ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes() || !NetworkedConfiguration.isCheckWorkbenchRecipes()) {
+					e.toolTip.add(EnumChatFormatting.RED + StatCollector.translateToLocal("tc4tweaks.disable_vanilla"));
+				}
+			}
 		}
-	}
-
-	@SubscribeEvent
-	public void onDisconnect(WorldEvent.Unload e) {
-		if (e.world.isRemote)
-			NetworkedConfiguration.resetCheckWorkbenchRecipes();
 	}
 
 	public static class FMLEventHandler {
