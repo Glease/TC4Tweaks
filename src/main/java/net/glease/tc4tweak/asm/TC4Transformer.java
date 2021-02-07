@@ -45,6 +45,7 @@ public class TC4Transformer implements IClassTransformer {
 
 	{
 		transformers.put("thaumcraft.client.gui.GuiResearchTable", TransformerFactory.of(GuiResearchTableVisitor::new));
+		transformers.put("thaumcraft.client.gui.MappingThread", TransformerFactory.of(MappingThreadVisitor::new));
 		transformers.put("thaumcraft.common.tiles.TileMagicWorkbench", TransformerFactory.of(TileMagicWorkbenchVisitor::new));
 		transformers.put("thaumcraft.client.fx.other.FXSonic", TransformerFactory.of(FXSonicVisitor::new));
 		serverTransformers.put("thaumcraft.api.research.ResearchCategories", TransformerFactory.of(ResearchCategoriesVisitor::new));
