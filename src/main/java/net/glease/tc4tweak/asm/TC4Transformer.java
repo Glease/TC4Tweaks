@@ -22,12 +22,23 @@ import static org.objectweb.asm.Opcodes.ASM5;
 public class TC4Transformer implements IClassTransformer {
 	private static class TransformerFactory {
 		private final BiFunction<Integer, ClassVisitor, ClassVisitor> factory;
+		private final boolean expandFrames;
 
-		private TransformerFactory(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
-			this.factory = factory;
+		public TransformerFactory(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
+			this(factory, false);
 		}
+
+		private TransformerFactory(BiFunction<Integer, ClassVisitor, ClassVisitor> factory, boolean expandFrames) {
+			this.factory = factory;
+			this.expandFrames = expandFrames;
+		}
+
 		public static TransformerFactory of(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
-			return new TransformerFactory(factory);
+			return of(factory, false);
+		}
+
+		public static TransformerFactory of(BiFunction<Integer, ClassVisitor, ClassVisitor> factory, boolean expandFrames) {
+			return new TransformerFactory(factory, expandFrames);
 		}
 
 		public boolean isActive() {
@@ -36,6 +47,10 @@ public class TC4Transformer implements IClassTransformer {
 
 		public final ClassVisitor apply(int api, ClassVisitor downstream) {
 			return factory.apply(api, downstream);
+		}
+
+		public boolean isExpandFrames() {
+			return expandFrames;
 		}
 	}
 	static final Logger log = LogManager.getLogger("TC4TweakTransformer");
@@ -50,6 +65,7 @@ public class TC4Transformer implements IClassTransformer {
 		transformers.put("thaumcraft.client.fx.other.FXSonic", TransformerFactory.of(FXSonicVisitor::new));
 		serverTransformers.put("thaumcraft.api.research.ResearchCategories", TransformerFactory.of(ResearchCategoriesVisitor::new));
 		serverTransformers.put("thaumcraft.common.container.ContainerArcaneWorkbench", TransformerFactory.of(ContainerArcaneWorkbenchVisitor::new));
+		serverTransformers.put("thaumcraft.common.items.wands.ItemWandCasting", TransformerFactory.of(ItemWandCastingVisitor::new, false));
 		serverTransformers.put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", TransformerFactory.of(ThaumcraftCraftingManagerVisitor::new));
 		serverTransformers.put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
 			@Override
@@ -74,10 +90,10 @@ public class TC4Transformer implements IClassTransformer {
 		}
 		log.info("Transforming class {}", name);
 		ClassReader cr = new ClassReader(basicClass);
-		ClassWriter cw = new ClassWriter(0);
+		ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
 		if (DEBUG) {
 			try (PrintWriter pw = new PrintWriter(name + ".txt", "UTF-8")) {
-				cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), ClassReader.SKIP_DEBUG);
+				cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), (factory.isExpandFrames() ? 0 : ClassReader.SKIP_FRAMES) | ClassReader.SKIP_DEBUG);
 			} catch (FileNotFoundException | UnsupportedEncodingException e) {
 				log.warn("Unable to dump debug output", e);
 				cr.accept(factory.apply(ASM5, cw), ClassReader.SKIP_DEBUG);
