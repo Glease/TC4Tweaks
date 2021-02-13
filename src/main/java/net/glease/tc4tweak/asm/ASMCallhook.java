@@ -6,11 +6,33 @@ import thaumcraft.common.tiles.TileMagicWorkbench;
 
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ASMCallhook {
 	private static final WeakHashMap<TileMagicWorkbench, Void> postponed = new WeakHashMap<>();
 	// workbench throttling
 	private static long lastUpdate = 0;
+	private static final AtomicBoolean cacheUsed = new AtomicBoolean(false);
+	private static boolean priorityChanged = false;
+
+	/**
+	 * Called from {@link thaumcraft.client.gui.GuiResearchRecipe#getFromCache(int)}
+	 */
+	@Callhook
+	public static void onCacheLookupHead() {
+		cacheUsed.lazySet(true);
+	}
+
+	/**
+	 * Called from {@link thaumcraft.client.gui.MappingThread#run()}
+	 */
+	@Callhook
+	public static void onMappingDidWork() {
+		if (!priorityChanged && cacheUsed.get()) {
+			Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+			priorityChanged = true;
+		}
+	}
 
 	public static void updatePostponed() {
 		synchronized (postponed) {

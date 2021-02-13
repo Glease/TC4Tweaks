@@ -59,6 +59,7 @@ public class TC4Transformer implements IClassTransformer {
 	private final Map<String, TransformerFactory> serverTransformers = new HashMap<>();
 
 	{
+		transformers.put("thaumcraft.client.gui.GuiResearchRecipe", TransformerFactory.of(GuiResearchRecipeVisitor::new));
 		transformers.put("thaumcraft.client.gui.GuiResearchTable", TransformerFactory.of(GuiResearchTableVisitor::new));
 		transformers.put("thaumcraft.client.gui.MappingThread", TransformerFactory.of(MappingThreadVisitor::new));
 		transformers.put("thaumcraft.common.tiles.TileMagicWorkbench", TransformerFactory.of(TileMagicWorkbenchVisitor::new));

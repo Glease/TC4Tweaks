@@ -3,6 +3,7 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOK_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
 public class MappingThreadVisitor extends ClassVisitor {
@@ -17,6 +18,13 @@ public class MappingThreadVisitor extends ClassVisitor {
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
 			mv.visitInsn(ICONST_1);
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "setPriority", "(I)V", false);
+		}
+
+		@Override
+		public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+			super.visitMethodInsn(opcode, owner, name, desc, itf);
+			if (opcode == INVOKEINTERFACE && "java/util/Iterator".equals(owner) && "next".equals(name))
+				mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "onMappingDidWork", "()V", false);
 		}
 	}
 
