@@ -37,7 +37,7 @@ public class ItemWandCastingVisitor extends ClassVisitor {
 			super.visitMethodInsn(opcode, owner, name, desc, itf);
 			if (opcode == INVOKESTATIC &&
 					"net/minecraft/item/ItemStack".equals(owner) &&
-					"loadItemStackFromNBT".equals(name) &&
+					("func_77949_a".equals(name) || "loadItemStackFromNBT".equals(name)) &&
 					"(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/item/ItemStack;".equals(desc))
 			{
 				mv.visitInsn(DUP);

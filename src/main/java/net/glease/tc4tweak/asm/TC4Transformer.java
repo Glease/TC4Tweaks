@@ -92,15 +92,20 @@ public class TC4Transformer implements IClassTransformer {
 		log.info("Transforming class {}", name);
 		ClassReader cr = new ClassReader(basicClass);
 		ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
-		if (DEBUG) {
-			try (PrintWriter pw = new PrintWriter(name + ".txt", "UTF-8")) {
-				cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), (factory.isExpandFrames() ? 0 : ClassReader.SKIP_FRAMES) | ClassReader.SKIP_DEBUG);
-			} catch (FileNotFoundException | UnsupportedEncodingException e) {
-				log.warn("Unable to dump debug output", e);
-				cr.accept(factory.apply(ASM5, cw), ClassReader.SKIP_DEBUG);
+		// we are very probably the last one to run.
+		try {
+			if (DEBUG) {
+				try (PrintWriter pw = new PrintWriter(name + ".txt", "UTF-8")) {
+					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+				} catch (FileNotFoundException | UnsupportedEncodingException e) {
+					log.warn("Unable to dump debug output", e);
+					cr.accept(factory.apply(ASM5, cw), ClassReader.SKIP_DEBUG);
+				}
+			} else {
+				cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG));
 			}
-		} else {
-			cr.accept(factory.apply(ASM5, cw), ClassReader.SKIP_DEBUG);
+		} catch (Exception e) {
+			log.error("Something went very wrong! Aborting!!!", e);
 		}
 		return cw.toByteArray();
 	}
