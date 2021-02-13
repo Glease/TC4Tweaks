@@ -54,7 +54,7 @@ public class ASMCallhookServer {
 		if (recipe != null && arcaneCraftingHistory != null) {
 			LinkedList<IArcaneRecipe> history = arcaneCraftingHistory.get();
 			history.addFirst(recipe);
-			if (history.size() > ARCANE_CRAFTING_HISTORY_SIZE)
+			if (history.size() > ConfigurationHandler.INSTANCE.getArcaneCraftingHistorySize())
 				history.removeLast();
 		}
 		return recipe;
@@ -92,16 +92,18 @@ public class ASMCallhookServer {
 		arcaneCraftingHistory = null;
 	}
 
-	public static void flushAllCache() {
-		researchItemMap = ResearchCategories.researchCategories.values().stream()
-				.flatMap(l -> l.research.values().stream())
-				.collect(Collectors.toMap(
-						i -> i.key,
-						Function.identity(),
-						(u, v) -> u,
-						LinkedHashMap::new
-				));
-		arcaneCraftingHistory = ThreadLocal.withInitial(LinkedList::new);
+	public static void flushAllCache(boolean doCreate) {
+		if (!doCreate && researchItemMap != null) {
+			researchItemMap = ResearchCategories.researchCategories.values().stream()
+					.flatMap(l -> l.research.values().stream())
+					.collect(Collectors.toMap(
+							i -> i.key,
+							Function.identity(),
+							(u, v) -> u,
+							LinkedHashMap::new
+					));
+			arcaneCraftingHistory = ThreadLocal.withInitial(LinkedList::new);
+		}
 	}
 
 	/**

@@ -19,7 +19,7 @@ public class CommonProxy {
 	}
 
 	public void serverStarted(FMLServerStartedEvent e) {
-		ASMCallhookServer.flushAllCache();
+		ASMCallhookServer.flushAllCache(true);
 		NetworkedConfiguration.resetCheckWorkbenchRecipes();
 	}
 }
