@@ -16,6 +16,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
@@ -58,6 +59,17 @@ public class ASMCallhookServer {
 				history.removeLast();
 		}
 		return recipe;
+	}
+
+	/**
+	 * Called from both {@link ItemWandCasting#getFocusItem(ItemStack)} and {@link ItemWandCasting#getFocus(ItemStack)}
+	 *
+	 * @param stack reconstructed focus stack, not wand stack
+	 * @return true if the stack is valid
+	 */
+	@Callhook
+	public static boolean isValidFocusItemStack(ItemStack stack) {
+		return stack != null && stack.getItem() instanceof ItemFocusBasic;
 	}
 
 	/**

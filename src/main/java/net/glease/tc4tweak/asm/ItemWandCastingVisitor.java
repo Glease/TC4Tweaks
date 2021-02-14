@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
 public class ItemWandCastingVisitor extends ClassVisitor {
@@ -38,14 +39,14 @@ public class ItemWandCastingVisitor extends ClassVisitor {
 			if (opcode == INVOKESTATIC &&
 					"net/minecraft/item/ItemStack".equals(owner) &&
 					("func_77949_a".equals(name) || "loadItemStackFromNBT".equals(name)) &&
-					"(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/item/ItemStack;".equals(desc))
-			{
+					"(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/item/ItemStack;".equals(desc)) {
 				mv.visitInsn(DUP);
-				Label nonnull = new Label();
-				mv.visitJumpInsn(IFNONNULL, nonnull);
+				Label branchNonnull = new Label();
+				mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "isValidFocusItemStack", "(Lnet/minecraft/item/ItemStack;)Z", false);
+				mv.visitJumpInsn(IFNE, branchNonnull);
 				mv.visitInsn(POP);
 				mv.visitJumpInsn(GOTO, elseBranchStart);
-				mv.visitLabel(nonnull);
+				mv.visitLabel(branchNonnull);
 			}
 		}
 
