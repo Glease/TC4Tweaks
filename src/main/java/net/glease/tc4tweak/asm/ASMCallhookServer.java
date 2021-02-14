@@ -33,7 +33,6 @@ public class ASMCallhookServer {
 	// arcane crafting recipe speed up
 	// thread local to make integrated server happy
 	private static ThreadLocal<LinkedList<IArcaneRecipe>> arcaneCraftingHistory = null;
-	private static final int ARCANE_CRAFTING_HISTORY_SIZE = 256;
 
 	private static IArcaneRecipe findArcaneRecipe(IInventory inv, EntityPlayer player) {
 		if (arcaneCraftingHistory != null) {
@@ -105,7 +104,7 @@ public class ASMCallhookServer {
 	}
 
 	public static void flushAllCache(boolean doCreate) {
-		if (!doCreate && researchItemMap != null) {
+		if (doCreate || researchItemMap != null) {
 			researchItemMap = ResearchCategories.researchCategories.values().stream()
 					.flatMap(l -> l.research.values().stream())
 					.collect(Collectors.toMap(
