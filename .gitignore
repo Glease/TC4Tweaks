@@ -142,3 +142,5 @@ gradle-app.setting
 
 run/
 .idea/
+# Change log is always auto generated. No need to include.
+CHANGELOG.md

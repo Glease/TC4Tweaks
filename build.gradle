@@ -13,15 +13,20 @@ buildscript {
             name = "jitpack"
             url = "https://jitpack.io"
         }
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.github.GTNH2:ForgeGradle:FG_1.2-SNAPSHOT'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
+        classpath "se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.65"
     }
 }
 
 apply plugin: 'forge'
+apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.2.0-beta5"
+version = "1.2.0-beta6"
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 
@@ -37,7 +42,7 @@ minecraft {
     runDir = "run"
 }
 
-jar {
+def addJarManifest() {
     manifest {
         attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
         attributes "FMLCorePluginContainsFMLMod": true
@@ -79,4 +84,99 @@ processResources
 
 sourceSets {
     main { output.resourcesDir = output.classesDir }
+}
+
+jar {
+    addJarManifest()
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    addJarManifest()
+}
+
+task devJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'dev'
+    addJarManifest()
+}
+
+artifacts {
+    archives(devJar)
+    archives(sourceJar)
+}
+
+curseforge {
+    apiKey = project.hasProperty('curseforgeAPI') ? project.curseforgeAPI : ''
+    project {
+        id = '431297'
+        changelog = new File("CHANGELOG.md")
+        releaseType = version.contains('beta') ? 'beta' : version.contains('alpha') ? 'alpha' : 'release'
+        changelogType = 'markdown'
+        relations {
+            requiredDependency 'thaumcraft'
+        }
+        addGameVersion '1.7.10'
+
+        mainArtifact(jar)
+        addArtifact(devJar)
+        addArtifact(sourceJar)
+    }
+}
+
+task createSignedJarDir() {
+    doLast {
+        mkdir new File(jar.destinationDir, "signed").toString()
+    }
+}
+
+task generateGitChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    file = new File("CHANGELOG.md")
+    templateContent = """<!-- Generated file. DO NOT HAND EDIT!!! -->
+# Change log
+Change log generated from git history.
+{{#tags}}
+## {{name}}
+ {{#issues}}
+  {{#commits}}
+   1. {{{messageTitle}}} ([@{{{hash}}} by {{{authorName}}}](https://github.com/Glease/TC4Tweaks/commit/{{{hashFull}}}))
+  {{/commits}}
+ {{/issues}}
+{{/tags}}
+"""
+}
+
+// sign jars
+task signJar() {
+    dependsOn reobf
+    dependsOn createSignedJarDir
+    onlyIf { // Skip the task if our secret data isn't available
+        project.hasProperty('keyStore')
+    }
+    inputs.file jar.outputs.files
+    jar.outputs.files.forEach {
+        outputs.file it
+    }
+    doLast {
+        jar.outputs.files.forEach {
+            ant.signjar destDir: new File(jar.destinationDir, "signed"),
+                    sigfile: project.hasProperty("signerName") ? project.signerName : project.keyStoreAlias,
+                    keystore: project.keyStore,
+                    alias: project.keyStoreAlias,
+                    storepass: project.keyStorePass,
+                    keypass: project.keyStoreKeyPass,
+                    jar: it
+        }
+    }
+}
+
+assemble.dependsOn signJar
+tasks.whenTaskAdded { it->
+    if (it.name.startsWith('curseforge')) {
+        it.dependsOn generateGitChangelog
+        it.onlyIf {
+            project.hasProperty('curseforgeAPI')
+        }
+    }
 }
