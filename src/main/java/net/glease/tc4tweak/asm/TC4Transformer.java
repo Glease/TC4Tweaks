@@ -1,6 +1,6 @@
 package net.glease.tc4tweak.asm;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.apache.logging.log4j.LogManager;
@@ -80,11 +80,6 @@ public class TC4Transformer implements IClassTransformer {
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		TransformerFactory factory = serverTransformers.get(name);
 		if (factory == null || !factory.isActive()) {
-			/*
-			 query transformers first as a hack to not load FMLCommonHandler too early
-			 otherwise you need to do an expensive class lookup to determine if said class is initialized
-			 and potentially screw up early class loading order
-			*/
 			factory = transformers.get(name);
 			if (factory == null || !factory.isActive() || isServerSide())
 				return basicClass;
@@ -111,6 +106,6 @@ public class TC4Transformer implements IClassTransformer {
 	}
 
 	private static boolean isServerSide() {
-		return FMLCommonHandler.instance().getSide() == Side.SERVER;
+		return FMLLaunchHandler.side() == Side.SERVER;
 	}
 }
