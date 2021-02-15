@@ -15,6 +15,7 @@ public class MappingThreadVisitor extends ClassVisitor {
 		@Override
 		public void visitCode() {
 			super.visitCode();
+			TC4Transformer.log.debug("Injecting thread priority change");
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
 			mv.visitInsn(ICONST_1);
 			mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "setPriority", "(I)V", false);
@@ -23,8 +24,10 @@ public class MappingThreadVisitor extends ClassVisitor {
 		@Override
 		public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
 			super.visitMethodInsn(opcode, owner, name, desc, itf);
-			if (opcode == INVOKEINTERFACE && "java/util/Iterator".equals(owner) && "next".equals(name))
+			if (opcode == INVOKEINTERFACE && "java/util/Iterator".equals(owner) && "next".equals(name)) {
+				TC4Transformer.log.debug("Injecting callhook before Iterator#next()");
 				mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "onMappingDidWork", "()V", false);
+			}
 		}
 	}
 

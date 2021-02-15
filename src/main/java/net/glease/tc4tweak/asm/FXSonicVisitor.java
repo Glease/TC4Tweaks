@@ -20,6 +20,8 @@ public class FXSonicVisitor extends ClassVisitor {
 		@Override
 		public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 			if (owner.equals("thaumcraft/client/fx/other/FXSonic") && name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
+				TC4Transformer.log.debug("Replacing opcode {} with {}", opcode, opcode - 2);
+				// pop this
 				mv.visitInsn(POP);
 				// (opcode - 2) will translate GETFIELD/PUTFIELD into GETSTATIC/PUTSTATIC
 				super.visitFieldInsn(opcode - 2, owner, name, desc);
@@ -35,8 +37,10 @@ public class FXSonicVisitor extends ClassVisitor {
 
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-		if (name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC))
+		if (name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
+			TC4Transformer.log.debug("Making field model static");
 			return super.visitField(access | ACC_STATIC, name, desc, signature, value);
+		}
 		return super.visitField(access, name, desc, signature, value);
 	}
 

@@ -15,6 +15,7 @@ public class GuiResearchRecipeVisitor extends ClassVisitor {
 		@Override
 		public void visitCode() {
 			super.visitCode();
+			TC4Transformer.log.debug("Injecting callhook at head of getFromCache");
 			mv.visitMethodInsn(INVOKESTATIC, MyConstants.ASMCALLHOOK_INTERNAL_NAME, "onCacheLookupHead", "()V", false);
 		}
 	}
@@ -25,10 +26,14 @@ public class GuiResearchRecipeVisitor extends ClassVisitor {
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		if (("putToCache".equals(name) && "(ILnet/minecraft/item/ItemStack;)V".equals(desc)))
+		if (("putToCache".equals(name) && "(ILnet/minecraft/item/ItemStack;)V".equals(desc))) {
+			TC4Transformer.log.debug("Removing ACC_SYNCHRONIZED from putToCache");
 			return super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions);
-		if ("getFromCache".equals(name) && "(I)Lnet/minecraft/item/ItemStack;".equals(desc))
+		}
+		if ("getFromCache".equals(name) && "(I)Lnet/minecraft/item/ItemStack;".equals(desc)) {
+			TC4Transformer.log.debug("Removing ACC_SYNCHRONIZED from getFromCache");
 			return new GetFromCacheVisitor(api, super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions));
+		}
 		return super.visitMethod(access, name, desc, signature, exceptions);
 	}
 }
