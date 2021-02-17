@@ -129,9 +129,37 @@ public class ASMCallhookServer {
 	}
 
 	/**
+	 * give hash as if the whole thing was a string: {@code (earlierString+Integer.toString(number)).hashCode()}
+	 *
+	 * @param hash   {@code earlierString.hashCode()}
+	 * @param number the number part
+	 */
+	private static int updateHash(int hash, int number) {
+		return updateHash(hash, Integer.toString(number));
+	}
+
+	/**
+	 * give hash as if the whole thing was a string: {@code (earlierString+later).hashCode()}
+	 *
+	 * @param hash  {@code earlierString.hashCode()}
+	 * @param later the later part
+	 */
+	private static int updateHash(int hash, String later) {
+		// this has to be done this way to preserve integer overflow behavior
+		int length = later.length();
+		for (int i = 0; i < length; i++) {
+			hash = hash * 31 + later.charAt(i);
+		}
+		return hash;
+	}
+
+	/**
 	 * Replacement of {@link thaumcraft.common.lib.research.ScanManager#generateItemHash(Item, int)}.
 	 * Basically remove all string creation. Blocks of logic is rearranged to minimize unnecessary hash generation
 	 * The returned hash code should be the same.
+	 * <p>
+	 * ALERT!!!
+	 * This hashCode is persisted across server restarts. Changing it means all scanned data will be lost!
 	 */
 	@Callhook
 	public static int generateItemHash(Item item, int meta) {
@@ -144,12 +172,13 @@ public class ASMCallhookServer {
 		} catch (Exception ignored) {
 		}
 
-		final int[] value = ThaumcraftApi.groupedObjectTags.get(Arrays.asList(item, meta));
+		List<Object> key = Arrays.asList(item, meta);
+		final int[] value = ThaumcraftApi.groupedObjectTags.get(key);
 		if (value != null) {
 			meta = value[0];
 		}
 
-		if (ThaumcraftApi.objectTags.containsKey(Arrays.asList(item, meta))) {
+		if (ThaumcraftApi.objectTags.containsKey(key)) {
 			return hash(item, meta, t);
 		}
 
@@ -161,9 +190,10 @@ public class ASMCallhookServer {
 				if (Arrays.binarySearch(range, meta) >= 0) {
 					GameRegistry.UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
 					int hash = ui != null ? ui.hashCode() : t.getUnlocalizedName().hashCode();
+					hash = hash * 31 + ':';
 
 					for (int r : range) {
-						hash = hash * 31 * 31 + ':' * 31 + r;
+						hash = updateHash(hash, r);
 					}
 
 					return hash;
@@ -171,27 +201,22 @@ public class ASMCallhookServer {
 			}
 		}
 
-		if (meta != -1 || ThaumcraftApi.objectTags.containsKey(Arrays.asList(item, -1)))
-			return hash(item, meta, t);
-
-
-		for (int i = 0; i < 16; i++) {
-			if (ThaumcraftApi.objectTags.containsKey(Arrays.asList(item, i)))
-				return hash(item, i, t);
+		key.set(1, -1);
+		if (meta == -1 && !ThaumcraftApi.objectTags.containsKey(key)) {
+			for (int i = 0; i < 16; i++) {
+				key.set(1, i);
+				if (ThaumcraftApi.objectTags.containsKey(key))
+					return hash(item, i, t);
+			}
 		}
 		return hash(item, meta, t);
 	}
 
 	private static int hash(Item item, int meta, ItemStack t) {
 		try {
-			int hash;
 			GameRegistry.UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
-			if (ui != null) {
-				hash = ui.modId.hashCode() * 31 * 31 * 31 * 31 + ':' * 31 * 31 * 31 + ui.name.hashCode() * 31 * 31 + ':' * 31 + meta;
-			} else {
-				hash = t.getUnlocalizedName().hashCode() * 31 * 31 + ':' * 31 + meta;
-			}
-			return hash;
+			// this has be done this way to preserve integer overflow behavior
+			return updateHash(ui != null ? updateHash(ui.modId.hashCode() * 31 + ':', ui.name) * 31 + ':' : t.getUnlocalizedName().hashCode() * 31 + ':', meta);
 		} catch (Exception e) {
 			return DEFAULT_NAMESPACE_HASH_BASE + meta;
 		}
