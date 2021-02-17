@@ -86,7 +86,9 @@ public class ClientProxy extends CommonProxy {
 				public void onResourceManagerReload(IResourceManager ignored) {
 					try {
 						fieldModel.set(null, null);
-					} catch (IllegalAccessException err) {
+					} catch (IllegalAccessException | NullPointerException err) {
+						// illegal access exception is impossible
+						// NPE means ASM has failed somehow.
 						err.printStackTrace();
 					}
 				}
