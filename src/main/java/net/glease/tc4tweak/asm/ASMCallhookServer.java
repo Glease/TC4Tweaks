@@ -178,6 +178,7 @@ public class ASMCallhookServer {
 			meta = value[0];
 		}
 
+		key.set(1, meta);
 		if (ThaumcraftApi.objectTags.containsKey(key)) {
 			return hash(item, meta, t);
 		}
