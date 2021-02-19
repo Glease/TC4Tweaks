@@ -4,8 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.POP;
+import static org.objectweb.asm.Opcodes.*;
 
 public class FXSonicVisitor extends ClassVisitor {
 
@@ -21,10 +20,21 @@ public class FXSonicVisitor extends ClassVisitor {
 		public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 			if (owner.equals("thaumcraft/client/fx/other/FXSonic") && name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
 				TC4Transformer.log.debug("Replacing opcode {} with {}", opcode, opcode - 2);
-				// pop this
-				mv.visitInsn(POP);
-				// (opcode - 2) will translate GETFIELD/PUTFIELD into GETSTATIC/PUTSTATIC
-				super.visitFieldInsn(opcode - 2, owner, name, desc);
+				if (opcode == GETFIELD) {
+					// before
+					// ..., this, -> ..., model,
+					// after
+					// ..., this, -> ..., -> ..., model
+					mv.visitInsn(POP);
+					super.visitFieldInsn(GETSTATIC, owner, name, desc);
+				} else if (opcode == PUTFIELD) {
+					// before
+					// ..., this, model -> ...,
+					// after
+					// ..., this, model -> ..., this, -> ...,
+					super.visitFieldInsn(PUTSTATIC, owner, name, desc);
+					mv.visitInsn(POP);
+				}
 			} else {
 				super.visitFieldInsn(opcode, owner, name, desc);
 			}
