@@ -6,9 +6,10 @@ A mod that adds a bit of functionality and a bit of performance into thaumcraft 
 
 ### If you wish to upload to curseforge
 
-If this repo is archived, or you cannot reach me via GitHub Issues, DM on discord or email within 90 full days, you can
-safely assume I have give up maintaining this mod. If I'm no longer maintaining this mod, and you happen to find an
-opportunity to improve it, you can create a fork of this mod and *upload it to curseforge under a different name*,
+If this repo is archived, or you cannot reach me via GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c)
+or email within 90 full days, you can safely assume I have give up maintaining this mod. 
+If I'm no longer maintaining this mod, and you happen to find an opportunity to improve it, you can create a fork of this
+mod and *upload it to curseforge under a different name*,
 provided you still follow the license (AGPL) AND signing the jar with a key.
 
 HOWEVER, please do remember to add the digest of your signing key to list of known keys
