@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.block.Block;
@@ -23,6 +24,7 @@ import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ public class ASMCallhookServer {
 	// arcane crafting recipe speed up
 	// thread local to make integrated server happy
 	private static ThreadLocal<LinkedList<IArcaneRecipe>> arcaneCraftingHistory = null;
+	private static ConcurrentHashMap<List<?>, int[]> groupedObjectTags;
 
 	private static IArcaneRecipe findArcaneRecipe(IInventory inv, EntityPlayer player) {
 		if (arcaneCraftingHistory != null) {
@@ -173,7 +176,7 @@ public class ASMCallhookServer {
 		}
 
 		List<Object> key = Arrays.asList(item, meta);
-		final int[] value = ThaumcraftApi.groupedObjectTags.get(key);
+		final int[] value = getGroupedObjectTags().get(key);
 		if (value != null) {
 			meta = value[0];
 		}
@@ -244,5 +247,20 @@ public class ASMCallhookServer {
 				tileEntity.setInventorySlotContentsSoftly(9, ThaumcraftCraftingManager.findMatchingArcaneRecipe(tileEntity, ip.player));
 			}
 		}
+	}
+
+	private static ConcurrentHashMap<List<?>, int[]> getGroupedObjectTags() {
+		if (groupedObjectTags == null) {
+			synchronized (ASMCallhookServer.class) {
+				if (groupedObjectTags == null) {
+					try {
+						groupedObjectTags = ReflectionHelper.getPrivateValue(ThaumcraftApi.class, null, "groupedObjectTags");
+					} catch (Exception e) {
+						groupedObjectTags = new ConcurrentHashMap<>();
+					}
+				}
+			}
+		}
+		return groupedObjectTags;
 	}
 }
