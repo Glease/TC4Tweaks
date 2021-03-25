@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+## Mod Version
+e.g. 1.0.0
+
 ## Describe the bug
 A clear and concise description of what the bug is.
 
@@ -16,6 +19,9 @@ Steps to reproduce the behavior:
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+
+**FAILURE TO INCLUDE THIS SECTION WILL CAUSE YOUR ISSUE TO BE CLOSED IMMEDIATELY.** 
+Your issue will not be considered until you added this section back.
 
 ## Expected behavior
 A clear and concise description of what you expected to happen.
