@@ -81,6 +81,7 @@ public class ClientProxy extends CommonProxy {
 		FMLCommonHandler.instance().bus().register(instance);
 		final IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		if (resourceManager instanceof IReloadableResourceManager) {
+			//noinspection Convert2Lambda
 			((IReloadableResourceManager) resourceManager).registerReloadListener(new IResourceManagerReloadListener() {
 				@Override
 				public void onResourceManagerReload(IResourceManager ignored) {

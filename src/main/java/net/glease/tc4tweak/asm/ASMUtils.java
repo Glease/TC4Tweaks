@@ -30,7 +30,7 @@ public final class ASMUtils {
 		} else {
 			mv.visitVarInsn(ALOAD, 0);
 			base = 1;
-			targetDesc = '(' + Type.getObjectType(clazz).getDescriptor() + desc.substring(1, desc.length());
+			targetDesc = '(' + Type.getObjectType(clazz).getDescriptor() + desc.substring(1);
 		}
 
 		mv.visitCode();

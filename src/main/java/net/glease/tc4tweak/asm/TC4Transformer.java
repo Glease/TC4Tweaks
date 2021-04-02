@@ -1,7 +1,6 @@
 package net.glease.tc4tweak.asm;
 
 import com.google.common.collect.ImmutableMap;
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.launchwrapper.IClassTransformer;
@@ -12,9 +11,9 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import static org.objectweb.asm.Opcodes.ASM5;
@@ -49,16 +48,18 @@ public class TC4Transformer implements IClassTransformer {
 		log.info("Transforming class {}", name);
 		ClassReader cr = new ClassReader(basicClass);
 		ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
+		boolean success = false;
 		// we are very probably the last one to run.
 		try {
 			if (DEBUG) {
-				try (PrintWriter pw = new PrintWriter(name + ".txt", "UTF-8")) {
-					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
-				} catch (FileNotFoundException | UnsupportedEncodingException e) {
-					log.warn("Unable to dump debug output", e);
-					cr.accept(factory.apply(ASM5, cw), ClassReader.SKIP_DEBUG);
+				try (PrintWriter pw = new PrintWriter(new File(debugOutputDir, name + ".txt"), "UTF-8")) {
+					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? 0 : ClassReader.SKIP_FRAMES);
+					success = true;
+				} catch (IOException e) {
+					log.warn("Unable to dump debug output. Redoing transform without debug!", e);
 				}
-			} else {
+			}
+			if (!success) {
 				cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG));
 			}
 		} catch (Exception e) {
@@ -74,10 +75,6 @@ public class TC4Transformer implements IClassTransformer {
 			}
 		}
 		return transformedBytes;
-	}
-
-	private static boolean isServerSide() {
-		return FMLLaunchHandler.side() == Side.SERVER;
 	}
 
 	private static class Util {
