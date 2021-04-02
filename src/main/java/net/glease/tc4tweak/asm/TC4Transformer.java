@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import static net.glease.tc4tweak.asm.LoadingPlugin.debugOutputDir;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 public class TC4Transformer implements IClassTransformer {
@@ -28,6 +29,7 @@ public class TC4Transformer implements IClassTransformer {
 			.put("thaumcraft.common.tiles.TileMagicWorkbench", new TransformerFactory(TileMagicWorkbenchVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.fx.other.FXSonic", new TransformerFactory(FXSonicVisitor::new, Side.CLIENT))
 			.put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
+			.put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
 			.put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
 			.put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, false))
 			.put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
