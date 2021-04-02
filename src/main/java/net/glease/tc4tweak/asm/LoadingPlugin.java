@@ -34,7 +34,9 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 	public void injectData(Map<String, Object> data) {
 		dev = !(boolean) data.get("runtimeDeobfuscationEnabled");
 		gt6 = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Greg-ASM"));
-
+		debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
+		//noinspection ResultOfMethodCallIgnored
+		debugOutputDir.mkdir();
 	}
 
 	@Override
