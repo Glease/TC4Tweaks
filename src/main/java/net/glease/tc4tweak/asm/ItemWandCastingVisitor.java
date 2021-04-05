@@ -34,7 +34,8 @@ class ItemWandCastingVisitor extends ClassVisitor {
 		@Override
 		public void visitJumpInsn(int opcode, Label label) {
 			super.visitJumpInsn(opcode, label);
-			elseBranchStart = label;
+			if (elseBranchStart == null)
+				elseBranchStart = label;
 		}
 
 		@Override
