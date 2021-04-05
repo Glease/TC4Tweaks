@@ -14,17 +14,18 @@ class ResearchCategoriesVisitor extends ClassVisitor {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		final MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-		if (!name.equals("getResearch") || !desc.equals("(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;")) {
+		if (name.equals("getResearch") && desc.equals("(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;")) {
+			TC4Transformer.log.debug("Replacing getResearch(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;");
+			mv.visitParameter("key", 0);
+			mv.visitCode();
+			mv.visitVarInsn(ALOAD, 0);
+			mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, name, desc, false);
+			mv.visitInsn(ARETURN);
+			mv.visitMaxs(1, 1);
+			mv.visitEnd();
+			return null;
+		} else {
 			return mv;
 		}
-		TC4Transformer.log.debug("Replacing {}", name);
-		mv.visitParameter("key", 0);
-		mv.visitCode();
-		mv.visitVarInsn(ALOAD, 0);
-		mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, name, desc, false);
-		mv.visitInsn(ARETURN);
-		mv.visitMaxs(1, 1);
-		mv.visitEnd();
-		return null;
 	}
 }

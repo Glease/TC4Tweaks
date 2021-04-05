@@ -12,7 +12,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ public class TC4Transformer implements IClassTransformer {
 			.put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
 			.put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
 			.put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
-			.put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, false))
+			.put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
 			.put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
 			.put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
 				@Override
@@ -53,17 +52,7 @@ public class TC4Transformer implements IClassTransformer {
 		boolean success = false;
 		// we are very probably the last one to run.
 		try {
-			if (DEBUG) {
-				try (PrintWriter pw = new PrintWriter(new File(debugOutputDir, name + ".txt"), "UTF-8")) {
-					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? 0 : ClassReader.SKIP_FRAMES);
-					success = true;
-				} catch (IOException e) {
-					log.warn("Unable to dump debug output. Redoing transform without debug!", e);
-				}
-			}
-			if (!success) {
-				cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG));
-			}
+			cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0));
 		} catch (Exception e) {
 			Util.catching(e);
 		}
@@ -74,6 +63,14 @@ public class TC4Transformer implements IClassTransformer {
 			} else {
 				log.fatal("Null or empty byte array created. Transforming will rollback as a last effort attempt to make things work! However features will not function!");
 				return basicClass;
+			}
+		} else {
+			if (DEBUG) {
+				try (PrintWriter pw = new PrintWriter(new File(debugOutputDir, name + ".txt"), "UTF-8")) {
+					new ClassReader(transformedBytes).accept(new TraceClassVisitor(pw), 0);
+				} catch (Exception e) {
+					log.warn("Unable to dump debug output!", e);
+				}
 			}
 		}
 		return transformedBytes;

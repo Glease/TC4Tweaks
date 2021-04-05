@@ -12,14 +12,19 @@ public class FXSonicVisitor extends ClassVisitor {
 	private static final String FIELD_MODEL_NAME = "model";
 
 	private static class FieldModelScrubberVisitor extends MethodVisitor {
-		public FieldModelScrubberVisitor(int api, MethodVisitor mv) {
+		private final String name;
+		private final String desc;
+
+		public FieldModelScrubberVisitor(int api, String name, String desc, MethodVisitor mv) {
 			super(api, mv);
+			this.name = name;
+			this.desc = desc;
 		}
 
 		@Override
 		public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 			if (owner.equals("thaumcraft/client/fx/other/FXSonic") && name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
-				TC4Transformer.log.debug("Replacing opcode {} with {}", opcode, opcode - 2);
+				TC4Transformer.log.debug("Replacing opcode {} with {} in method {}{}", opcode, opcode - 2, this.name, this.desc);
 				if (opcode == GETFIELD) {
 					// before
 					// ..., this, -> ..., model,
@@ -50,12 +55,13 @@ public class FXSonicVisitor extends ClassVisitor {
 		if (name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
 			TC4Transformer.log.debug("Making field model static");
 			return super.visitField(access | ACC_STATIC, name, desc, signature, value);
+		} else {
+			return super.visitField(access, name, desc, signature, value);
 		}
-		return super.visitField(access, name, desc, signature, value);
 	}
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		return new FieldModelScrubberVisitor(api, super.visitMethod(access, name, desc, signature, exceptions));
+		return new FieldModelScrubberVisitor(api, name, desc, super.visitMethod(access, name, desc, signature, exceptions));
 	}
 }

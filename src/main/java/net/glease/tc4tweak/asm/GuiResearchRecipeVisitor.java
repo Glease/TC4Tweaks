@@ -29,11 +29,11 @@ class GuiResearchRecipeVisitor extends ClassVisitor {
 		if (("putToCache".equals(name) && "(ILnet/minecraft/item/ItemStack;)V".equals(desc))) {
 			TC4Transformer.log.debug("Removing ACC_SYNCHRONIZED from putToCache");
 			return super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions);
-		}
-		if ("getFromCache".equals(name) && "(I)Lnet/minecraft/item/ItemStack;".equals(desc)) {
+		} else if ("getFromCache".equals(name) && "(I)Lnet/minecraft/item/ItemStack;".equals(desc)) {
 			TC4Transformer.log.debug("Removing ACC_SYNCHRONIZED from getFromCache");
 			return new GetFromCacheVisitor(api, super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions));
+		} else {
+			return super.visitMethod(access, name, desc, signature, exceptions);
 		}
-		return super.visitMethod(access, name, desc, signature, exceptions);
 	}
 }
