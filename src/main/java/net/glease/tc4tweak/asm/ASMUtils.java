@@ -5,7 +5,7 @@ import org.objectweb.asm.Type;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public final class ASMUtils {
+final class ASMUtils {
 	private ASMUtils() {
 
 	}

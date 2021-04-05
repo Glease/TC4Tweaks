@@ -6,7 +6,7 @@ import org.objectweb.asm.MethodVisitor;
 import static org.objectweb.asm.Opcodes.ACC_SYNCHRONIZED;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-public class GuiResearchRecipeVisitor extends ClassVisitor {
+class GuiResearchRecipeVisitor extends ClassVisitor {
 	private static class GetFromCacheVisitor extends MethodVisitor {
 		public GetFromCacheVisitor(int api, MethodVisitor mv) {
 			super(api, mv);
@@ -16,7 +16,7 @@ public class GuiResearchRecipeVisitor extends ClassVisitor {
 		public void visitCode() {
 			super.visitCode();
 			TC4Transformer.log.debug("Injecting callhook at head of getFromCache");
-			mv.visitMethodInsn(INVOKESTATIC, MyConstants.ASMCALLHOOK_INTERNAL_NAME, "onCacheLookupHead", "()V", false);
+			mv.visitMethodInsn(INVOKESTATIC, ASMConstants.ASMCALLHOOK_INTERNAL_NAME, "onCacheLookupHead", "()V", false);
 		}
 	}
 

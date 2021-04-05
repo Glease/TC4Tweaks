@@ -3,10 +3,10 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOK_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
-public class MappingThreadVisitor extends ClassVisitor {
+class MappingThreadVisitor extends ClassVisitor {
 	private static class RunVisitor extends MethodVisitor {
 		public RunVisitor(int api, MethodVisitor mv) {
 			super(api, mv);

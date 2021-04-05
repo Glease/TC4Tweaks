@@ -7,10 +7,10 @@ import org.objectweb.asm.MethodVisitor;
 
 import java.util.Map;
 
-import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
-public class ThaumcraftCraftingManagerVisitor extends ClassVisitor {
+class ThaumcraftCraftingManagerVisitor extends ClassVisitor {
 	private static final Map<String, String> METHODS_TO_DEFLECT = ImmutableMap.of(
 			"getObjectTags", "(Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;",
 			"findMatchingArcaneRecipe", "(Lnet/minecraft/inventory/IInventory;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;",

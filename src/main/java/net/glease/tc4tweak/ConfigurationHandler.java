@@ -3,7 +3,7 @@ package net.glease.tc4tweak;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.glease.tc4tweak.asm.ASMCallhookServer;
+import net.glease.tc4tweak.modules.FlushableCache;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public enum ConfigurationHandler {
 	public void onConfigChange(ConfigChangedEvent.PostConfigChangedEvent e) {
 		if (e.modID.equals(TC4Tweak.MOD_ID)) {
 			loadConfig();
-			ASMCallhookServer.flushAllCache(false);
+			FlushableCache.enableAll(false);
 		}
 	}
 

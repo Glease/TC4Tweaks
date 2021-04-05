@@ -3,7 +3,7 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
 class ResearchCategoriesVisitor extends ClassVisitor {

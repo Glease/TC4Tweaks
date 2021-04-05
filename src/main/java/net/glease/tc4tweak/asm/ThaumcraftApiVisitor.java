@@ -3,11 +3,11 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
 
-public class ThaumcraftApiVisitor extends ClassVisitor {
+class ThaumcraftApiVisitor extends ClassVisitor {
 	public ThaumcraftApiVisitor(int api, ClassVisitor cv) {
 		super(api, cv);
 	}
