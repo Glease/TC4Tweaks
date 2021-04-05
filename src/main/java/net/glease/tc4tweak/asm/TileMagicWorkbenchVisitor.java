@@ -14,6 +14,7 @@ class TileMagicWorkbenchVisitor extends ClassVisitor {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		if (name.equals("func_70299_a") || name.equals("setInventorySlotContents") && desc.equals("(ILnet/minecraft/item/ItemStack;)V")) {
+			TC4Transformer.log.debug("Altering {}(ILnet/minecraft/item/ItemStack;)V", name);
 			return new SetInventorySlotContentsVisitor(api, super.visitMethod(access, name, desc, signature, exceptions));
 		}
 		return super.visitMethod(access, name, desc, signature, exceptions);

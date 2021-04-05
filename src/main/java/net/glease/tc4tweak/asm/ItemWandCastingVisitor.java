@@ -19,8 +19,9 @@ class ItemWandCastingVisitor extends ClassVisitor {
 				("getFocusItem".equals(name) && "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;".equals(desc))) {
 			TC4Transformer.log.debug("Visiting method {}", name);
 			return new LoadItemStackNullCheckVisitor(api, mv);
+		} else {
+			return mv;
 		}
-		return mv;
 	}
 
 	private static class LoadItemStackNullCheckVisitor extends MethodVisitor {

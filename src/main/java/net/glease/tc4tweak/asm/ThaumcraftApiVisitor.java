@@ -15,9 +15,12 @@ class ThaumcraftApiVisitor extends ClassVisitor {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
 		MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-		if ("<clinit>".equals(name) && "()V".equals(desc))
+		if ("<clinit>".equals(name) && "()V".equals(desc)) {
+			TC4Transformer.log.debug("Adding callhook to end of clinit");
 			return new ClinitVisitor(api, mv);
-		return mv;
+		} else {
+			return mv;
+		}
 	}
 
 	private static class ClinitVisitor extends MethodVisitor {

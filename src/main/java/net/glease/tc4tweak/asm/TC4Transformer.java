@@ -55,14 +55,14 @@ public class TC4Transformer implements IClassTransformer {
 		try {
 			if (DEBUG) {
 				try (PrintWriter pw = new PrintWriter(new File(debugOutputDir, name + ".txt"), "UTF-8")) {
-					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? 0 : ClassReader.SKIP_FRAMES);
+					cr.accept(factory.apply(ASM5, new TraceClassVisitor(cw, pw)), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
 					success = true;
 				} catch (IOException e) {
 					log.warn("Unable to dump debug output. Redoing transform without debug!", e);
 				}
 			}
 			if (!success) {
-				cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_DEBUG : ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG));
+				cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0));
 			}
 		} catch (Exception e) {
 			Util.catching(e);
