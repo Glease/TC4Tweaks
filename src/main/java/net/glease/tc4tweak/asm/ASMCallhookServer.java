@@ -430,17 +430,45 @@ public class ASMCallhookServer {
 		return ThaumcraftCraftingManager.generateTags(item, meta);
 	}
 
+	private interface ObjectTagsMutation {
+		void accept(TIntObjectMap<AspectList> submap, int meta);
+	}
+
 	@SuppressWarnings("rawtypes")
 	private static class InterceptingConcurrentHashMap extends ConcurrentHashMap<List, AspectList> {
 		@Override
 		public AspectList put(List key, AspectList value) {
-			if (objectTags != null) {
-				Item item = (Item) key.get(0);
+			mutateObjectTagsSubmap(key, (submap, meta) -> submap.put(meta, value));
+			return super.put(key, value);
+		}
+
+		@Override
+		public AspectList remove(Object key) {
+			if (key instanceof List) mutateObjectTagsSubmap((List<?>) key, TIntObjectMap::remove);
+			return super.remove(key);
+		}
+
+		@Override
+		public boolean remove(Object key, Object value) {
+			if (key instanceof List && value instanceof AspectList) {
+				mutateObjectTagsSubmap((List<?>) key, (submap, meta) -> {
+					if (value.equals(submap.get(meta))) submap.remove(meta);
+				});
+			}
+			return super.remove(key, value);
+		}
+	}
+
+	private static void mutateObjectTagsSubmap(List<?> key, ObjectTagsMutation action) {
+		if (objectTags != null) {
+			Item item = (Item) key.get(0);
+			if (key.get(1) instanceof int[]) {
 				int[] metas = (int[]) key.get(1);
 				TIntObjectMap<AspectList> submap = objectTags.computeIfAbsent(item, k -> new TIntObjectHashMap<>(metas.length));
-				for (int meta : metas) submap.put(meta, value);
+				for (int meta : metas) action.accept(submap, meta);
+			} else if (key.get(1) instanceof Integer) {
+				action.accept(objectTags.computeIfAbsent(item, k -> new TIntObjectHashMap<>()), ((Integer) key.get(1)));
 			}
-			return super.put(key, value);
 		}
 	}
 
