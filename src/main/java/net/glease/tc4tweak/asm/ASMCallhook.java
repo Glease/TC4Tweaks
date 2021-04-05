@@ -15,6 +15,9 @@ public class ASMCallhook {
 	private static final AtomicBoolean cacheUsed = new AtomicBoolean(false);
 	private static boolean priorityChanged = false;
 
+	private ASMCallhook() {
+	}
+
 	/**
 	 * Called from {@link thaumcraft.client.gui.GuiResearchRecipe#getFromCache(int)}
 	 */

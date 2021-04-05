@@ -4,7 +4,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.relauncher.Side;
-import net.glease.tc4tweak.asm.ASMCallhookServer;
+import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 
@@ -19,7 +19,7 @@ public class CommonProxy {
 	}
 
 	public void serverStarted(FMLServerStartedEvent e) {
-		ASMCallhookServer.flushAllCache(true);
+		FlushableCache.enableAll(true);
 		NetworkedConfiguration.resetCheckWorkbenchRecipes();
 	}
 }

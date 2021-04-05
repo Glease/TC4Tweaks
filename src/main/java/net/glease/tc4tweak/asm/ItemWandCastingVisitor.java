@@ -4,10 +4,10 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-import static net.glease.tc4tweak.asm.MyConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
-public class ItemWandCastingVisitor extends ClassVisitor {
+class ItemWandCastingVisitor extends ClassVisitor {
 	public ItemWandCastingVisitor(int api, ClassVisitor cv) {
 		super(api, cv);
 	}

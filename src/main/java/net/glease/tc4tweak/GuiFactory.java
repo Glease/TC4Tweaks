@@ -7,6 +7,10 @@ import net.minecraft.client.gui.GuiScreen;
 import java.util.Set;
 
 public class GuiFactory implements IModGuiFactory {
+	@SuppressWarnings("unused")
+	public GuiFactory() {
+	}
+
 	@Override
 	public void initialize(Minecraft minecraftInstance) {
 	}
