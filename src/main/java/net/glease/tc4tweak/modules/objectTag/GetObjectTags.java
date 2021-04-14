@@ -40,6 +40,9 @@ public class GetObjectTags {
 			return null;
 		}
 
+		if (item == null)
+			return null;
+
 		AspectList tmp = getBaseObjectTags(item, meta);
 		if (tmp == null)
 			tmp = ThaumcraftApi.objectTags.get(Arrays.asList(item, meta));
