@@ -26,7 +26,7 @@ apply plugin: 'forge'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.2.0-rc3"
+version = "1.2.0-rc4"
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 

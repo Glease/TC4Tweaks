@@ -40,7 +40,7 @@ public enum ConfigurationHandler {
 		checkWorkbenchRecipes = config.getBoolean("checkWorkbenchRecipes", "general", true, "When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken.");
 		arcaneCraftingHistorySize = config.getInt("arcaneCraftingHistorySize", "general", 16, 0, 256, "The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server.");
 		// if allow checking (vanilla behavior) no need to force client to have this mod
-		TC4Tweak.INSTANCE.setAllowAll(!checkWorkbenchRecipes);
+		TC4Tweak.INSTANCE.setAllowAll(checkWorkbenchRecipes);
 		TC4Tweak.INSTANCE.detectAndSendConfigChanges();
 		config.save();
 	}
