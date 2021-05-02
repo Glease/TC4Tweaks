@@ -23,25 +23,26 @@ public enum ConfigurationHandler {
 
 	void init(File f) {
 		config = new Configuration(f);
-		loadConfig();
+		loadConfig(false);
 	}
 
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent.PostConfigChangedEvent e) {
 		if (e.modID.equals(TC4Tweak.MOD_ID)) {
-			loadConfig();
+			loadConfig(true);
 			FlushableCache.enableAll(false);
 		}
 	}
 
-	private void loadConfig() {
+	private void loadConfig(boolean send) {
 		inverted = config.getBoolean("inverted", "general", false, "Flip it if you find the scrolling unintuitive");
 		updateInterval = config.getInt("updateInterval", "general", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
 		checkWorkbenchRecipes = config.getBoolean("checkWorkbenchRecipes", "general", true, "When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken.");
 		arcaneCraftingHistorySize = config.getInt("arcaneCraftingHistorySize", "general", 16, 0, 256, "The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server.");
 		// if allow checking (vanilla behavior) no need to force client to have this mod
-		TC4Tweak.INSTANCE.setAllowAll(!checkWorkbenchRecipes);
-		TC4Tweak.INSTANCE.detectAndSendConfigChanges();
+		TC4Tweak.INSTANCE.setAllowAll(checkWorkbenchRecipes);
+		if (send)
+			TC4Tweak.INSTANCE.detectAndSendConfigChanges();
 		config.save();
 	}
 
