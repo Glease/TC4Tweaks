@@ -26,7 +26,7 @@ apply plugin: 'forge'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.2.0-rc5"
+version = "1.2.0"
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 
@@ -135,6 +135,7 @@ task createSignedJarDir() {
 
 task generateGitChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
     file = new File("CHANGELOG.md")
+    toRef = "HEAD"
     templateContent = """<!-- Generated file. DO NOT HAND EDIT!!! -->
 # Change log
 Change log generated from git history.
