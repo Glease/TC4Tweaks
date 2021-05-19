@@ -99,7 +99,7 @@ public class ClientProxy extends CommonProxy {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onTooltip(ItemTooltipEvent e) {
-		if (e.itemStack != null) {
+		if (ConfigurationHandler.INSTANCE.isAddTooltip() && e.itemStack != null) {
 			if (e.itemStack.getItem() == ConfigItems.itemResearchNotes)
 				e.toolTip.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("tc4tweaks.enabled_scrolling"));
 			else if (e.itemStack.getItem() == ConfigItems.itemWandCasting) {
