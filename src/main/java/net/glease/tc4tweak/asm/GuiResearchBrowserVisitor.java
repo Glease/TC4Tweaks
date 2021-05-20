@@ -7,13 +7,13 @@ import org.objectweb.asm.MethodVisitor;
 import java.util.Map;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_HEIGHT;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_WIDTH;
 import static org.objectweb.asm.Opcodes.*;
 
 public class GuiResearchBrowserVisitor extends ClassVisitor {
-
-    public static final String TARGET_INTERNAL_NAME = "thaumcraft/client/gui/GuiResearchBrowser";
+    private static final String TARGET_INTERNAL_NAME = "thaumcraft/client/gui/GuiResearchBrowser";
 
     private static class UpdateResearchVisitor extends MethodVisitor {
         public UpdateResearchVisitor(int api, MethodVisitor mv) {
@@ -39,6 +39,10 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
             super(api, mv);
         }
 
+        private static boolean isDrawResearchBrowserBackground(String methodName) {
+            return dev ? "drawResearchBrowserBackground".equals(methodName) : "func_73729_b".equals(methodName);
+        }
+
         @Override
         public void visitIntInsn(int opcode, int operand) {
             if (!found112 && operand == 112) {
@@ -60,11 +64,11 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-            if (found112 && !backgroundDrawChanged && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && name.equals("drawTexturedModalRect") && desc.equals("(IIIIII)V")) {
+            if (found112 && !backgroundDrawChanged && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawResearchBrowserBackground(name) && desc.equals("(IIIIII)V")) {
                 backgroundDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBackground");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBackground", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
-            } else if (!borderDrawChanged && counter == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && name.equals("drawTexturedModalRect") && desc.equals("(IIIIII)V")) {
+            } else if (!borderDrawChanged && counter == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawResearchBrowserBackground(name) && desc.equals("(IIIIII)V")) {
                 borderDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBorders");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBorders", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
@@ -76,7 +80,9 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
         @Override
         public void visitEnd() {
             if (!borderDrawChanged)
-                TC4Transformer.log.warn("MISSED INJECT. Research browser resizing will not work!");
+                TC4Transformer.log.warn("MISSED BORDER DRAW INJECT. Research browser resizing will not work!");
+            if (!backgroundDrawChanged)
+                TC4Transformer.log.warn("MISSED BACKGROUND DRAW INJECT. Research browser resizing will not work!");
             super.visitEnd();
         }
     }
