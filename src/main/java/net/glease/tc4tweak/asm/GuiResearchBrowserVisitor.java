@@ -39,8 +39,8 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
             super(api, mv);
         }
 
-        private static boolean isDrawResearchBrowserBackground(String methodName) {
-            return dev ? "drawResearchBrowserBackground".equals(methodName) : "func_73729_b".equals(methodName);
+        private static boolean isDrawTexturedModalRect(String methodName) {
+            return dev ? "drawTexturedModalRect".equals(methodName) : "func_73729_b".equals(methodName);
         }
 
         @Override
@@ -64,11 +64,11 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
 
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-            if (found112 && !backgroundDrawChanged && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawResearchBrowserBackground(name) && desc.equals("(IIIIII)V")) {
+            if (found112 && !backgroundDrawChanged && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
                 backgroundDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBackground");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBackground", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
-            } else if (!borderDrawChanged && counter == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawResearchBrowserBackground(name) && desc.equals("(IIIIII)V")) {
+            } else if (!borderDrawChanged && counter == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
                 borderDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBorders");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBorders", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
