@@ -1,6 +1,9 @@
 package net.glease.tc4tweak.asm;
 
 import net.glease.tc4tweak.ClientProxy;
+import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
+import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
@@ -79,4 +82,46 @@ public class ASMCallhook {
 		}
 	}
 
+	/**
+	 * Draw research browser borders. Called from GuiResearchBrowser#genResearchBackground
+	 */
+	@Callhook
+	public static void drawResearchBrowserBorders(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {
+		DrawResearchBrowserBorders.drawResearchBrowserBorders(gui, x, y, u, v, width, height);
+	}
+
+	@Callhook
+	public static void drawResearchBrowserBackground(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {
+		DrawResearchBrowserBorders.drawResearchBrowserBackground(gui, x, y, u, v, width, height);
+	}
+
+	@Callhook
+	public static int getResearchBrowserHeight() {
+		return ConfigurationHandler.INSTANCE.getBrowserHeight();
+	}
+
+	@Callhook
+	public static int getResearchBrowserWidth() {
+		return ConfigurationHandler.INSTANCE.getBrowserWidth();
+	}
+
+	@Callhook
+	public static int getNewGuiMapTop(int oldVal) {
+		return (int) (oldVal - 85 * (ConfigurationHandler.INSTANCE.getBrowserScale() -1));
+	}
+
+	@Callhook
+	public static int getNewGuiMapLeft(int oldVal) {
+		return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() -1));
+	}
+
+	@Callhook
+	public static int getNewGuiMapBottom(int oldVal) {
+		return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() -1));
+	}
+
+	@Callhook
+	public static int getNewGuiMapRight(int oldVal) {
+		return (int) (oldVal - 61 * (ConfigurationHandler.INSTANCE.getBrowserScale() -1));
+	}
 }

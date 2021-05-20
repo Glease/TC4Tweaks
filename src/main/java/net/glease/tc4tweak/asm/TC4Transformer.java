@@ -22,6 +22,7 @@ public class TC4Transformer implements IClassTransformer {
 	static final Logger log = LogManager.getLogger("TC4TweakTransformer");
 	private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
 	private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
+			.put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
