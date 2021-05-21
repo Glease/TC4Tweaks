@@ -13,7 +13,6 @@ public class DrawResearchBrowserBorders {
     private static final int[][] PARAMS = {{0, 0, 0, 1}, {0, 1, 1, -1}, {1, -1, 1, 0}};
 
     public static void drawResearchBrowserBorders(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {
-//        if (false)
         for (int[] paramX : PARAMS) {
             for (int[] paramY : PARAMS) {
                 drawRectTextured(
