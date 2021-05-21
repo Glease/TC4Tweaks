@@ -2,9 +2,13 @@ package net.glease.tc4tweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 
 @IFMLLoadingPlugin.TransformerExclusions("net.glease.tc4tweak.asm")
 @IFMLLoadingPlugin.MCVersion("1.7.10")
@@ -34,6 +38,19 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 	public void injectData(Map<String, Object> data) {
 		dev = !(boolean) data.get("runtimeDeobfuscationEnabled");
 		gt6 = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Greg-ASM"));
+		if (((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("BTPlugin"))) {
+			if (!GraphicsEnvironment.isHeadless())
+				JOptionPane.showMessageDialog(null, "Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			log.error("#################################################################################");
+			log.error("#################################################################################");
+			log.error("#################################################################################");
+			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			log.error("#################################################################################");
+			log.error("#################################################################################");
+			log.error("#################################################################################");
+		}
 		debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
 		//noinspection ResultOfMethodCallIgnored
 		debugOutputDir.mkdir();

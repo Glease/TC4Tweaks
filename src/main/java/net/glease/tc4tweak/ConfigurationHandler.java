@@ -18,6 +18,8 @@ public enum ConfigurationHandler {
 	private int arcaneCraftingHistorySize;
 	private boolean addTooltip;
 	private float browserScale;
+	private boolean limitBookSearchToCategory;
+
 	private int browserHeight = 230;
 	private int browserWidth = 256;
 
@@ -45,6 +47,7 @@ public enum ConfigurationHandler {
 		arcaneCraftingHistorySize = config.getInt("arcaneCraftingHistorySize", "general", 16, 0, 256, "The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server.");
 		addTooltip = config.getBoolean("addTooltip", "general", true, "If false, no tooltip will be added.");
 		browserScale = config.getFloat("browserScale", "general", 1, 1, 2, "Tweak the size of the book gui.");
+		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "general", false, "Whether the book gui search should search current tab only.");
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
@@ -88,5 +91,9 @@ public enum ConfigurationHandler {
 
 	public int getBrowserWidth() {
 		return browserWidth;
+	}
+
+	public boolean isLimitBookSearchToCategory() {
+		return limitBookSearchToCategory;
 	}
 }

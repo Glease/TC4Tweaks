@@ -2,6 +2,8 @@ package net.glease.tc4tweak;
 
 import com.google.common.collect.ImmutableMap;
 import cpw.mods.fml.common.*;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
@@ -71,6 +73,16 @@ public class TC4Tweak {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		proxy.preInit(e);
+	}
+
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent e) {
+		proxy.init(e);
+	}
+
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent e) {
+		proxy.postInit(e);
 	}
 
 	@Mod.EventHandler

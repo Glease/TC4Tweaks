@@ -1,11 +1,14 @@
 package net.glease.tc4tweak;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
+import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -94,6 +97,24 @@ public class ClientProxy extends CommonProxy {
 					}
 				}
 			});
+		}
+	}
+
+	@Override
+	public void init(FMLInitializationEvent e) {
+		super.init(e);
+		ThaumonomiconIndexSearcher.init();
+	}
+
+	@Override
+	public void postInit(FMLPostInitializationEvent e) {
+		super.postInit(e);
+		try {
+			Object wgSearcher = Class.forName("witchinggadgets.client.ThaumonomiconIndexSearcher").getField("instance").get(null);
+			MinecraftForge.EVENT_BUS.unregister(wgSearcher);
+			FMLCommonHandler.instance().bus().unregister(wgSearcher);
+		} catch (ReflectiveOperationException ignored) {
+			// WG is probably installed, ignoring
 		}
 	}
 
