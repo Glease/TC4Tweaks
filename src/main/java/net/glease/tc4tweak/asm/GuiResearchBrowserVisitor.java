@@ -48,6 +48,10 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
             if (!found112 && operand == 112) {
                 TC4Transformer.log.debug("Found 112");
                 found112 = true;
+            } else if (operand == 264) {
+                TC4Transformer.log.debug("Replacing 264 with getTabDistance()");
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getTabDistance", "()I", false);
+                return;
             }
             super.visitIntInsn(opcode, operand);
         }
@@ -127,6 +131,57 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
         }
     }
 
+    private static class LimitResearchCategoryToPageVisitor extends MethodVisitor {
+        private final int maxReplacement;
+        private int replaced = 0;
+
+        public LimitResearchCategoryToPageVisitor(int api, MethodVisitor mv, int maxReplacement) {
+            super(api, mv);
+            this.maxReplacement = maxReplacement;
+        }
+
+        @Override
+        public void visitFieldInsn(int opcode, String owner, String name, String desc) {
+            if (replaced < maxReplacement && opcode == GETSTATIC && "thaumcraft/api/research/ResearchCategories".equals(owner) && "researchCategories".equals(name) && "Ljava/util/LinkedHashMap;".equals(desc)) {
+                TC4Transformer.log.debug("Replacing ResearchCategories.researchCategories with getTabsOnCurrentPage()");
+                super.visitVarInsn(ALOAD, 0);
+                super.visitFieldInsn(GETFIELD, TARGET_INTERNAL_NAME, "player", "Ljava/lang/String;");
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getTabsOnCurrentPage", "(Ljava/lang/String;)Ljava/util/LinkedHashMap;", false);
+                replaced++;
+            } else
+                super.visitFieldInsn(opcode, owner, name, desc);
+        }
+    }
+
+    private static class ConstantToDynamicReplacer extends MethodVisitor {
+        private final int maxReplacement;
+        private final int toReplace;
+        private final String target;
+        private int replaced = 0;
+
+        public ConstantToDynamicReplacer(int api, MethodVisitor mv, int toReplace, String target) {
+            this(api, mv, toReplace, target, 1);
+        }
+
+        public ConstantToDynamicReplacer(int api, MethodVisitor mv, int toReplace, String target, int maxReplacement) {
+            super(api, mv);
+            this.maxReplacement = maxReplacement;
+            this.toReplace = toReplace;
+            this.target = target;
+        }
+
+        @Override
+        public void visitIntInsn(int opcode, int operand) {
+            if (replaced < maxReplacement && operand == toReplace) {
+                TC4Transformer.log.debug("Replacing constant {} with {}()I", toReplace, target);
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, target, "()I", false);
+                replaced++;
+            } else {
+                super.visitIntInsn(opcode, operand);
+            }
+        }
+    }
+
     public GuiResearchBrowserVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }
@@ -136,11 +191,24 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
         MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
         if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
             TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
-            return new GenResearchBackgroundVisitor(api, mv);
+            return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
         } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
             TC4Transformer.log.debug("Visiting updateResearch()V");
-            return new UpdateResearchVisitor(api, mv);
+            return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
+        } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
+                isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting {}{}", name, desc);
+            return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
+                    280, "getTabIconDistance");
         }
         return mv;
+    }
+
+    private static boolean isMouseClickedMethod(String name) {
+        return dev ? "mouseClicked".equals(name) : "func_73864_a".equals(name);
+    }
+
+    private static boolean isDrawScreenMethod(String name) {
+        return dev ? "drawScreen".equals(name) : "func_73863_a".equals(name);
     }
 }

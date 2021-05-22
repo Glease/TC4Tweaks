@@ -19,7 +19,7 @@ public class GuiModConfig extends GuiConfig {
 		List<IConfigElement> elements = new ArrayList<>();
 		final Configuration config = ConfigurationHandler.INSTANCE.getConfig();
 		for (String name : config.getCategoryNames()) {
-			elements.add(new ConfigElement(config.getCategory(name).setLanguageKey("tcscrolling.category." + name)));
+			elements.add(new ConfigElement(config.getCategory(name).setLanguageKey("tc4tweak.category." + name)));
 		}
 		return elements;
 	}

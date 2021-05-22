@@ -8,6 +8,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
+import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.client.Minecraft;
@@ -104,6 +105,7 @@ public class ClientProxy extends CommonProxy {
 	public void init(FMLInitializationEvent e) {
 		super.init(e);
 		ThaumonomiconIndexSearcher.init();
+		BrowserPaging.init();
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.glease.tc4tweak.modules.FlushableCache;
+import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
@@ -52,8 +53,10 @@ public enum ConfigurationHandler {
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
 		TC4Tweak.INSTANCE.setAllowAll(checkWorkbenchRecipes);
-		if (send)
+		if (send) {
 			TC4Tweak.INSTANCE.detectAndSendConfigChanges();
+			BrowserPaging.flushCache();
+		}
 		config.save();
 	}
 
