@@ -49,6 +49,14 @@ Monumental features falls in the category of item 4, thus bypassing the above re
 
 ## Compat
 
+### NotEnoughThaumcraftTabs
+
+Not compatible. This mod supersedes that mod anyway.
+
+### WitchingGadgets
+
+Takes over the WG thaumonomicon index search functionality, to change where its stuff got drawn on higher browser scale.
+
 ### Minetweaker 3
 
 Any kind of reload will invalidate any cache used
