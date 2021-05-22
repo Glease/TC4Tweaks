@@ -147,7 +147,7 @@ public class ThaumonomiconIndexSearcher {
             event.gui.drawTexturedModalRect(thaumSearchField.xPosition + thaumSearchField.width + 6, thaumSearchField.yPosition - 4, 244, 136, 2, thaumSearchField.height + 2);
 
             if ((searchResults == null || searchResults.isEmpty()) && !thaumSearchField.isFocused())
-                event.gui.drawString(event.gui.mc.fontRenderer, StatCollector.translateToLocal("wg.gui.search"), thaumSearchField.xPosition, thaumSearchField.yPosition, 0x777777);
+                event.gui.drawString(event.gui.mc.fontRenderer, StatCollector.translateToLocal("tc4tweaks.gui.search"), thaumSearchField.xPosition, thaumSearchField.yPosition, 0x777777);
             else
                 for (int i = 0; i < 20; i++)
                     if (i + listDisplayOffset < searchResults.size()) {
