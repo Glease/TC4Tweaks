@@ -70,6 +70,7 @@ public class ThaumonomiconIndexSearcher {
 
     @SubscribeEvent
     public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
+        searchResults.clear();
         if (event.gui.getClass().getName().endsWith("GuiResearchBrowser")) {
 			int width = ConfigurationHandler.INSTANCE.getBrowserWidth();
 			int height = ConfigurationHandler.INSTANCE.getBrowserHeight();
