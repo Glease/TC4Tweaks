@@ -98,8 +98,8 @@ public class ThaumonomiconIndexSearcher {
                         if (thaumSearchField.isFocused() && button == 1) {
                             thaumSearchField.setText("");
                             searchResults.clear();
-                        } else if (mx > (event.gui.width / 2 + 128 + (ResearchCategories.researchCategories.size() > 9 ? 24 : 2)) && my > event.gui.height / 2 - 115 && my < event.gui.height / 2 + 115) {
-                            int clicked = my - (event.gui.height / 2 - 109);
+                        } else if (mx > (event.gui.width / 2 + ConfigurationHandler.INSTANCE.getBrowserWidth() / 2 + (ResearchCategories.researchCategories.size() > BrowserPaging.getTabPerSide() ? 24 : 2)) && my > event.gui.height / 2 - ConfigurationHandler.INSTANCE.getBrowserHeight() / 2 && my < event.gui.height / 2 + ConfigurationHandler.INSTANCE.getBrowserHeight() / 2) {
+                            int clicked = my - (event.gui.height / 2 - ConfigurationHandler.INSTANCE.getBrowserHeight() / 2 + 6);
                             clicked /= 11;
                             int selected = clicked + listDisplayOffset;
                             if (selected < searchResults.size()) {
@@ -107,7 +107,7 @@ public class ThaumonomiconIndexSearcher {
                                 event.gui.mc.displayGuiScreen(new GuiResearchRecipe(item, 0, item.displayColumn, item.displayRow));
                             }
                         }
-                    } else if (wheel != 0 && mx > (event.gui.width / 2 + 128 + (ResearchCategories.researchCategories.size() > 9 ? 24 : 2))) {
+                    } else if (wheel != 0 && mx > (event.gui.width / 2 + ConfigurationHandler.INSTANCE.getBrowserWidth() / 2 + (ResearchCategories.researchCategories.size() > BrowserPaging.getTabPerSide() ? 24 : 2))) {
                         if (wheel < 0)
                             listDisplayOffset++;
                         else
@@ -132,7 +132,7 @@ public class ThaumonomiconIndexSearcher {
 
             if (!searchResults.isEmpty()) {
                 UtilsFX.bindTexture("textures/misc/parchment3.png");
-                GL11.glEnable(3042);
+                GL11.glEnable(GL11.GL_BLEND);
                 Tessellator tes = Tessellator.instance;
                 tes.startDrawingQuads();
                 tes.setColorOpaque_I(0xffffff);
