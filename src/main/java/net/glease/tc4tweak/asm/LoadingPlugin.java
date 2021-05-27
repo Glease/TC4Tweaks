@@ -50,6 +50,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 			log.error("#################################################################################");
 			log.error("#################################################################################");
 			log.error("#################################################################################");
+			throw new RuntimeException("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
 		}
 		debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
 		//noinspection ResultOfMethodCallIgnored
