@@ -45,8 +45,10 @@ public class GetObjectTags {
 
 		AspectList tmp = getBaseObjectTags(item, meta);
 		if (tmp == null)
+			// cache disabled, try find it as is
 			tmp = ThaumcraftApi.objectTags.get(Arrays.asList(item, meta));
 		if (tmp == null) {
+			// try wildcard and int[] indexes
 			for (List l : ThaumcraftApi.objectTags.keySet()) {
 				if (l.get(0) == item && l.get(1) instanceof int[]) {
 					int[] range = (int[]) l.get(1);
@@ -68,6 +70,7 @@ public class GetObjectTags {
 					}
 				}
 
+				// regen it
 				if (tmp == null) {
 					tmp = ThaumcraftCraftingManager.generateTags(item, meta);
 				}
@@ -78,7 +81,7 @@ public class GetObjectTags {
 			ItemWandCasting wand = (ItemWandCasting) itemstack.getItem();
 			if (tmp == null) tmp = new AspectList();
 			addWandTags(itemstack, tmp, wand);
-		} else if (item != null && item == Items.potionitem) {
+		} else if (item == Items.potionitem) {
 			if (tmp == null) tmp = new AspectList();
 			addPotionTags(itemstack, (ItemPotion) item, tmp);
 		}
@@ -86,6 +89,7 @@ public class GetObjectTags {
 		if (tmp == null) {
 			return null;
 		} else if (tmp.aspects.values().stream().allMatch(n -> n <= 64)) {
+			// no need to truncate - return as is
 			return tmp;
 		}
 		AspectList out = tmp.copy();
@@ -93,11 +97,17 @@ public class GetObjectTags {
 		return out;
 	}
 
+	/**
+	 * Add wand related aspects
+	 */
 	private static void addWandTags(ItemStack itemstack, AspectList tmp, ItemWandCasting wand) {
 		tmp.merge(Aspect.MAGIC, (wand.getRod(itemstack).getCraftCost() + wand.getCap(itemstack).getCraftCost()) / 2);
 		tmp.merge(Aspect.TOOL, (wand.getRod(itemstack).getCraftCost() + wand.getCap(itemstack).getCraftCost()) / 3);
 	}
 
+	/**
+	 * Add potion related aspects
+	 */
 	@SuppressWarnings("unchecked")
 	private static void addPotionTags(ItemStack itemstack, ItemPotion item, AspectList tmp) {
 		tmp.merge(Aspect.WATER, 1);
@@ -155,6 +165,10 @@ public class GetObjectTags {
 		}
 	}
 
+	/**
+	 * Get base object tags (no enchantment, potion, etc) from the cache. MAY return null if cache is temporarily disabled.
+	 * @return null if cache disabled. non null if cache enabled. might be an empty aspect list if the generateTag failed.
+	 */
 	private static AspectList getBaseObjectTags(Item item, int meta) {
 		ConcurrentMap<Item, TIntObjectMap<AspectList>> cache = GetObjectTags.cache.getCache();
 		if (cache == null)
@@ -171,7 +185,9 @@ public class GetObjectTags {
 				}
 			}
 		}
-		return ThaumcraftCraftingManager.generateTags(item, meta);
+		AspectList aspectList = ThaumcraftCraftingManager.generateTags(item, meta);
+		// do not return null -  u
+		return aspectList == null ? new AspectList() : aspectList;
 	}
 
 	static void mutateObjectTagsSubmap(List<?> key, ObjectTagsMutation action) {
