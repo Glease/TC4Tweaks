@@ -50,7 +50,7 @@ public enum ConfigurationHandler {
 		addTooltip = config.getBoolean("addTooltip", "general", true, "If false, no tooltip will be added.");
 		browserScale = config.getFloat("browserScale", "general", 1, 1, 2, "Tweak the size of the book gui.");
 		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "general", false, "Whether the book gui search should search current tab only.");
-		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "general", 1, 0.5f, 10, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow.");
+		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "general", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
