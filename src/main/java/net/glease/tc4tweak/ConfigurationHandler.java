@@ -20,6 +20,7 @@ public enum ConfigurationHandler {
 	private boolean addTooltip;
 	private float browserScale;
 	private boolean limitBookSearchToCategory;
+	private float nodeVisualSizeLimit;
 
 	private int browserHeight = 230;
 	private int browserWidth = 256;
@@ -49,6 +50,7 @@ public enum ConfigurationHandler {
 		addTooltip = config.getBoolean("addTooltip", "general", true, "If false, no tooltip will be added.");
 		browserScale = config.getFloat("browserScale", "general", 1, 1, 2, "Tweak the size of the book gui.");
 		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "general", false, "Whether the book gui search should search current tab only.");
+		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "general", 1, 0.5f, 10, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow.");
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
@@ -98,5 +100,9 @@ public enum ConfigurationHandler {
 
 	public boolean isLimitBookSearchToCategory() {
 		return limitBookSearchToCategory;
+	}
+
+	public float getNodeVisualSizeLimit() {
+		return nodeVisualSizeLimit;
 	}
 }

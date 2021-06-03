@@ -7,6 +7,7 @@ import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchTable;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
 import java.util.LinkedHashMap;
@@ -83,6 +84,11 @@ public class ASMCallhook {
 				postponed.put(self, null);
 			}
 		}
+	}
+
+	@Callhook
+	public static void renderFacingStrip(double px, double py, double pz, float angle, float scale, float alpha, int frames, int strip, int frame, float partialTicks, int color) {
+		UtilsFX.renderFacingStrip(px, py, pz, angle, Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, frame, partialTicks, color);
 	}
 
 	/**
