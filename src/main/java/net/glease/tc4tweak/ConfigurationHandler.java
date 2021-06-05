@@ -30,7 +30,8 @@ public enum ConfigurationHandler {
 	}
 
 	void init(File f) {
-		config = new Configuration(f);
+		config = new Configuration(f, ConfigurationVersion.latest().getVersionMarker());
+		ConfigurationVersion.migrateToLatest(config);
 		loadConfig(false);
 	}
 
@@ -43,14 +44,16 @@ public enum ConfigurationHandler {
 	}
 
 	private void loadConfig(boolean send) {
-		inverted = config.getBoolean("inverted", "general", false, "Flip it if you find the scrolling unintuitive");
-		updateInterval = config.getInt("updateInterval", "general", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
 		checkWorkbenchRecipes = config.getBoolean("checkWorkbenchRecipes", "general", true, "When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken.");
 		arcaneCraftingHistorySize = config.getInt("arcaneCraftingHistorySize", "general", 16, 0, 256, "The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server.");
-		addTooltip = config.getBoolean("addTooltip", "general", true, "If false, no tooltip will be added.");
-		browserScale = config.getFloat("browserScale", "general", 1, 1, 2, "Tweak the size of the book gui.");
-		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "general", false, "Whether the book gui search should search current tab only.");
-		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "general", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
+
+		inverted = config.getBoolean("inverted", "client", false, "Flip it if you find the scrolling unintuitive");
+		updateInterval = config.getInt("updateInterval", "client", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
+		addTooltip = config.getBoolean("addTooltip", "client", true, "If false, no tooltip will be added.");
+		browserScale = config.getFloat("browserScale", "client", 1, 1, 4, "Tweak the size of the book gui.");
+		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "client", false, "Whether the book gui search should search current tab only.");
+		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
+
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
