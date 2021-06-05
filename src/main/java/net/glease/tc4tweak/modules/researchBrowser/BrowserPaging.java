@@ -194,7 +194,11 @@ public class BrowserPaging {
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public void onGuiInitPre(GuiScreenEvent.InitGuiEvent.Pre e) {
             if (e.gui instanceof GuiResearchBrowser && ConfigurationHandler.INSTANCE.isInferBrowserScale()) {
-                ConfigurationHandler.INSTANCE.setBrowserScale(Math.max(1, Math.min(((float) e.gui.width - BORDER_WIDTH) / TEXTURE_WIDTH, ((float) e.gui.height - BORDER_HEIGHT) / TEXTURE_HEIGHT)));
+                int searchAreaSizeTimesTwo = ConfigurationHandler.INSTANCE.isInferBrowserScaleConsiderSearch() ? ThaumonomiconIndexSearcher.getResultDisplayAreaWidth(e.gui) * 2 : 0;
+                // factors to consider:
+                // width: browser itself. tab icons on both sides. search area. a visual gap (BORDER_WIDTH * 2) between the furthest element and window border
+                // height: browser itself. a visual gap (BORDER_HEIGHT * 2) between the furthest element and window border
+                ConfigurationHandler.INSTANCE.setBrowserScale(Math.max(1, Math.min(((float) e.gui.width - BORDER_WIDTH * 2 - searchAreaSizeTimesTwo - 24 * Math.min(2, ResearchCategories.researchCategories.size() / getTabPerSide())) / TEXTURE_WIDTH, ((float) e.gui.height - BORDER_HEIGHT * 2) / TEXTURE_HEIGHT)));
             }
         }
 

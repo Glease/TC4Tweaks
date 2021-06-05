@@ -5,6 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.EnumChatFormatting;
@@ -126,9 +127,9 @@ public class ThaumonomiconIndexSearcher {
     @SubscribeEvent
     public void onGuiPostDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
         if (thaumSearchField != null) {
-            int x = event.gui.width / 2 + ConfigurationHandler.INSTANCE.getBrowserWidth() / 2 + (ResearchCategories.researchCategories.size() > 9 ? 24 : 0);
+            int x = getResultDisplayAreaX(event.gui);
             int y = event.gui.height / 2 - ConfigurationHandler.INSTANCE.getBrowserHeight() / 2;
-            int maxWidth = Math.min(event.gui.width - x, 224);
+            int maxWidth = getResultDisplayAreaWidth(event.gui);
 
             if (!searchResults.isEmpty()) {
                 UtilsFX.bindTexture("textures/misc/parchment3.png");
@@ -159,6 +160,14 @@ public class ThaumonomiconIndexSearcher {
 
             thaumSearchField.drawTextBox();
         }
+    }
+
+    static int getResultDisplayAreaWidth(GuiScreen gui) {
+        return Math.min(gui.width - getResultDisplayAreaX(gui), 224);
+    }
+
+    static int getResultDisplayAreaX(GuiScreen gui) {
+        return gui.width / 2 + ConfigurationHandler.INSTANCE.getBrowserWidth() / 2 + (ResearchCategories.researchCategories.size() > BrowserPaging.getTabPerSide() ? 24 : 0);
     }
 
     @SubscribeEvent

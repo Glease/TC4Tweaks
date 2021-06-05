@@ -24,6 +24,7 @@ public enum ConfigurationHandler {
 	private boolean inferBrowserScale;
 	private float inferBrowserScaleUpperBound;
 	private float inferBrowserScaleLowerBound;
+	private boolean inferBrowserScaleConsiderSearch;
 
 	private int browserHeight = 230;
 	private int browserWidth = 256;
@@ -59,6 +60,7 @@ public enum ConfigurationHandler {
 		inferBrowserScale = config.getBoolean("inferBrowserScale", "client", true, "Tweak the size of the book gui based on screen size automatically. The value of browserScale set manually will not function any more.");
 		inferBrowserScaleUpperBound = config.getFloat("inferBrowserScaleUpperBound", "client", 4, 1, 16, "The upper bound of inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
 		inferBrowserScaleLowerBound = config.getFloat("inferBrowserScaleLowerBound", "client", 1, 1, 16, "The lower bound of inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
+		inferBrowserScaleConsiderSearch = config.getBoolean("inferBrowserScaleConsiderSearch", "client", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
 
 		// validation
 		if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -127,5 +129,9 @@ public enum ConfigurationHandler {
 
 	public boolean isInferBrowserScale() {
 		return inferBrowserScale;
+	}
+
+	public boolean isInferBrowserScaleConsiderSearch() {
+		return inferBrowserScaleConsiderSearch;
 	}
 }
