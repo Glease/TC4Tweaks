@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.modules.researchBrowser;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -22,8 +23,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_HEIGHT;
-import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_WIDTH;
+import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.*;
 
 public class BrowserPaging {
     private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
@@ -47,8 +47,12 @@ public class BrowserPaging {
 
     private static void updateMaxPageIndex(GuiResearchBrowser gui) {
         int tabsPerPage = getTabPerSide() * 2;
-        maxPageIndex = (ResearchCategories.researchCategories.size() - (isEldritchUnlocked(gui) ? 0 : 1) + tabsPerPage) / tabsPerPage - 1;
-        currentPageIndex = Math.min(currentPageIndex, maxPageIndex);
+        int newMaxPageIndex = (ResearchCategories.researchCategories.size() - (isEldritchUnlocked(gui) ? 0 : 1) + tabsPerPage) / tabsPerPage - 1;
+        if (newMaxPageIndex != maxPageIndex) {
+            maxPageIndex = newMaxPageIndex;
+            currentPageIndex = Math.min(currentPageIndex, BrowserPaging.maxPageIndex);
+            currentPageTabs = null;
+        }
     }
 
     public static LinkedHashMap<String, ResearchCategoryList> getTabsOnCurrentPage(String player) {
@@ -187,9 +191,16 @@ public class BrowserPaging {
             }
         }
 
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public void onGuiInitPre(GuiScreenEvent.InitGuiEvent.Pre e) {
+            if (e.gui instanceof GuiResearchBrowser && ConfigurationHandler.INSTANCE.isInferBrowserScale()) {
+                ConfigurationHandler.INSTANCE.setBrowserScale(Math.max(1, Math.min(((float) e.gui.width - BORDER_WIDTH) / TEXTURE_WIDTH, ((float) e.gui.height - BORDER_HEIGHT) / TEXTURE_HEIGHT)));
+            }
+        }
+
         @SubscribeEvent
         @SuppressWarnings("unchecked")
-        public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post e) {
+        public void onGuiInitPost(GuiScreenEvent.InitGuiEvent.Post e) {
             if (e.gui instanceof GuiResearchBrowser) {
                 GuiResearchBrowser gui = (GuiResearchBrowser) e.gui;
                 // 5 here is small gap

@@ -21,6 +21,9 @@ public enum ConfigurationHandler {
 	private float browserScale;
 	private boolean limitBookSearchToCategory;
 	private float nodeVisualSizeLimit;
+	private boolean inferBrowserScale;
+	private float inferBrowserScaleUpperBound;
+	private float inferBrowserScaleLowerBound;
 
 	private int browserHeight = 230;
 	private int browserWidth = 256;
@@ -50,9 +53,16 @@ public enum ConfigurationHandler {
 		inverted = config.getBoolean("inverted", "client", false, "Flip it if you find the scrolling unintuitive");
 		updateInterval = config.getInt("updateInterval", "client", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
 		addTooltip = config.getBoolean("addTooltip", "client", true, "If false, no tooltip will be added.");
-		browserScale = config.getFloat("browserScale", "client", 1, 1, 4, "Tweak the size of the book gui.");
+		browserScale = config.getFloat("browserScale", "client", 1, 1, 4, "Tweak the size of the book gui. No longer works if inferBrowserScale is set to true.");
 		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "client", false, "Whether the book gui search should search current tab only.");
 		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
+		inferBrowserScale = config.getBoolean("inferBrowserScale", "client", true, "Tweak the size of the book gui based on screen size automatically. The value of browserScale set manually will not function any more.");
+		inferBrowserScaleUpperBound = config.getFloat("inferBrowserScaleUpperBound", "client", 4, 1, 16, "The upper bound of inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
+		inferBrowserScaleLowerBound = config.getFloat("inferBrowserScaleLowerBound", "client", 1, 1, 16, "The lower bound of inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
+
+		// validation
+		if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
+			config.getCategory("client").get("inferBrowserScaleLowerBound").set(inferBrowserScaleUpperBound);
 
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
@@ -89,6 +99,12 @@ public enum ConfigurationHandler {
 		return addTooltip;
 	}
 
+	public void setBrowserScale(float browserScale) {
+		this.browserScale = Math.max(Math.min(browserScale, inferBrowserScaleUpperBound), inferBrowserScaleLowerBound);
+		browserWidth = (int) (browserScale * 256);
+		browserHeight = (int) (browserScale * 230);
+	}
+
 	public float getBrowserScale() {
 		return browserScale;
 	}
@@ -107,5 +123,9 @@ public enum ConfigurationHandler {
 
 	public float getNodeVisualSizeLimit() {
 		return nodeVisualSizeLimit;
+	}
+
+	public boolean isInferBrowserScale() {
+		return inferBrowserScale;
 	}
 }
