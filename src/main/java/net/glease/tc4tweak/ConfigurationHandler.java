@@ -21,6 +21,9 @@ public enum ConfigurationHandler {
 	private float browserScale;
 	private boolean limitBookSearchToCategory;
 	private float nodeVisualSizeLimit;
+	private boolean inferBrowserScale;
+	private float inferBrowserScaleUpperBound;
+	private float inferBrowserScaleLowerBound;
 
 	private int browserHeight = 230;
 	private int browserWidth = 256;
@@ -30,7 +33,8 @@ public enum ConfigurationHandler {
 	}
 
 	void init(File f) {
-		config = new Configuration(f);
+		config = new Configuration(f, ConfigurationVersion.latest().getVersionMarker());
+		ConfigurationVersion.migrateToLatest(config);
 		loadConfig(false);
 	}
 
@@ -43,14 +47,23 @@ public enum ConfigurationHandler {
 	}
 
 	private void loadConfig(boolean send) {
-		inverted = config.getBoolean("inverted", "general", false, "Flip it if you find the scrolling unintuitive");
-		updateInterval = config.getInt("updateInterval", "general", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
 		checkWorkbenchRecipes = config.getBoolean("checkWorkbenchRecipes", "general", true, "When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken.");
 		arcaneCraftingHistorySize = config.getInt("arcaneCraftingHistorySize", "general", 16, 0, 256, "The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server.");
-		addTooltip = config.getBoolean("addTooltip", "general", true, "If false, no tooltip will be added.");
-		browserScale = config.getFloat("browserScale", "general", 1, 1, 2, "Tweak the size of the book gui.");
-		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "general", false, "Whether the book gui search should search current tab only.");
-		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "general", 1, 0.5f, 10, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow.");
+
+		inverted = config.getBoolean("inverted", "client", false, "Flip it if you find the scrolling unintuitive");
+		updateInterval = config.getInt("updateInterval", "client", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
+		addTooltip = config.getBoolean("addTooltip", "client", true, "If false, no tooltip will be added.");
+		browserScale = config.getFloat("browserScale", "client", 1, 1, 4, "Tweak the size of the book gui. No longer works if inferBrowserScale is set to true.");
+		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "client", false, "Whether the book gui search should search current tab only.");
+		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
+		inferBrowserScale = config.getBoolean("inferBrowserScale", "client", true, "Tweak the size of the book gui based on screen size automatically. The value of browserScale set manually will not function any more.");
+		inferBrowserScaleUpperBound = config.getFloat("inferBrowserScaleUpperBound", "client", 4, 1, 16, "The upper bound of inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
+		inferBrowserScaleLowerBound = config.getFloat("inferBrowserScaleLowerBound", "client", 1, 1, 16, "The lower bound of inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
+
+		// validation
+		if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
+			config.getCategory("client").get("inferBrowserScaleLowerBound").set(inferBrowserScaleUpperBound);
+
 		browserWidth = (int) (browserScale * 256);
 		browserHeight = (int) (browserScale * 230);
 		// if allow checking (vanilla behavior) no need to force client to have this mod
@@ -86,6 +99,12 @@ public enum ConfigurationHandler {
 		return addTooltip;
 	}
 
+	public void setBrowserScale(float browserScale) {
+		this.browserScale = Math.max(Math.min(browserScale, inferBrowserScaleUpperBound), inferBrowserScaleLowerBound);
+		browserWidth = (int) (browserScale * 256);
+		browserHeight = (int) (browserScale * 230);
+	}
+
 	public float getBrowserScale() {
 		return browserScale;
 	}
@@ -104,5 +123,9 @@ public enum ConfigurationHandler {
 
 	public float getNodeVisualSizeLimit() {
 		return nodeVisualSizeLimit;
+	}
+
+	public boolean isInferBrowserScale() {
+		return inferBrowserScale;
 	}
 }
