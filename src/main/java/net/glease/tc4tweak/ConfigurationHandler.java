@@ -5,9 +5,14 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 public enum ConfigurationHandler {
 	INSTANCE;
@@ -37,6 +42,24 @@ public enum ConfigurationHandler {
 		config = new Configuration(f, ConfigurationVersion.latest().getVersionMarker());
 		ConfigurationVersion.migrateToLatest(config);
 		loadConfig(false);
+		setLanguageKeys();
+	}
+
+	private void setLanguageKeys() {
+		Queue<ConfigCategory> queue = new LinkedList<>();
+		for (String categoryName : config.getCategoryNames()) {
+			ConfigCategory category = config.getCategory(categoryName);
+			category.setLanguageKey("tc4tweaks.config." + categoryName);
+			queue.offer(category);
+		}
+
+		ConfigCategory category;
+		while ((category = queue.poll()) != null) {
+			queue.addAll(category.getChildren());
+			for (Map.Entry<String, Property> entry : category.entrySet()) {
+				entry.getValue().setLanguageKey(String.format("%s.%s", category.getLanguagekey(), entry.getKey()));
+			}
+		}
 	}
 
 	@SubscribeEvent
