@@ -34,7 +34,7 @@ public class ClientProxy extends CommonProxy {
 	static Method methodPlayScroll = null;
 	static Field fieldModel = null;
 
-	FMLEventHandler instance = new FMLEventHandler();
+	static final FMLEventHandler instance = new FMLEventHandler();
 
 	public static void handleMouseInput(GuiResearchTable screen) {
 		final int dwheel = Mouse.getEventDWheel();

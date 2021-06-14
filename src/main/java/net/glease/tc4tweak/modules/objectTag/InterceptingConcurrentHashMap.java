@@ -3,9 +3,11 @@ package net.glease.tc4tweak.modules.objectTag;
 import gnu.trove.map.TIntObjectMap;
 import thaumcraft.api.aspects.AspectList;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@ParametersAreNonnullByDefault
 @SuppressWarnings("rawtypes")
 class InterceptingConcurrentHashMap extends ConcurrentHashMap<List, AspectList> {
 	@Override

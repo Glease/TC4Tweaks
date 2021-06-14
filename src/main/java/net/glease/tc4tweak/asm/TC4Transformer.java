@@ -51,7 +51,6 @@ public class TC4Transformer implements IClassTransformer {
 		log.info("Transforming class {}", name);
 		ClassReader cr = new ClassReader(basicClass);
 		ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
-		boolean success = false;
 		// we are very probably the last one to run.
 		try {
 			cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0));
