@@ -26,7 +26,7 @@ apply plugin: 'forge'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.3.0-beta6"
+version = "1.3.0"
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 
@@ -126,6 +126,9 @@ curseforge {
 }
 
 task createSignedJarDir() {
+    onlyIf { // Skip the task if our secret data isn't available
+        project.hasProperty('keyStore')
+    }
     doLast {
         mkdir new File(jar.destinationDir, "signed").toString()
     }
