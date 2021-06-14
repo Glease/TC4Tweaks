@@ -9,8 +9,6 @@ import cpw.mods.fml.relauncher.Side;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
-import net.minecraft.util.ResourceLocation;
-import thaumcraft.api.research.ResearchCategories;
 
 public class CommonProxy {
 	public void preInit(FMLPreInitializationEvent e) {
@@ -31,8 +29,5 @@ public class CommonProxy {
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
-		for (int i = 0; i < 100; i++) {
-			ResearchCategories.registerCategory("BASICS_" + i, new ResourceLocation("thaumcraft", "textures/items/thaumonomiconcheat.png"), new ResourceLocation("thaumcraft", "textures/gui/gui_researchback.png"));
-		}
 	}
 }
