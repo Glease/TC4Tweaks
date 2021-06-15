@@ -25,6 +25,7 @@ public class GetObjectTags {
 	static final Logger log = LogManager.getLogger("GetObjectTags");
 	private static final ObjectTagsCache cache = new ObjectTagsCache();
 
+	@SuppressWarnings({"rawtypes"})
 	public static ConcurrentHashMap<List, AspectList> newReplacementObjectTagsMap() {
 		return new InterceptingConcurrentHashMap();
 	}

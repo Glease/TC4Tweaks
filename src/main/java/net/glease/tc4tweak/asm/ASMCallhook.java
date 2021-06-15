@@ -91,6 +91,11 @@ public class ASMCallhook {
 		UtilsFX.renderFacingStrip(px, py, pz, angle, Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, frame, partialTicks, color);
 	}
 
+	@Callhook
+	public static void renderAnimatedQuadStrip(float scale, float alpha, int frames, int strip, int cframe, float partialTicks, int color) {
+		UtilsFX.renderAnimatedQuadStrip(Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, cframe, partialTicks, color);
+	}
+
 	/**
 	 * Draw research browser borders. Called from GuiResearchBrowser#genResearchBackground
 	 */

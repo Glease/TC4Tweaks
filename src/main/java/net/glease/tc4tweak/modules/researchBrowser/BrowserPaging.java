@@ -9,7 +9,6 @@ import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.opengl.GL11;
@@ -100,9 +99,6 @@ public class BrowserPaging {
     public static void flushCache() {
         currentPageTabs = null;
     }
-
-    private static final ResourceLocation misc = new ResourceLocation("tc4tweak", "textures/gui/misc.png");
-
 
     // region Poor man's way of hooking into research browser.
     // Surely I could just add lines via asm, but that should be used as sparingly as possible.

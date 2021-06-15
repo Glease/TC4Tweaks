@@ -27,6 +27,7 @@ public class TC4Transformer implements IClassTransformer {
 			.put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.renderers.tile.TileNodeRenderer", new TransformerFactory(TileNodeRendererVisitor::new, Side.CLIENT))
+			.put("thaumcraft.client.renderers.tile.ItemNodeRenderer", new TransformerFactory(ItemNodeRendererVisitor::new, Side.CLIENT))
 			.put("thaumcraft.common.tiles.TileMagicWorkbench", new TransformerFactory(TileMagicWorkbenchVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.fx.other.FXSonic", new TransformerFactory(FXSonicVisitor::new, Side.CLIENT))
 			.put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
@@ -51,7 +52,6 @@ public class TC4Transformer implements IClassTransformer {
 		log.info("Transforming class {}", name);
 		ClassReader cr = new ClassReader(basicClass);
 		ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
-		boolean success = false;
 		// we are very probably the last one to run.
 		try {
 			cr.accept(factory.apply(ASM5, cw), (factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0));

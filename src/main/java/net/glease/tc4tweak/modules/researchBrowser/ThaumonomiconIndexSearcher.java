@@ -35,11 +35,11 @@ import java.util.*;
  * https://github.com/GTNewHorizons/WitchingGadgets/blob/1.2.13-GTNH/src/main/java/witchinggadgets/client/ThaumonomiconIndexSearcher.java
  */
 public class ThaumonomiconIndexSearcher {
-    final static int mouseBufferIdent = 17;
-    static ByteBuffer mouseBuffer;
+    private static final int mouseBufferIdent = 17;
+    private static ByteBuffer mouseBuffer;
 
-    final static int selectedCategoryIdent = 21;
-    static Field f_selectedCategory = null;
+    private static final int selectedCategoryIdent = 21;
+    private static Field f_selectedCategory = null;
     public static ThaumonomiconIndexSearcher instance;
 
     public static void init() {
@@ -67,7 +67,7 @@ public class ThaumonomiconIndexSearcher {
         }
     }
 
-    public static GuiTextField thaumSearchField;
+    private static GuiTextField thaumSearchField;
 
     @SubscribeEvent
     public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
@@ -122,7 +122,7 @@ public class ThaumonomiconIndexSearcher {
         }
     }
 
-    static int listDisplayOffset = 0;
+    private static int listDisplayOffset = 0;
 
     @SubscribeEvent
     public void onGuiPostDraw(GuiScreenEvent.DrawScreenEvent.Post event) {
@@ -166,7 +166,7 @@ public class ThaumonomiconIndexSearcher {
         return Math.min(gui.width - getResultDisplayAreaX(gui), 224);
     }
 
-    static int getResultDisplayAreaX(GuiScreen gui) {
+    private static int getResultDisplayAreaX(GuiScreen gui) {
         return gui.width / 2 + ConfigurationHandler.INSTANCE.getBrowserWidth() / 2 + (ResearchCategories.researchCategories.size() > BrowserPaging.getTabPerSide() ? 24 : 0);
     }
 
@@ -197,10 +197,10 @@ public class ThaumonomiconIndexSearcher {
     }
 
 
-    static String searchCategory;
-    static List<SearchQuery> searchResults = new ArrayList<>();
+    private static String searchCategory;
+    private static List<SearchQuery> searchResults = new ArrayList<>();
 
-    static void buildEntryList(String query) {
+    private static void buildEntryList(String query) {
         if (query == null || query.isEmpty()) {
             searchResults.clear();
             return;
@@ -224,7 +224,6 @@ public class ThaumonomiconIndexSearcher {
                     continue;
                 recipeBased.clear();
                 ResearchPage[] pages = ResearchCategories.getResearch(key).getPages();
-                int iPage = 0;
                 if (pages != null)
                     for (ResearchPage page : pages) {
                         if (page.recipeOutput != null && page.recipeOutput.getDisplayName().toLowerCase().contains(query)) {
@@ -238,17 +237,16 @@ public class ThaumonomiconIndexSearcher {
                                 dn = page.recipeOutput.getDisplayName();
                             }
                             if (!usedResearches.contains(dn)) {
-                                recipeBased.add(new SearchQuery(key, "Item: " + dn, iPage));
+                                recipeBased.add(new SearchQuery(key, "Item: " + dn));
                                 usedResearches.add(dn);
                             }
                         }
-                        iPage++;
                     }
                 boolean rAdded = false;
                 if (recipeBased.size() <= 1) {
                     if (!usedResearches.contains(ResearchCategories.getResearch(key).getName()))
                         if (key.toLowerCase().contains(query) || ResearchCategories.getResearch(key).getName().toLowerCase().contains(query)) {
-                            valids.add(new SearchQuery(key, null, 0));
+                            valids.add(new SearchQuery(key, null));
                             usedResearches.add(ResearchCategories.getResearch(key).getName());
                             rAdded = true;
                         }
@@ -260,7 +258,7 @@ public class ThaumonomiconIndexSearcher {
         searchResults = valids;
     }
 
-    static String getActiveCategory() {
+    private static String getActiveCategory() {
         String s = null;
         try {
             s = (String) f_selectedCategory.get(null);
@@ -270,8 +268,8 @@ public class ThaumonomiconIndexSearcher {
         return s;
     }
 
-    static class ResearchSorter implements Comparator<SearchQuery> {
-        static ResearchSorter instance = new ResearchSorter();
+    private static class ResearchSorter implements Comparator<SearchQuery> {
+        static final ResearchSorter instance = new ResearchSorter();
 
         @Override
         public int compare(SearchQuery o1, SearchQuery o2) {
@@ -281,16 +279,14 @@ public class ThaumonomiconIndexSearcher {
         }
     }
 
-    static class SearchQuery {
+    private static class SearchQuery {
         public final String research;
         public final String display;
-        public final int page;
-        String modifier;
+        public final String modifier;
 
-        public SearchQuery(String research, String display, int page) {
+        public SearchQuery(String research, String display) {
             this.research = research;
             this.display = display;
-            this.page = page;
             modifier = display != null ? EnumChatFormatting.DARK_GRAY.toString() : "";
         }
     }

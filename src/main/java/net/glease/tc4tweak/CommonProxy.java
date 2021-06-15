@@ -4,7 +4,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
@@ -20,7 +19,7 @@ public class CommonProxy {
 		TC4Tweak.INSTANCE.CHANNEL.registerMessage(MessageSendConfiguration.class, MessageSendConfiguration.class, 0, Side.CLIENT);
 	}
 
-	public void serverStarted(FMLServerStartedEvent e) {
+	public void serverStarted() {
 		FlushableCache.enableAll(true);
 		NetworkedConfiguration.resetCheckWorkbenchRecipes();
 	}
