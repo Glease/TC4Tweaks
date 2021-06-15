@@ -10,9 +10,7 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 import java.io.File;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 public enum ConfigurationHandler {
 	INSTANCE;
@@ -46,16 +44,9 @@ public enum ConfigurationHandler {
 	}
 
 	private void setLanguageKeys() {
-		Queue<ConfigCategory> queue = new LinkedList<>();
 		for (String categoryName : config.getCategoryNames()) {
 			ConfigCategory category = config.getCategory(categoryName);
 			category.setLanguageKey("tc4tweaks.config." + categoryName);
-			queue.offer(category);
-		}
-
-		ConfigCategory category;
-		while ((category = queue.poll()) != null) {
-			queue.addAll(category.getChildren());
 			for (Map.Entry<String, Property> entry : category.entrySet()) {
 				entry.getValue().setLanguageKey(String.format("%s.%s", category.getLanguagekey(), entry.getKey()));
 			}
@@ -77,13 +68,13 @@ public enum ConfigurationHandler {
 		inverted = config.getBoolean("inverted", "client", false, "Flip it if you find the scrolling unintuitive");
 		updateInterval = config.getInt("updateInterval", "client", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
 		addTooltip = config.getBoolean("addTooltip", "client", true, "If false, no tooltip will be added.");
-		browserScale = config.getFloat("browserScale", "client", 1, 1, 4, "Tweak the size of the book gui. No longer works if inferBrowserScale is set to true.");
+		browserScale = config.getFloat("scale", "client.browser_scale", 1, 1, 4, "Tweak the size of the book gui. No longer works if inferBrowserScale is set to true.");
 		limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "client", false, "Whether the book gui search should search current tab only.");
-		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "Put an upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality.");
-		inferBrowserScale = config.getBoolean("inferBrowserScale", "client", true, "Tweak the size of the book gui based on screen size automatically. The value of browserScale set manually will not function any more.");
-		inferBrowserScaleUpperBound = config.getFloat("inferBrowserScaleUpperBound", "client", 4, 1, 16, "The upper bound of inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
-		inferBrowserScaleLowerBound = config.getFloat("inferBrowserScaleLowerBound", "client", 1, 1, 16, "The lower bound of inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
-		inferBrowserScaleConsiderSearch = config.getBoolean("inferBrowserScaleConsiderSearch", "client", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
+		nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "The upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality, i.e. not limit the rendered size.");
+		inferBrowserScale = config.getBoolean("infer", "client.browser_scale", true, "Tweak the size of the book gui based on screen size automatically. The value of browserScale set manually will not function any more.");
+		inferBrowserScaleUpperBound = config.getFloat("maximum", "client.browser_scale", 4, 1, 16, "The minimum inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
+		inferBrowserScaleLowerBound = config.getFloat("minimum", "client.browser_scale", 1, 1, 16, "The maximum inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
+		inferBrowserScaleConsiderSearch = config.getBoolean("considerSearchArea", "client.browser_scale", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
 
 		// validation
 		if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)

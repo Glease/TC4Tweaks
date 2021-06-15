@@ -1,9 +1,11 @@
 package net.glease.tc4tweak;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.common.config.Configuration;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 enum ConfigurationVersion {
@@ -13,7 +15,7 @@ enum ConfigurationVersion {
             throw new IllegalStateException();
         }
     },
-    V1() {
+    V1 {
         private final String[] propsToClient = {
                 "inverted",
                 "updateInterval",
@@ -26,6 +28,22 @@ enum ConfigurationVersion {
         protected void step(Configuration c) {
             for (String name : propsToClient) {
                 c.moveProperty("general", name, "client");
+            }
+        }
+    },
+    V2 {
+        private final Map<String, String> propsToMove = ImmutableMap.of(
+                "browserScale", "scale",
+                "inferBrowserScale", "infer",
+                "inferBrowserScaleConsiderSearch", "considerSearchArea",
+                "inferBrowserScaleLowerBound", "minimum",
+                "inferBrowserScaleUpperBound", "maximum"
+                );
+        @Override
+        protected void step(Configuration c) {
+            for (Map.Entry<String, String> name : propsToMove.entrySet()) {
+                c.moveProperty("client", name.getKey(), "client.browser_scale");
+                c.renameProperty("client.browser_scale", name.getKey(), name.getValue());
             }
         }
     };
