@@ -39,18 +39,19 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 		dev = !(boolean) data.get("runtimeDeobfuscationEnabled");
 		gt6 = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Greg-ASM"));
 		if (((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("BTPlugin"))) {
+			String errorMessage = "Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality and is incompatible with it.";
 			if (!GraphicsEnvironment.isHeadless())
-				JOptionPane.showMessageDialog(null, "Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+				JOptionPane.showMessageDialog(null, errorMessage);
 			log.error("#################################################################################");
 			log.error("#################################################################################");
 			log.error("#################################################################################");
-			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
-			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
-			log.error("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			log.error(errorMessage);
+			log.error(errorMessage);
+			log.error(errorMessage);
 			log.error("#################################################################################");
 			log.error("#################################################################################");
 			log.error("#################################################################################");
-			throw new RuntimeException("Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality.");
+			throw new RuntimeException(errorMessage);
 		}
 		debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
 		//noinspection ResultOfMethodCallIgnored
