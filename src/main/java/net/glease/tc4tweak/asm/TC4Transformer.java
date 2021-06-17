@@ -16,13 +16,15 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import static net.glease.tc4tweak.asm.LoadingPlugin.debugOutputDir;
+import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 public class TC4Transformer implements IClassTransformer {
 	static final Logger log = LogManager.getLogger("TC4TweakTransformer");
 	private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
 	private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
-			.put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory("renderTileEntityAt"))
+			.put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
+			.put("makeo.gadomancy.client.renderers.tile", NodeLikeRendererVisitor.createFactory("renderNode"))
 			.put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
 			.put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
