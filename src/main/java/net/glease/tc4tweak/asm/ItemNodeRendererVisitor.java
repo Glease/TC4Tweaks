@@ -4,7 +4,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
-import static thaumcraft.common.Thaumcraft.log;
 
 public class ItemNodeRendererVisitor extends ClassVisitor {
     private static class RenderNodeVisitor extends MethodVisitor {
@@ -15,7 +14,7 @@ public class ItemNodeRendererVisitor extends ClassVisitor {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (owner.equals("thaumcraft/client/lib/UtilsFX") && name.equals("renderAnimatedQuadStrip")) {
-                log.debug("Replacing renderAnimatedQuadStrip");
+                TC4Transformer.log.debug("Replacing renderAnimatedQuadStrip");
                 super.visitMethodInsn(opcode, ASMCALLHOOK_INTERNAL_NAME, name, desc, false);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -30,7 +29,7 @@ public class ItemNodeRendererVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("renderItemNode")) {
-            log.debug("Visiting renderNode");
+            TC4Transformer.log.debug("Visiting renderNode");
             return new RenderNodeVisitor(api, mv);
         }
         return mv;

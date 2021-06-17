@@ -6,8 +6,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GuiModConfig extends GuiConfig {
 	public GuiModConfig(GuiScreen guiScreen) {
@@ -16,11 +16,10 @@ public class GuiModConfig extends GuiConfig {
 
 	@SuppressWarnings("rawtypes")
 	private static List<IConfigElement> getConfigElements() {
-		List<IConfigElement> elements = new ArrayList<>();
 		final Configuration config = ConfigurationHandler.INSTANCE.getConfig();
-		for (String name : config.getCategoryNames()) {
-			elements.add(new ConfigElement(config.getCategory(name)));
-		}
-		return elements;
+		return config.getCategoryNames().stream()
+				.filter(name -> name.indexOf('.') == -1)
+				.map(name -> new ConfigElement(config.getCategory(name)))
+				.collect(Collectors.toList());
 	}
 }

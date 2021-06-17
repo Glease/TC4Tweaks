@@ -215,6 +215,7 @@ public class BrowserPaging {
                 ReflectionHelper.setPrivateValue(GuiResearchBrowser.class, gui, ConfigurationHandler.INSTANCE.getBrowserWidth(), "paneWidth");
                 ReflectionHelper.setPrivateValue(GuiResearchBrowser.class, gui, ConfigurationHandler.INSTANCE.getBrowserHeight(), "paneHeight");
 
+                currentPageTabs = null;
                 updateMaxPageIndex(gui);
             }
         }
