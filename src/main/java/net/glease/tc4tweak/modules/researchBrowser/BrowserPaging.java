@@ -25,9 +25,9 @@ import java.util.Map;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.*;
 
 public class BrowserPaging {
-    private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     public static final int BUTTON_HEIGHT = 8;
     public static final int BUTTON_WIDTH = 24;
+    private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     private static int currentPageIndex;
     private static int maxPageIndex;
     private static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
@@ -71,9 +71,9 @@ public class BrowserPaging {
                     toSkip--;
                     continue;
                 }
+                currentPageTabs.put(e.getKey(), e.getValue());
                 // stop if collection full
                 if (currentPageTabs.size() == tabsPerPage) break;
-                currentPageTabs.put(e.getKey(), e.getValue());
             }
         }
         return currentPageTabs;

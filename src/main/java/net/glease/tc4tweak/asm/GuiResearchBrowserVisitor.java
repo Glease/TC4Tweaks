@@ -12,8 +12,38 @@ import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBor
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_WIDTH;
 import static org.objectweb.asm.Opcodes.*;
 
-public class GuiResearchBrowserVisitor extends ClassVisitor {
+class GuiResearchBrowserVisitor extends ClassVisitor {
     private static final String TARGET_INTERNAL_NAME = "thaumcraft/client/gui/GuiResearchBrowser";
+
+    public GuiResearchBrowserVisitor(int api, ClassVisitor cv) {
+        super(api, cv);
+    }
+
+    private static boolean isMouseClickedMethod(String name) {
+        return dev ? "mouseClicked".equals(name) : "func_73864_a".equals(name);
+    }
+
+    private static boolean isDrawScreenMethod(String name) {
+        return dev ? "drawScreen".equals(name) : "func_73863_a".equals(name);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
+        if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
+            return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
+        } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting updateResearch()V");
+            return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
+        } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
+                isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting {}{}", name, desc);
+            return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
+                    280, "getTabIconDistance");
+        }
+        return mv;
+    }
 
     private static class UpdateResearchVisitor extends MethodVisitor {
         public UpdateResearchVisitor(int api, MethodVisitor mv) {
@@ -180,35 +210,5 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
                 super.visitIntInsn(opcode, operand);
             }
         }
-    }
-
-    public GuiResearchBrowserVisitor(int api, ClassVisitor cv) {
-        super(api, cv);
-    }
-
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
-        if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
-            return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
-        } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting updateResearch()V");
-            return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
-        } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
-                isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting {}{}", name, desc);
-            return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
-                    280, "getTabIconDistance");
-        }
-        return mv;
-    }
-
-    private static boolean isMouseClickedMethod(String name) {
-        return dev ? "mouseClicked".equals(name) : "func_73864_a".equals(name);
-    }
-
-    private static boolean isDrawScreenMethod(String name) {
-        return dev ? "drawScreen".equals(name) : "func_73863_a".equals(name);
     }
 }

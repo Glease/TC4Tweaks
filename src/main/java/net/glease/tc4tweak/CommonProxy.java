@@ -10,23 +10,23 @@ import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 
 public class CommonProxy {
-	public void preInit(FMLPreInitializationEvent e) {
-		ConfigurationHandler.INSTANCE.init(e.getSuggestedConfigurationFile());
+    public void preInit(FMLPreInitializationEvent e) {
+        ConfigurationHandler.INSTANCE.init(e.getSuggestedConfigurationFile());
 
-		if (Loader.isModLoaded("MineTweaker3"))
-			MTCompat.preInit();
+        if (Loader.isModLoaded("MineTweaker3"))
+            MTCompat.preInit();
 
-		TC4Tweak.INSTANCE.CHANNEL.registerMessage(MessageSendConfiguration.class, MessageSendConfiguration.class, 0, Side.CLIENT);
-	}
+        TC4Tweak.INSTANCE.CHANNEL.registerMessage(MessageSendConfiguration.class, MessageSendConfiguration.class, 0, Side.CLIENT);
+    }
 
-	public void serverStarted() {
-		FlushableCache.enableAll(true);
-		NetworkedConfiguration.resetCheckWorkbenchRecipes();
-	}
+    public void serverStarted() {
+        FlushableCache.enableAll(true);
+        NetworkedConfiguration.resetCheckWorkbenchRecipes();
+    }
 
-	public void init(FMLInitializationEvent e) {
-	}
+    public void init(FMLInitializationEvent e) {
+    }
 
-	public void postInit(FMLPostInitializationEvent e) {
-	}
+    public void postInit(FMLPostInitializationEvent e) {
+    }
 }

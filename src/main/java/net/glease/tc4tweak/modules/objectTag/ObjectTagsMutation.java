@@ -4,5 +4,5 @@ import gnu.trove.map.TIntObjectMap;
 import thaumcraft.api.aspects.AspectList;
 
 interface ObjectTagsMutation {
-	void accept(TIntObjectMap<AspectList> submap, int meta);
+    void accept(TIntObjectMap<AspectList> submap, int meta);
 }

@@ -5,7 +5,21 @@ import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
 
-public class ItemNodeRendererVisitor extends ClassVisitor {
+class ItemNodeRendererVisitor extends ClassVisitor {
+    public ItemNodeRendererVisitor(int api, ClassVisitor cv) {
+        super(api, cv);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
+        if (name.equals("renderItemNode")) {
+            TC4Transformer.log.debug("Visiting renderNode");
+            return new RenderNodeVisitor(api, mv);
+        }
+        return mv;
+    }
+
     private static class RenderNodeVisitor extends MethodVisitor {
         public RenderNodeVisitor(int api, MethodVisitor mv) {
             super(api, mv);
@@ -20,18 +34,5 @@ public class ItemNodeRendererVisitor extends ClassVisitor {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
         }
-    }
-    public ItemNodeRendererVisitor(int api, ClassVisitor cv) {
-        super(api, cv);
-    }
-
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        if (name.equals("renderItemNode")) {
-            TC4Transformer.log.debug("Visiting renderNode");
-            return new RenderNodeVisitor(api, mv);
-        }
-        return mv;
     }
 }

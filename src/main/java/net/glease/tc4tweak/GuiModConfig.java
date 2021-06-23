@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiModConfig extends GuiConfig {
-	public GuiModConfig(GuiScreen guiScreen) {
-		super(guiScreen, getConfigElements(), TC4Tweak.MOD_ID, false, false, GuiConfig.getAbridgedConfigPath(ConfigurationHandler.INSTANCE.getConfig().toString()));
-	}
+    public GuiModConfig(GuiScreen guiScreen) {
+        super(guiScreen, getConfigElements(), TC4Tweak.MOD_ID, false, false, GuiConfig.getAbridgedConfigPath(ConfigurationHandler.INSTANCE.getConfig().toString()));
+    }
 
-	@SuppressWarnings("rawtypes")
-	private static List<IConfigElement> getConfigElements() {
-		final Configuration config = ConfigurationHandler.INSTANCE.getConfig();
-		return config.getCategoryNames().stream()
-				.filter(name -> name.indexOf('.') == -1)
-				.map(name -> new ConfigElement(config.getCategory(name)))
-				.collect(Collectors.toList());
-	}
+    @SuppressWarnings("rawtypes")
+    private static List<IConfigElement> getConfigElements() {
+        final Configuration config = ConfigurationHandler.INSTANCE.getConfig();
+        return config.getCategoryNames().stream()
+                .filter(name -> name.indexOf('.') == -1)
+                .map(name -> new ConfigElement(config.getCategory(name)))
+                .collect(Collectors.toList());
+    }
 }

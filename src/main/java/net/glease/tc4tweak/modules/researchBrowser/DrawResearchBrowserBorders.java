@@ -31,7 +31,6 @@ public class DrawResearchBrowserBorders {
                 u1 = u / scale, v1 = v / scale,
                 w1 = ConfigurationHandler.INSTANCE.getBrowserWidth() / scale / 2 - BORDER_WIDTH / scale, h1 = ConfigurationHandler.INSTANCE.getBrowserHeight() / scale / 2 - BORDER_HEIGHT / scale;
         GL11.glScalef(scale, scale, 1.0f);
-        // can't just call gui.drawTexturedModalRect, it losses precision of u/v coord
         ClientUtils.drawRectTextured(x1, x1 + w1, y1, y1 + h1, u1, u1 + w1, v1, v1 + h1, ZLEVEL);
     }
 }
