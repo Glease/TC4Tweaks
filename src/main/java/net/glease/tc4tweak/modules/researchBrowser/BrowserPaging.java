@@ -116,12 +116,11 @@ public class BrowserPaging {
         public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_) {
             updateState();
             if (visible) {
-                GL11.glPushMatrix();
+                GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 184, 184 + 24, 208, 208 + 8, zLevel);
-                GL11.glPopMatrix();
             }
         }
 
@@ -153,12 +152,11 @@ public class BrowserPaging {
         public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_) {
             updateState();
             if (visible) {
-                GL11.glPushMatrix();
+                GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 207, 207 + 25, 208, 208 + 8, zLevel);
-                GL11.glPopMatrix();
             }
         }
 

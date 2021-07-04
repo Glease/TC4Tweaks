@@ -141,6 +141,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 run/
+.okhttpcache
 .idea/
 # Change log is always auto generated. No need to include.
 CHANGELOG.md
