@@ -90,10 +90,17 @@ public class GetObjectTags {
 
         if (tmp == null) {
             return null;
-        } else if (tmp.aspects.values().stream().allMatch(n -> n <= 64)) {
-            // no need to truncate - return as is
-            return tmp;
         }
+        for (Integer size : tmp.aspects.values()) {
+            if (size > 64) {
+                return truncateAspectList(tmp);
+            }
+        }
+        // no need to truncate - return as is
+        return tmp;
+    }
+
+    private static AspectList truncateAspectList(AspectList tmp) {
         AspectList out = tmp.copy();
         out.aspects.replaceAll((a, n) -> Math.min(64, n));
         return out;
