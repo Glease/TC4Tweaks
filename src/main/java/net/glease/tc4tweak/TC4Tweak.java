@@ -21,81 +21,79 @@ import java.util.Map;
 
 @Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "${version}", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
 public class TC4Tweak {
-	public static final String MOD_ID = "tc4tweak";
-	private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
-	private static final ImmutableMap<String, String> KNOWN_SIGNATURE =
-			ImmutableMap.of("47:3C:3A:39:76:76:97:8F:F4:87:7A:BA:2D:57:86:0D:DA:20:E2:FC", "glease");
+    public static final String MOD_ID = "tc4tweak";
+    private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
+    private static final ImmutableMap<String, String> KNOWN_SIGNATURE =
+            ImmutableMap.of("47:3C:3A:39:76:76:97:8F:F4:87:7A:BA:2D:57:86:0D:DA:20:E2:FC", "glease");
+    @Mod.Instance
+    public static TC4Tweak INSTANCE;
+    @SidedProxy(serverSide = "net.glease.tc4tweak.CommonProxy", clientSide = "net.glease.tc4tweak.ClientProxy")
+    static CommonProxy proxy;
+    public final SimpleNetworkWrapper CHANNEL = new SimpleNetworkWrapper(MOD_ID);
+    private boolean allowAll = true;
 
-	@SidedProxy(serverSide = "net.glease.tc4tweak.CommonProxy", clientSide = "net.glease.tc4tweak.ClientProxy")
-	static CommonProxy proxy;
-	@Mod.Instance
-	public static TC4Tweak INSTANCE;
+    public TC4Tweak() {
+        FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
+            @Override
+            public String getLabel() {
+                return "TC4Tweak signing signature";
+            }
 
-	private boolean allowAll = true;
-	public final SimpleNetworkWrapper CHANNEL = new SimpleNetworkWrapper(MOD_ID);
+            @Override
+            public String call() {
+                try {
+                    Certificate certificate = Loader.instance().getIndexedModList().get(MOD_ID).getSigningCertificate();
+                    if (certificate == null)
+                        return "None. Do not bother glease for this crash!";
+                    String fingerprint = CertificateHelper.getFingerprint(certificate);
+                    // everyone can tamper the manifest and add a Built-By,
+                    // not so for signatures
+                    return fingerprint + ", Built by: " + KNOWN_SIGNATURE.getOrDefault(fingerprint, "Not known");
+                } catch (Exception e) {
+                    StringWriter sw = new StringWriter();
+                    sw.append("Cannot determine due to error: ");
+                    e.printStackTrace(new PrintWriter(sw));
+                    return sw.toString();
+                }
+            }
+        });
+    }
 
-	void detectAndSendConfigChanges() {
-		if (FMLCommonHandler.instance().getMinecraftServerInstance() != null)
-			INSTANCE.CHANNEL.sendToAll(new MessageSendConfiguration());
-	}
+    void detectAndSendConfigChanges() {
+        if (FMLCommonHandler.instance().getMinecraftServerInstance() != null)
+            INSTANCE.CHANNEL.sendToAll(new MessageSendConfiguration());
+    }
 
-	void setAllowAll(boolean allowAll) {
-		this.allowAll = allowAll;
-	}
+    void setAllowAll(boolean allowAll) {
+        this.allowAll = allowAll;
+    }
 
-	public TC4Tweak() {
-		FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
-			@Override
-			public String getLabel() {
-				return "TC4Tweak signing signature";
-			}
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent e) {
+        proxy.preInit(e);
+    }
 
-			@Override
-			public String call() {
-				try {
-					Certificate certificate = Loader.instance().getIndexedModList().get(MOD_ID).getSigningCertificate();
-					if (certificate == null)
-						return "None. Do not bother glease for this crash!";
-					String fingerprint = CertificateHelper.getFingerprint(certificate);
-					// everyone can tamper the manifest and add a Built-By,
-					// not so for signatures
-					return fingerprint + ", Built by: " + KNOWN_SIGNATURE.getOrDefault(fingerprint, "Not known");
-				} catch (Exception e) {
-					StringWriter sw = new StringWriter();
-					sw.append("Cannot determine due to error: ");
-					e.printStackTrace(new PrintWriter(sw));
-					return sw.toString();
-				}
-			}
-		});
-	}
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent e) {
+        proxy.init(e);
+    }
 
-	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent e) {
-		proxy.preInit(e);
-	}
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent e) {
+        proxy.postInit(e);
+    }
 
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent e) {
-		proxy.init(e);
-	}
+    @Mod.EventHandler
+    public void serverStarted(FMLServerStartedEvent e) {
+        proxy.serverStarted();
+    }
 
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent e) {
-		proxy.postInit(e);
-	}
-
-	@Mod.EventHandler
-	public void serverStarted(FMLServerStartedEvent e) {
-		proxy.serverStarted();
-	}
-
-	@NetworkCheckHandler
-	public boolean checkConnection(Map<String, String> remoteVersions, Side side) {
-		if (side == Side.CLIENT) {
-			String remoteVersionString = remoteVersions.getOrDefault(MOD_ID, null);
-			return allowAll || remoteVersionString != null && ACCEPTED_CLIENT_VERSION.containsVersion(new DefaultArtifactVersion(MOD_ID, remoteVersionString));
-		}
-		return true;
-	}
+    @NetworkCheckHandler
+    public boolean checkConnection(Map<String, String> remoteVersions, Side side) {
+        if (side == Side.CLIENT) {
+            String remoteVersionString = remoteVersions.getOrDefault(MOD_ID, null);
+            return allowAll || remoteVersionString != null && ACCEPTED_CLIENT_VERSION.containsVersion(new DefaultArtifactVersion(MOD_ID, remoteVersionString));
+        }
+        return true;
+    }
 }

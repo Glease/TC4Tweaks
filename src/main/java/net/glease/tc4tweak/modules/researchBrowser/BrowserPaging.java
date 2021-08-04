@@ -25,9 +25,9 @@ import java.util.Map;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.*;
 
 public class BrowserPaging {
-    private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     public static final int BUTTON_HEIGHT = 8;
     public static final int BUTTON_WIDTH = 24;
+    private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     private static int currentPageIndex;
     private static int maxPageIndex;
     private static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
@@ -71,9 +71,9 @@ public class BrowserPaging {
                     toSkip--;
                     continue;
                 }
+                currentPageTabs.put(e.getKey(), e.getValue());
                 // stop if collection full
                 if (currentPageTabs.size() == tabsPerPage) break;
-                currentPageTabs.put(e.getKey(), e.getValue());
             }
         }
         return currentPageTabs;
@@ -116,12 +116,11 @@ public class BrowserPaging {
         public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_) {
             updateState();
             if (visible) {
-                GL11.glPushMatrix();
+                GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 184, 184 + 24, 208, 208 + 8, zLevel);
-                GL11.glPopMatrix();
             }
         }
 
@@ -153,12 +152,11 @@ public class BrowserPaging {
         public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_) {
             updateState();
             if (visible) {
-                GL11.glPushMatrix();
+                GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDisable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 207, 207 + 25, 208, 208 + 8, zLevel);
-                GL11.glPopMatrix();
             }
         }
 

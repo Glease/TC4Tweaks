@@ -24,6 +24,7 @@ enum ConfigurationVersion {
                 "limitBookSearchToCategory",
                 "limitOversizedNodeRender",
         };
+
         @Override
         protected void step(Configuration c) {
             for (String name : propsToClient) {
@@ -38,7 +39,8 @@ enum ConfigurationVersion {
                 "inferBrowserScaleConsiderSearch", "considerSearchArea",
                 "inferBrowserScaleLowerBound", "minimum",
                 "inferBrowserScaleUpperBound", "maximum"
-                );
+        );
+
         @Override
         protected void step(Configuration c) {
             for (Map.Entry<String, String> name : propsToMove.entrySet()) {
@@ -60,13 +62,6 @@ enum ConfigurationVersion {
         this.versionMarker = versionMarker;
     }
 
-    @Nullable
-    public String getVersionMarker() {
-        return versionMarker;
-    }
-
-    protected abstract void step(Configuration c);
-
     public static void migrateToLatest(Configuration c) {
         for (int i = identify(c).ordinal() + 1; i < VALUES.length; i++) {
             VALUES[i].step(c);
@@ -80,4 +75,11 @@ enum ConfigurationVersion {
     public static ConfigurationVersion identify(Configuration c) {
         return Arrays.stream(VALUES).filter(v -> Objects.equals(c.getLoadedConfigVersion(), v.getVersionMarker())).findFirst().orElse(LEGACY);
     }
+
+    @Nullable
+    public String getVersionMarker() {
+        return versionMarker;
+    }
+
+    protected abstract void step(Configuration c);
 }

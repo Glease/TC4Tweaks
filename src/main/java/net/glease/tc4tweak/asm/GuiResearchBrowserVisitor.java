@@ -10,10 +10,48 @@ import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_HEIGHT;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_WIDTH;
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.BIPUSH;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.GETSTATIC;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.ISUB;
+import static org.objectweb.asm.Opcodes.POP;
+import static org.objectweb.asm.Opcodes.PUTSTATIC;
 
-public class GuiResearchBrowserVisitor extends ClassVisitor {
+class GuiResearchBrowserVisitor extends ClassVisitor {
     private static final String TARGET_INTERNAL_NAME = "thaumcraft/client/gui/GuiResearchBrowser";
+
+    public GuiResearchBrowserVisitor(int api, ClassVisitor cv) {
+        super(api, cv);
+    }
+
+    private static boolean isMouseClickedMethod(String name) {
+        return dev ? "mouseClicked".equals(name) : "func_73864_a".equals(name);
+    }
+
+    private static boolean isDrawScreenMethod(String name) {
+        return dev ? "drawScreen".equals(name) : "func_73863_a".equals(name);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
+        if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
+            return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
+        } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting updateResearch()V");
+            return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
+        } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
+                isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
+            TC4Transformer.log.debug("Visiting {}{}", name, desc);
+            return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
+                    280, "getTabIconDistance");
+        }
+        return mv;
+    }
 
     private static class UpdateResearchVisitor extends MethodVisitor {
         public UpdateResearchVisitor(int api, MethodVisitor mv) {
@@ -32,7 +70,8 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
     }
 
     private static class GenResearchBackgroundVisitor extends MethodVisitor {
-        private int counter = 0;
+        private int counterPaneWidth = 0;
+        private int counterParticleDraw = 0;
         private boolean borderDrawChanged = false, found112 = false, backgroundDrawChanged = false;
 
         public GenResearchBackgroundVisitor(int api, MethodVisitor mv) {
@@ -60,8 +99,8 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             super.visitFieldInsn(opcode, owner, name, desc);
             if (opcode == GETFIELD && "thaumcraft/client/gui/GuiResearchBrowser".equals(owner) && "paneWidth".equals(name) && "I".equals(desc)) {
-                counter++;
-                if (counter > 2)
+                counterPaneWidth++;
+                if (counterPaneWidth > 2)
                     TC4Transformer.log.warn("GuiResearchBrowser has been changed by other people! Things are not going to work right!");
             }
         }
@@ -72,10 +111,14 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
                 backgroundDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBackground");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBackground", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
-            } else if (!borderDrawChanged && counter == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
+            } else if (!borderDrawChanged && counterPaneWidth == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
                 borderDrawChanged = true;
                 TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBorders");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBorders", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
+            } else if (opcode == INVOKESTATIC && owner.equals("thaumcraft/client/lib/UtilsFX") && name.equals("drawTexturedQuad") && desc.equals("(IIIIIID)V") && counterParticleDraw++ == 1) {
+                TC4Transformer.log.debug("Deflecting drawTexturedQuad to drawResearchCategoryHintParticles");
+                super.visitVarInsn(ALOAD, 0);
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchCategoryHintParticles", "(IIIIIIDL" + TARGET_INTERNAL_NAME + ";)V", false);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
@@ -83,6 +126,10 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
 
         @Override
         public void visitEnd() {
+            if (counterParticleDraw < 2)
+                TC4Transformer.log.warn("MISSED HINT PARTICLE REDIRECT. This fix will not work!");
+            else if (counterParticleDraw > 2)
+                TC4Transformer.log.warn("WEIRD HINT PARTICLE REDIRECT. This fix will most likely not work!");
             if (!borderDrawChanged)
                 TC4Transformer.log.warn("MISSED BORDER DRAW INJECT. Research browser resizing will not work!");
             if (!backgroundDrawChanged)
@@ -180,35 +227,5 @@ public class GuiResearchBrowserVisitor extends ClassVisitor {
                 super.visitIntInsn(opcode, operand);
             }
         }
-    }
-
-    public GuiResearchBrowserVisitor(int api, ClassVisitor cv) {
-        super(api, cv);
-    }
-
-    @Override
-    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
-        if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
-            return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
-        } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting updateResearch()V");
-            return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
-        } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
-                isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting {}{}", name, desc);
-            return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
-                    280, "getTabIconDistance");
-        }
-        return mv;
-    }
-
-    private static boolean isMouseClickedMethod(String name) {
-        return dev ? "mouseClicked".equals(name) : "func_73864_a".equals(name);
-    }
-
-    private static boolean isDrawScreenMethod(String name) {
-        return dev ? "drawScreen".equals(name) : "func_73863_a".equals(name);
     }
 }
