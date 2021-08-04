@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import net.glease.tc4tweak.ClientProxy;
+import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
@@ -159,5 +160,15 @@ public class ASMCallhook {
     @Callhook
     public static LinkedHashMap<String, ResearchCategoryList> getTabsOnCurrentPage(String player) {
         return BrowserPaging.getTabsOnCurrentPage(player);
+    }
+
+    @Callhook
+    public static void drawResearchCategoryHintParticles(int x, int y, int u, int v, int width, int height, double zLevel, GuiResearchBrowser gui) {
+        if (x < gui.width / 2)
+            UtilsFX.drawTexturedQuad(x, y, u, v, width, height, zLevel);
+        else {
+            x += 16;
+            ClientUtils.drawRectTextured(x, x + width, y, y + height, u + width, u, v + height, v, zLevel);
+        }
     }
 }
