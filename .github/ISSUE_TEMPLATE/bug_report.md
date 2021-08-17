@@ -35,3 +35,7 @@ If applicable, add crashreport via https://pastebin.com/, https://paste.ee/ or a
 
 ## Additional context
 Add any other context about the problem here.
+
+ex. 1: I'm using X modpack
+ex. 2: I have Y TC4 addon installed
+ex. 3: I edited my world with NBTExplorer a few days before.
