@@ -28,6 +28,7 @@ public class BrowserPaging {
     public static final int BUTTON_HEIGHT = 8;
     public static final int BUTTON_WIDTH = 24;
     private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
+    private static final int NAVIGATION_BUTTON_Z_LEVEL = -50;
     private static int currentPageIndex;
     private static int maxPageIndex;
     private static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
@@ -105,7 +106,7 @@ public class BrowserPaging {
     private static class ButtonPrevPage extends GuiButton {
         public ButtonPrevPage(int id, int x, int y) {
             super(id, x, y, BUTTON_WIDTH, BUTTON_HEIGHT, "");
-            zLevel = 10;
+            zLevel = NAVIGATION_BUTTON_Z_LEVEL;
         }
 
         private void updateState() {
@@ -118,9 +119,10 @@ public class BrowserPaging {
             if (visible) {
                 GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 184, 184 + 24, 208, 208 + 8, zLevel);
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
             }
         }
 
@@ -141,7 +143,7 @@ public class BrowserPaging {
         public ButtonNextPage(int id, int x, int y) {
             // draw an additional black line
             super(id, x, y, BUTTON_WIDTH + 1, BUTTON_HEIGHT, "");
-            zLevel = 10;
+            zLevel = NAVIGATION_BUTTON_Z_LEVEL;
         }
 
         private void updateState() {
@@ -154,9 +156,10 @@ public class BrowserPaging {
             if (visible) {
                 GL11.glColor4f(1, 1, 1, 1);
                 GL11.glEnable(GL11.GL_BLEND);
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
                 UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
                 ClientUtils.drawRectTextured(xPosition, xPosition + width, yPosition, yPosition + height, 207, 207 + 25, 208, 208 + 8, zLevel);
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
             }
         }
 
@@ -224,16 +227,6 @@ public class BrowserPaging {
                 if (ticks % 10 == 0 && !updated) {
                     updated = true;
                     updateMaxPageIndex((GuiResearchBrowser) e.gui);
-                }
-            }
-        }
-
-        @SubscribeEvent
-        public void onGuiPostDraw(GuiScreenEvent.DrawScreenEvent.Post e) {
-            // TC is missing this call. we'd do it for ya
-            if (e.gui instanceof GuiResearchBrowser) {
-                for (GuiButton button : ClientUtils.getButtonList(e.gui)) {
-                    button.drawButton(e.gui.mc, e.mouseX, e.mouseY);
                 }
             }
         }
