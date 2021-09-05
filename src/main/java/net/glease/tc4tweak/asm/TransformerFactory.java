@@ -10,6 +10,7 @@ class TransformerFactory {
     private final BiFunction<Integer, ClassVisitor, ClassVisitor> factory;
     private final Side activeSide;
     private final boolean expandFrames;
+    private volatile ClassVisitor generated;
 
     public TransformerFactory(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
         this(factory, null, false);
@@ -39,7 +40,13 @@ class TransformerFactory {
     }
 
     public final ClassVisitor apply(int api, ClassVisitor downstream) {
-        return factory.apply(api, downstream);
+        if (generated == null) {
+            synchronized (this) {
+                if (generated == null)
+                    generated = factory.apply(api, downstream);
+            }
+        }
+        return generated;
     }
 
     public boolean isExpandFrames() {
