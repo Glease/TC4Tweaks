@@ -22,7 +22,7 @@ apply plugin: 'forge'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.4.1"
+version = "1.4.2"
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 
@@ -67,10 +67,6 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
 }
 
 jar {
@@ -178,5 +174,15 @@ tasks.whenTaskAdded { it->
         it.onlyIf {
             project.hasProperty('curseforgeAPI')
         }
+    }
+}
+
+install.dependsOn reobf
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = new File(compileJava.destinationDir.parentFile.parentFile, "idea")
+        testOutputDir = new File(compileTestJava.destinationDir.parentFile.parentFile, "ideaTest")
     }
 }
