@@ -14,6 +14,8 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static net.glease.tc4tweak.asm.LoadingPlugin.debugOutputDir;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
@@ -22,6 +24,7 @@ import static org.objectweb.asm.Opcodes.ASM5;
 public class TC4Transformer implements IClassTransformer {
     static final Logger log = LogManager.getLogger("TC4TweakTransformer");
     private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
+    private static final ConcurrentMap<String, Integer> transformCounts = new ConcurrentHashMap<>();
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
             .put("makeo.gadomancy.client.renderers.tile", NodeLikeRendererVisitor.createFactory("renderNode"))
@@ -29,13 +32,13 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
-            .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileChestHungryRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileEldritchCapRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileEldritchObeliskRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileManaPodRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileNodeConverterRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
-            .put("thaumcraft.client.renderers.tile.TileNodeStabilizerRenderer", new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT, true))
+            .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileChestHungryRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileEldritchCapRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileEldritchObeliskRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileManaPodRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileNodeConverterRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
+            .put("thaumcraft.client.renderers.tile.TileNodeStabilizerRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileNodeRenderer", NodeLikeRendererVisitor.createFactory("renderNode"))
             .put("thaumcraft.client.renderers.tile.ItemNodeRenderer", new TransformerFactory(ItemNodeRendererVisitor::new, Side.CLIENT))
             .put("thaumcraft.common.tiles.TileMagicWorkbench", new TransformerFactory(TileMagicWorkbenchVisitor::new, Side.CLIENT))
@@ -70,9 +73,11 @@ public class TC4Transformer implements IClassTransformer {
         // we are very probably the last one to run.
         byte[] transformedBytes = null;
         if (DEBUG) {
-            try (PrintWriter origOut = new PrintWriter(new File(debugOutputDir, name + "_orig.txt"), "UTF-8");
-                 PrintWriter tranOut = new PrintWriter(new File(debugOutputDir, name + "_tran.txt"), "UTF-8")) {
-                cr.accept(new TraceClassVisitor(factory.apply(ASM5, transformedName, new TraceClassVisitor(cw, tranOut)), origOut), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
+            int curCount = transformCounts.compute(transformedName, (k, v) -> v == null ? 0 : v + 1);
+            String infix = curCount == 0 ? "" : "_" + curCount;
+            try (PrintWriter origOut = new PrintWriter(new File(debugOutputDir, name + infix + "_orig.txt"), "UTF-8");
+                 PrintWriter tranOut = new PrintWriter(new File(debugOutputDir, name + infix + "_tran.txt"), "UTF-8")) {
+                cr.accept(new TraceClassVisitor(factory.apply(ASM5, new TraceClassVisitor(cw, tranOut)), origOut), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
                 transformedBytes = cw.toByteArray();
             } catch (Exception e) {
                 log.warn("Unable to transform with debug output on. Now retrying without debug output.", e);
@@ -80,7 +85,7 @@ public class TC4Transformer implements IClassTransformer {
         }
         if (transformedBytes == null || transformedBytes.length == 0) {
             try {
-                cr.accept(factory.apply(ASM5, transformedName, cw), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
+                cr.accept(factory.apply(ASM5, cw), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
                 transformedBytes = cw.toByteArray();
             } catch (Exception e) {
                 catching(e);
