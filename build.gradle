@@ -69,10 +69,6 @@ processResources
     }
 }
 
-sourceSets {
-    main { output.resourcesDir = output.classesDir }
-}
-
 jar {
     manifest {
         attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
@@ -178,5 +174,15 @@ tasks.whenTaskAdded { it->
         it.onlyIf {
             project.hasProperty('curseforgeAPI')
         }
+    }
+}
+
+install.dependsOn reobf
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = new File(compileJava.destinationDir.parentFile.parentFile, "idea")
+        testOutputDir = new File(compileTestJava.destinationDir.parentFile.parentFile, "ideaTest")
     }
 }
