@@ -67,7 +67,14 @@ My quick and dirty patch of `generateItemHash()` will disable itself when GT6 is
 
 ### Other stuff
 
-The mod is tested with GTNH modpack and with latest thaumcraft 4 alone.
+The mod is tested under the following two configurations:
+1. GTNH latest dev pack
+2. Only this mod and latest thaumcraft 4.
+
+I used to install GT6 into my test env, but that slows down client down too much and is hampering my development speed.
+Therefore the compatibility with it would no longer comes as guarenteed.
+However I do wish to fix any future incompatibility if any more happens.
+
 Other configuration should work but is not guaranteed.
 Open a ticket in issues should you meet any problem.
 
