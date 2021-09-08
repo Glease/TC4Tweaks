@@ -32,9 +32,14 @@ public class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
         @Override
         public void visitCode() {
             super.visitCode();
+            Label lblSkipReturn = new Label();
+            // no world probably means the block is being rendered in inventory
+            // it probably have guards against getBlockType() == null regardless, so don't do our checks.
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", dev ? "hasWorldObj" : "func_145830_o", "()Z", false);
+            mv.visitJumpInsn(IFEQ, lblSkipReturn);
             mv.visitVarInsn(ALOAD, 1);
             mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", dev ? "getBlockType" : "func_145838_q", "()Lnet/minecraft/block/Block;", false);
-            Label lblSkipReturn = new Label();
             mv.visitJumpInsn(IFNONNULL, lblSkipReturn);
             mv.visitInsn(RETURN);
             mv.visitLabel(lblSkipReturn);
