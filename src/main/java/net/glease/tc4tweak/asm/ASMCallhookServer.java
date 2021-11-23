@@ -21,6 +21,7 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
+import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 
 public class ASMCallhookServer {
@@ -92,6 +93,11 @@ public class ASMCallhookServer {
                 tileEntity.setInventorySlotContentsSoftly(9, ThaumcraftCraftingManager.findMatchingArcaneRecipe(tileEntity, ip.player));
             }
         }
+    }
+
+    @Callhook
+    public static int hashCellLoc(CellLoc thiz) {
+        return ((1664525 * thiz.x) + 1013904223) ^ ((1664525 * (thiz.z ^ -559038737)) + 1013904223);
     }
 
     @Callhook
