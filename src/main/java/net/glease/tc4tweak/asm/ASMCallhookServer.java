@@ -13,6 +13,8 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
@@ -22,7 +24,10 @@ import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.world.dim.CellLoc;
+import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+
+import java.util.Map.Entry;
 
 public class ASMCallhookServer {
     private ASMCallhookServer() {
@@ -105,4 +110,24 @@ public class ASMCallhookServer {
         ThaumcraftApi.objectTags = GetObjectTags.newReplacementObjectTagsMap();
     }
 
+    @Callhook
+    public static NBTTagCompound writeMazeToNBT() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        NBTTagList tagList = new NBTTagList();
+
+        for( Entry<CellLoc, Short> entry : MazeHandler.labyrinth.entrySet()) {
+            short v;
+            if (entry.getValue() == null) continue;
+            if ((v = entry.getValue()) <= 0) continue;
+            CellLoc loc = entry.getKey();
+            NBTTagCompound cell = new NBTTagCompound();
+            cell.setInteger("x", loc.x);
+            cell.setInteger("z", loc.z);
+            cell.setShort("cell", v);
+            tagList.appendTag(cell);
+        }
+
+        nbt.setTag("cells", tagList);
+        return nbt;
+    }
 }
