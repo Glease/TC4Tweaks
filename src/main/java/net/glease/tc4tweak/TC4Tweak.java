@@ -19,7 +19,7 @@ import java.io.StringWriter;
 import java.security.cert.Certificate;
 import java.util.Map;
 
-@Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "${version}", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
+@Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "GRADLETOKEN_VERSION", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
 public class TC4Tweak {
     public static final String MOD_ID = "tc4tweak";
     private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");

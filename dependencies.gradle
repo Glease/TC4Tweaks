@@ -1,0 +1,11 @@
+// Add your dependencies here
+
+dependencies {
+    compile("thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev")
+
+    compileOnly("minetweaker:MineTweaker3:1.7.10-3.0.10:dev-full") {
+        transitive = false
+    }
+
+    runtime("com.github.GTNewHorizons:Baubles:master-SNAPSHOT:dev")
+}
