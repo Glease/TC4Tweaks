@@ -1,0 +1,15 @@
+// Add any additional repositiroes for your dependencies here
+
+repositories {
+    maven {
+        name = "gt"
+        url = "http://gregtech.overminddl1.com/"
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+    }
+    maven {
+        url = "https://jitpack.io"
+    }
+}

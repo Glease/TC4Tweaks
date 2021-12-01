@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-FMLCorePluginContainsFMLMod: true
-FMLCorePlugin: net.glease.tc4tweak.asm.LoadingPlugin
-

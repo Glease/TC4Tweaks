@@ -1,10 +1,10 @@
 [
 {
-  "modid": "tc4tweak",
-  "name": "TC4 Tweak",
+  "modid": "${modId}",
+  "name": "${modName}",
   "description": "Magic with ease",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${modVersion}",
+  "mcversion": "${minecraftVersion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["glee8e"],
