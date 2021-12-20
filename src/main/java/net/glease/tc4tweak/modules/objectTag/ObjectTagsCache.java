@@ -13,10 +13,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 class ObjectTagsCache extends FlushableCache<ConcurrentMap<Item, TIntObjectMap<AspectList>>> {
-    private static TIntObjectMap<AspectList> mergeTIntObjectMap(TIntObjectMap<AspectList> lhs, TIntObjectMap<AspectList> rhs) {
-        lhs.putAll(rhs);
-        return lhs;
-    }
 
     private static TIntObjectMap<AspectList> bakeSubmap(@SuppressWarnings("rawtypes") Map.Entry<List, AspectList> e) {
         TIntObjectMap<AspectList> submap = new TIntObjectHashMap<>();
@@ -40,7 +36,7 @@ class ObjectTagsCache extends FlushableCache<ConcurrentMap<Item, TIntObjectMap<A
                 .collect(Collectors.toConcurrentMap(
                         e -> (Item) e.getKey().get(0),
                         ObjectTagsCache::bakeSubmap,
-                        ObjectTagsCache::mergeTIntObjectMap
+                        FlushableCache::mergeTIntObjectMap
                 ));
     }
 }
