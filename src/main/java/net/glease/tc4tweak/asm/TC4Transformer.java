@@ -54,11 +54,20 @@ public class TC4Transformer implements IClassTransformer {
                     return super.isInactive() || LoadingPlugin.gt6;
                 }
             })
+            .put("thaumcraft.common.lib.world.dim.CellLoc", new TransformerFactory(CellLocVisitor::new))
+            .put("thaumcraft.common.lib.world.dim.MazeHandler", new TransformerFactory(MazeHandlerVisitor::new))
             .build();
 
     static void catching(Exception e) {
         log.fatal("Something went very wrong with class transforming! Aborting!!!", e);
-        throw new ReportedException(CrashReport.makeCrashReport(e, "Transforming class"));
+        RuntimeException exception;
+        try {
+            exception = new ReportedException(CrashReport.makeCrashReport(e, "Transforming class"));
+        } catch (Throwable e2) {
+            // presumably because this happened too early
+            exception = new RuntimeException("Transforming class", e);
+        }
+        throw exception;
     }
 
     @Override
