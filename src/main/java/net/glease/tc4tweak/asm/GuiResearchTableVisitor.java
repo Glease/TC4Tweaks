@@ -27,6 +27,7 @@ class GuiResearchTableVisitor extends ClassVisitor {
         mv.visitVarInsn(ALOAD, 0);
         mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/client/gui/GuiScreen", name, "()V", false);
         mv.visitInsn(RETURN);
+        mv.visitMaxs(1,1);
         super.visitEnd();
     }
 }
