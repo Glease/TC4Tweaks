@@ -18,6 +18,10 @@ class ThaumcraftApiVisitor extends ClassVisitor {
         if ("<clinit>".equals(name) && "()V".equals(desc)) {
             TC4Transformer.log.debug("Adding callhook to end of clinit");
             return new ClinitVisitor(api, mv);
+        } else if ("getCrucibleRecipeFromHash".equals(name) && "(I)Lthaumcraft/api/crafting/CrucibleRecipe;".equals(desc)) {
+            TC4Transformer.log.debug("Replacing getCrucibleRecipeFromHash(I)Lthaumcraft/api/crafting/CrucibleRecipe;");
+            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "getCrucibleRecipeFromHash", mv, null, desc);
+            return null;
         } else {
             return mv;
         }

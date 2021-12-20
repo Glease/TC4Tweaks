@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
 import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.wands.ItemFocusBasic;
@@ -129,5 +131,10 @@ public class ASMCallhookServer {
 
         nbt.setTag("cells", tagList);
         return nbt;
+    }
+
+    @Callhook
+    public static CrucibleRecipe getCrucibleRecipeFromHash(int hash) {
+        return FindCrucibleRecipe.getCrucibleRecipeFromHash(hash);
     }
 }

@@ -19,6 +19,7 @@ public class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((name.equals("renderTileEntityAt") || name.equals("func_147500_a")) && desc.equals("(Lnet/minecraft/tileentity/TileEntity;DDDF)V")) {
+            TC4Transformer.log.debug("Visiting {}", name);
             return new RenderTileEntityAtVisitor(api, mv);
         }
         return mv;
@@ -32,6 +33,7 @@ public class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
         @Override
         public void visitCode() {
             super.visitCode();
+            TC4Transformer.log.debug("Injected if guard at HEAD");
             Label lblSkipReturn = new Label();
             // no world probably means the block is being rendered in inventory
             // it probably have guards against getBlockType() == null regardless, so don't do our checks.

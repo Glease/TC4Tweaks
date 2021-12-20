@@ -8,6 +8,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
@@ -16,6 +17,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
@@ -62,9 +64,9 @@ public class GetObjectTags {
                 }
             }
 
-            tmp = ThaumcraftApi.objectTags.get(Arrays.asList(item, 32767));
+            tmp = ThaumcraftApi.objectTags.get(Arrays.asList(item, OreDictionary.WILDCARD_VALUE));
             if (tmp == null) {
-                if (meta == 32767) {
+                if (meta == OreDictionary.WILDCARD_VALUE) {
                     for (int index = 0; index < 16; ++index) {
                         tmp = ThaumcraftApi.objectTags.get(Arrays.asList(item, index));
                         if (tmp != null)
@@ -179,6 +181,7 @@ public class GetObjectTags {
      *
      * @return null if cache disabled. non null if cache enabled. might be an empty aspect list if the generateTag failed.
      */
+    @Nullable
     private static AspectList getBaseObjectTags(Item item, int meta) {
         ConcurrentMap<Item, TIntObjectMap<AspectList>> cache = GetObjectTags.cache.getCache();
         if (cache == null)
@@ -187,16 +190,16 @@ public class GetObjectTags {
         if (submap != null) {
             AspectList aspectList;
             if ((aspectList = submap.get(meta)) != null) return aspectList;
-            if ((aspectList = submap.get(32767)) != null) return aspectList;
+            if ((aspectList = submap.get(OreDictionary.WILDCARD_VALUE)) != null) return aspectList;
 
-            if (meta == 32767) {
+            if (meta == OreDictionary.WILDCARD_VALUE) {
                 for (int i = 0; i < 16; i++) {
                     if ((aspectList = submap.get(i)) != null) return aspectList;
                 }
             }
         }
         AspectList aspectList = ThaumcraftCraftingManager.generateTags(item, meta);
-        // do not return null -  u
+        // do not return null. null signals the cache is disabled
         return aspectList == null ? new AspectList() : aspectList;
     }
 

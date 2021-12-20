@@ -12,19 +12,25 @@ import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
 import cpw.mods.fml.relauncher.Side;
+import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "GRADLETOKEN_VERSION", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
 public class TC4Tweak {
     public static final String MOD_ID = "tc4tweak";
     private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
-    private static final ImmutableMap<String, String> KNOWN_SIGNATURE =
-            ImmutableMap.of("47:3C:3A:39:76:76:97:8F:F4:87:7A:BA:2D:57:86:0D:DA:20:E2:FC", "glease");
+    private static final ImmutableMap<String, String> KNOWN_SIGNATURE = ImmutableMap.<String, String>builder()
+            .put("473C3A397676978FF4877ABA2D57860DDA20E2FC", "glease")
+            .put("004227A857B097EDE4E36FACB9B5491BC9808464", "glease")
+            .build();
     @Mod.Instance
     public static TC4Tweak INSTANCE;
     @SidedProxy(serverSide = "net.glease.tc4tweak.CommonProxy", clientSide = "net.glease.tc4tweak.ClientProxy")
@@ -41,22 +47,27 @@ public class TC4Tweak {
 
             @Override
             public String call() {
-                try {
-                    Certificate certificate = Loader.instance().getIndexedModList().get(MOD_ID).getSigningCertificate();
-                    if (certificate == null)
-                        return "None. Do not bother glease for this crash!";
-                    String fingerprint = CertificateHelper.getFingerprint(certificate);
-                    // everyone can tamper the manifest and add a Built-By,
-                    // not so for signatures
-                    return fingerprint + ", Built by: " + KNOWN_SIGNATURE.getOrDefault(fingerprint, "Not known");
-                } catch (Exception e) {
-                    StringWriter sw = new StringWriter();
-                    sw.append("Cannot determine due to error: ");
-                    e.printStackTrace(new PrintWriter(sw));
-                    return sw.toString();
-                }
+                return getFingerprintDescriptions();
             }
         });
+    }
+
+    private String getFingerprintDescriptions() {
+        try {
+            Certificate[] certificates = LoadingPlugin.class.getProtectionDomain().getCodeSource().getCertificates();
+            if (certificates == null || certificates.length == 0)
+                return "None. Do not bother glease for this crash!";
+            // everyone can tamper the manifest and add a Built-By or sign a jar,
+            // not so for signatures
+            return Arrays.stream(certificates).map(c -> CertificateHelper.getFingerprint(c).toUpperCase(Locale.ROOT))
+                    .map(f -> f.replace(".", "") + ", Built by: " + KNOWN_SIGNATURE.getOrDefault(f, "Not known"))
+                    .collect(Collectors.joining("; "));
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            sw.append("Cannot determine due to error: ");
+            e.printStackTrace(new PrintWriter(sw));
+            return sw.toString();
+        }
     }
 
     void detectAndSendConfigChanges() {
