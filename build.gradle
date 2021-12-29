@@ -48,12 +48,17 @@ repositories {
         name = "gt"
         url = "http://gregtech.overminddl1.com/"
     }
+    maven {
+        name = "jitpack.io"
+        url = "https://jitpack.io"
+    }
 }
 
 dependencies {
     compile "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
     compile "thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev"
     compileOnly "minetweaker:MineTweaker3:1.7.10-3.0.10:dev-full"
+    compile "com.github.GTNewHorizons:NotEnoughItems:2.1.18-GTNH:dev"
 }
 
 processResources

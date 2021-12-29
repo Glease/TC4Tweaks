@@ -23,9 +23,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = "${version}", dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
+@Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = TC4Tweak.VERSION, dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
 public class TC4Tweak {
     public static final String MOD_ID = "tc4tweak";
+    public static final String VERSION = "${version}";
     private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
     private static final ImmutableMap<String, String> KNOWN_SIGNATURE = ImmutableMap.<String, String>builder()
             .put("473C3A397676978FF4877ABA2D57860DDA20E2FC", "glease")

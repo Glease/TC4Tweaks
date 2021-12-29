@@ -1,5 +1,6 @@
 package net.glease.tc4tweak.modules.objectTag;
 
+import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.minecraft.init.Items;
@@ -9,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.oredict.OreDictionary;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
@@ -19,10 +21,12 @@ import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class GetObjectTags {
     static final Logger log = LogManager.getLogger("GetObjectTags");
@@ -31,6 +35,29 @@ public class GetObjectTags {
     @SuppressWarnings({"rawtypes"})
     public static ConcurrentHashMap<List, AspectList> newReplacementObjectTagsMap() {
         return new InterceptingConcurrentHashMap();
+    }
+
+    public static Stream<Map.Entry<ItemStack, AspectList>> stream() {
+        if (cache.isEnabled())
+            return cache.getCache().entrySet().stream()
+                    .flatMap(e -> StreamSupport.stream(Spliterators.spliterator(iterate(e.getKey(), e.getValue()), e.getValue().size(), Spliterator.DISTINCT | Spliterator.NONNULL), false));
+        return Stream.empty();
+    }
+
+    private static Iterator<Map.Entry<ItemStack, AspectList>> iterate(Item owner, TIntObjectMap<AspectList> all) {
+        TIntObjectIterator<AspectList> backing = all.iterator();
+        return new Iterator<Entry<ItemStack, AspectList>>() {
+            @Override
+            public boolean hasNext() {
+                return backing.hasNext();
+            }
+
+            @Override
+            public Entry<ItemStack, AspectList> next() {
+                backing.advance();
+                return Pair.of(new ItemStack(owner, 1, backing.key()), backing.value());
+            }
+        };
     }
 
     @SuppressWarnings({"rawtypes"})
