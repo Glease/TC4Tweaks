@@ -8,7 +8,7 @@ import org.objectweb.asm.MethodVisitor;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static org.objectweb.asm.Opcodes.*;
 
-public class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
+class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
     static final TransformerFactory FACTORY = new TransformerFactory(TESRGetBlockTypeNullSafetyVisitor::new, Side.CLIENT);
 
     public TESRGetBlockTypeNullSafetyVisitor(int api, ClassVisitor cv) {

@@ -32,6 +32,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
+            .put("thaumcraft.client.lib.UtilsFX", new TransformerFactory(UtilsFXVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileChestHungryRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileEldritchCapRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)

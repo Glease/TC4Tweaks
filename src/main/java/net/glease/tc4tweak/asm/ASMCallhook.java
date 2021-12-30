@@ -1,16 +1,20 @@
 package net.glease.tc4tweak.asm;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ClientProxy;
 import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
+import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -22,6 +26,7 @@ public class ASMCallhook {
     // workbench throttling
     private static long lastUpdate = 0;
     private static boolean priorityChanged = false;
+    private static Field fieldParticleTexture;
 
     private ASMCallhook() {
     }
@@ -169,6 +174,17 @@ public class ASMCallhook {
         else {
             x += 16;
             ClientUtils.drawRectTextured(x, x + width, y, y + height, u + width, u, v + height, v, zLevel);
+        }
+    }
+
+    @Callhook
+    public static ResourceLocation getParticleTexture() {
+        try {
+            if (fieldParticleTexture == null)
+                fieldParticleTexture = ReflectionHelper.findField(EffectRenderer.class, "particleTextures", "b", "field_110737_b");
+            return (ResourceLocation) fieldParticleTexture.get(null);
+        } catch (Exception ignored) {
+            return null;
         }
     }
 }
