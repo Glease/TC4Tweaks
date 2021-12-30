@@ -7,6 +7,7 @@ import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -136,5 +137,10 @@ public class ASMCallhookServer {
     @Callhook
     public static CrucibleRecipe getCrucibleRecipeFromHash(int hash) {
         return FindCrucibleRecipe.getCrucibleRecipeFromHash(hash);
+    }
+
+    @Callhook
+    public static EntityItem onlyIfAlive(EntityItem sus) {
+        return sus != null && sus.isEntityAlive() ? sus : null;
     }
 }
