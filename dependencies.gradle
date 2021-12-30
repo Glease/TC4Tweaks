@@ -8,4 +8,5 @@ dependencies {
     }
 
     runtime("com.github.GTNewHorizons:Baubles:master-SNAPSHOT:dev")
+    compile "com.github.GTNewHorizons:NotEnoughItems:2.1.18-GTNH:dev"
 }

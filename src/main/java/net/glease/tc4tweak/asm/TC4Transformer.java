@@ -32,6 +32,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
+            .put("thaumcraft.client.lib.UtilsFX", new TransformerFactory(UtilsFXVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileChestHungryRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileEldritchCapRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
@@ -46,6 +47,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
             .put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
+            .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
             .put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
             .put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
