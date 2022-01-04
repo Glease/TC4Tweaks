@@ -14,6 +14,13 @@ class CrucibleRecipeByHash extends FlushableCache<TIntObjectMap<CrucibleRecipe>>
 	@Override
 	protected TIntObjectMap<CrucibleRecipe> createCache() {
 		List<?> list = ThaumcraftApi.getCraftingRecipes();
-		return list.stream().filter(r -> r instanceof CrucibleRecipe).map(r -> (CrucibleRecipe) r).collect(Collector.of(TIntObjectHashMap::new, (m, r)-> m.put(r.hash, r), FlushableCache::mergeTIntObjectMap, Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED));
+		TIntObjectMap<CrucibleRecipe> result = new TIntObjectHashMap<>();
+		for (Object o : list) {
+			if (o instanceof CrucibleRecipe) {
+				CrucibleRecipe recipe = (CrucibleRecipe) o;
+				result.putIfAbsent(recipe.hash, recipe);
+			}
+		}
+		return result;
 	}
 }
