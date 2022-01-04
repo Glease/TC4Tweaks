@@ -1,16 +1,15 @@
 package net.glease.tc4tweak.nei;
 
 import codechicken.nei.config.DataDumper;
+import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
-import thaumcraft.api.aspects.AspectList;
 
 import java.io.File;
-import java.util.stream.Collectors;
 
 public class DumpObjectTags extends DataDumper {
     public DumpObjectTags() {
@@ -31,12 +30,8 @@ public class DumpObjectTags extends DataDumper {
                         e.getKey().getItem().getUnlocalizedName(),
                         String.valueOf(Item.getIdFromItem(e.getKey().getItem())),
                         String.valueOf(Items.feather.getDamage(e.getKey())),
-                        toString(e.getValue())
+                        CommonUtils.toString(e.getValue())
                 }).iterator();
-    }
-
-    private static String toString(AspectList al) {
-        return al.aspects.entrySet().stream().filter(e -> e.getKey() != null && e.getValue() != null).map(e -> String.format("%dx%s", e.getValue(), e.getKey().getName())).collect(Collectors.joining(";"));
     }
 
     private static String safeGetDisplayName(ItemStack is) {
