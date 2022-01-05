@@ -2,18 +2,28 @@ package net.glease.tc4tweak.modules.findCrucibleRecipe;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.FlushableCache;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.crafting.CrucibleRecipe;
 
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
+
+import static net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe.log;
 
 class CrucibleRecipeByHash extends FlushableCache<TIntObjectMap<CrucibleRecipe>> {
 	@Override
 	protected TIntObjectMap<CrucibleRecipe> createCache() {
 		List<?> list = ThaumcraftApi.getCraftingRecipes();
-		return list.stream().filter(r -> r instanceof CrucibleRecipe).map(r -> (CrucibleRecipe) r).collect(Collector.of(TIntObjectHashMap::new, (m, r)-> m.put(r.hash, r), FlushableCache::mergeTIntObjectMap, Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED));
+		TIntObjectMap<CrucibleRecipe> result = new TIntObjectHashMap<>();
+		for (Object o : list) {
+			if (o instanceof CrucibleRecipe) {
+				CrucibleRecipe recipe = (CrucibleRecipe) o;
+				CrucibleRecipe existing = result.putIfAbsent(recipe.hash, recipe);
+				if (existing != null && log.isWarnEnabled())
+					log.warn("Recipe {} ignored due to collision with {} for hash {}", CommonUtils.toString(recipe), CommonUtils.toString(existing), recipe.hash);
+			}
+		}
+		return result;
 	}
 }
