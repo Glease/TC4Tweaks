@@ -29,7 +29,7 @@ apply plugin: 'forge'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'se.bjurr.gitchangelog.git-changelog-gradle-plugin'
 
-version = "1.4.13"
+version = new File("version.txt").getText("UTF-8").trim()
 group= "net.glease"
 archivesBaseName = "Thaumcraft4Tweaks"
 
