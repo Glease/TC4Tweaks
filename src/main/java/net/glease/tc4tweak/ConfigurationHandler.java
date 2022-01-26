@@ -54,7 +54,7 @@ public enum ConfigurationHandler {
     }
 
     @SubscribeEvent
-    public void onConfigChange(ConfigChangedEvent.PostConfigChangedEvent e) {
+    public void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent e) {
         if (e.modID.equals(TC4Tweak.MOD_ID)) {
             loadConfig(true);
             FlushableCache.enableAll(false);

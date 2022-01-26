@@ -18,6 +18,7 @@ public class GetResearch {
      * Called from {@link ResearchCategories#getResearch(String)}
      */
     public static ResearchItem getResearch(String key) {
+        if (key == null) return null;
         final Map<String, ResearchItem> map = cache.getCache();
         return map == null ? getResearchSlow(key) : map.get(key);
     }
@@ -28,7 +29,7 @@ public class GetResearch {
     private static ResearchItem getResearchSlow(String key) {
         return ResearchCategories.researchCategories.values().stream()
                 .flatMap(l -> l.research.values().stream())
-                .filter(i -> i.key.equals(key))
+                .filter(i -> key.equals(i.key))
                 .findFirst().orElse(null);
     }
 }
