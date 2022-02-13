@@ -1,6 +1,10 @@
 package net.glease.tc4tweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,10 +14,10 @@ import java.util.Map;
 
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 
-@IFMLLoadingPlugin.TransformerExclusions("net.glease.tc4tweak.asm")
-@IFMLLoadingPlugin.MCVersion("1.7.10")
-@IFMLLoadingPlugin.Name("TC4TweakCoreMod")
-@IFMLLoadingPlugin.SortingIndex(2000)
+@TransformerExclusions("net.glease.tc4tweak.asm")
+@MCVersion("1.7.10")
+@Name("TC4TweakCoreMod")
+@SortingIndex(2000)
 public class LoadingPlugin implements IFMLLoadingPlugin {
     static boolean dev;
     static boolean gt6;

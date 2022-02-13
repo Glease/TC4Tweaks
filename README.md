@@ -25,8 +25,8 @@ Generally, please follow the usual github workflow. Do not try to contact me in 
 
 ### Reporting issue
 
-Please use one of issue templates. Before you deleting everything in that template, think twice if it is indeed
-inappropriate. That'd make everyone's life easier.
+Please use one of the issue templates. Before you delete everything in that template, think twice if it is indeed
+inappropriate. That'll make everyone's life easier.
 
 ### Pull requests
 
@@ -69,13 +69,13 @@ My quick and dirty patch of `generateItemHash()` will disable itself when GT6 is
 
 The mod is tested under the following two configurations:
 1. GTNH latest dev pack
-2. Only this mod and latest thaumcraft 4.
+2. Only this mod and latest Thaumcraft 4.
 
-I used to install GT6 into my test env, but that slows down client down too much and is hampering my development speed.
-Therefore the compatibility with it would no longer comes as guarenteed.
-However I do wish to fix any future incompatibility if any more happens.
+I used to install GT6 into my test env, but that slows my client down too much and is hampering my development speed.
+Therefore, the compatibility with it will no longer come as guaranteed.
+However, I do wish to fix any future incompatibility.
 
-Other configuration should work but is not guaranteed.
+Other configurations should work but is not guaranteed.
 Open a ticket in issues should you meet any problem.
 
 

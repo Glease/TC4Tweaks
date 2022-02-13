@@ -2,14 +2,19 @@
 
 repositories {
     maven {
-        name = "gt"
-        url = "http://gregtech.overminddl1.com/"
+        name 'GTNH Maven'
+        url 'http://jenkins.usrv.eu:8081/nexus/content/groups/public/'
+        allowInsecureProtocol
+    }
+    maven {
+        name 'gt'
+        url 'http://gregtech.overminddl1.com/'
         metadataSources {
             mavenPom()
             artifact()
         }
     }
     maven {
-        url = "https://jitpack.io"
+        url 'https://jitpack.io'
     }
 }
