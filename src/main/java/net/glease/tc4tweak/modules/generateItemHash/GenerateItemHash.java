@@ -86,10 +86,10 @@ public class GenerateItemHash {
                 Arrays.sort(range);
                 if (Arrays.binarySearch(range, meta) >= 0) {
                     GameRegistry.UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
-                    int hash = ui != null ? ui.hashCode() : t.getUnlocalizedName().hashCode();
-                    hash = hash * 31 + ':';
+                    int hash = ui != null ? ((ui.modId.hashCode() * 31 + ':') * 31 + ui.name.hashCode() ) : t.getUnlocalizedName().hashCode();
 
                     for (int r : range) {
+                        hash = hash * 31 + ':';
                         hash = updateHash(hash, r);
                     }
 
@@ -98,8 +98,7 @@ public class GenerateItemHash {
             }
         }
 
-        key.set(1, -1);
-        if (meta == -1 && !ThaumcraftApi.objectTags.containsKey(key)) {
+        if (meta == -1) {
             for (int i = 0; i < 16; i++) {
                 key.set(1, i);
                 if (ThaumcraftApi.objectTags.containsKey(key))
