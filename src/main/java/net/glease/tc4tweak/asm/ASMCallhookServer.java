@@ -7,6 +7,7 @@ import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -17,11 +18,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -118,7 +124,7 @@ public class ASMCallhookServer {
         NBTTagCompound nbt = new NBTTagCompound();
         NBTTagList tagList = new NBTTagList();
 
-        for( Entry<CellLoc, Short> entry : MazeHandler.labyrinth.entrySet()) {
+        for (Entry<CellLoc, Short> entry : MazeHandler.labyrinth.entrySet()) {
             short v;
             if (entry.getValue() == null) continue;
             if ((v = entry.getValue()) <= 0) continue;
@@ -142,5 +148,140 @@ public class ASMCallhookServer {
     @Callhook
     public static Entity onlyIfAlive(Entity sus) {
         return sus != null && sus.isEntityAlive() ? sus : null;
+    }
+
+    @Callhook
+    public static boolean canNodeBeSeen(TileVisNode source, TileVisNode target) {
+        World world = source.getWorldObj();
+        Vec3 v1 = Vec3.createVectorHelper((double) source.xCoord + 0.5D, (double) source.yCoord + 0.5D, (double) source.zCoord + 0.5D);
+        Vec3 v2 = Vec3.createVectorHelper((double) target.xCoord + 0.5D, (double) target.yCoord + 0.5D, (double) target.zCoord + 0.5D);
+        if (Double.isNaN(v1.xCoord) || Double.isNaN(v1.yCoord) || Double.isNaN(v1.zCoord)) return false;
+        if (Double.isNaN(v2.xCoord) || Double.isNaN(v2.yCoord) || Double.isNaN(v2.zCoord)) return false;
+        int i = MathHelper.floor_double(v2.xCoord);
+        int j = MathHelper.floor_double(v2.yCoord);
+        int k = MathHelper.floor_double(v2.zCoord);
+        int l = MathHelper.floor_double(v1.xCoord);
+        int i1 = MathHelper.floor_double(v1.yCoord);
+        int j1 = MathHelper.floor_double(v1.zCoord);
+        int k1 = source.getRange() * 5; // mathematician please help. likely not * 5...
+
+        while (k1-- >= 0) {
+            if (Double.isNaN(v1.xCoord) || Double.isNaN(v1.yCoord) || Double.isNaN(v1.zCoord)) {
+                return false;
+            }
+
+            if (l != i || i1 != j || j1 != k) {
+                boolean flag6 = true;
+                boolean flag3 = true;
+                boolean flag4 = true;
+                double d0 = 999.0D;
+                double d1 = 999.0D;
+                double d2 = 999.0D;
+                if (i > l) {
+                    d0 = (double) l + 1.0D;
+                } else if (i < l) {
+                    d0 = (double) l + 0.0D;
+                } else {
+                    flag6 = false;
+                }
+
+                if (j > i1) {
+                    d1 = (double) i1 + 1.0D;
+                } else if (j < i1) {
+                    d1 = (double) i1 + 0.0D;
+                } else {
+                    flag3 = false;
+                }
+
+                if (k > j1) {
+                    d2 = (double) j1 + 1.0D;
+                } else if (k < j1) {
+                    d2 = (double) j1 + 0.0D;
+                } else {
+                    flag4 = false;
+                }
+
+                double d3 = 999.0D;
+                double d4 = 999.0D;
+                double d5 = 999.0D;
+                double d6 = v2.xCoord - v1.xCoord;
+                double d7 = v2.yCoord - v1.yCoord;
+                double d8 = v2.zCoord - v1.zCoord;
+                if (flag6) {
+                    d3 = (d0 - v1.xCoord) / d6;
+                }
+
+                if (flag3) {
+                    d4 = (d1 - v1.yCoord) / d7;
+                }
+
+                if (flag4) {
+                    d5 = (d2 - v1.zCoord) / d8;
+                }
+
+                byte b0;
+                if (d3 < d4 && d3 < d5) {
+                    if (i > l) {
+                        b0 = 4;
+                    } else {
+                        b0 = 5;
+                    }
+
+                    v1.xCoord = d0;
+                    v1.yCoord += d7 * d3;
+                    v1.zCoord += d8 * d3;
+                } else if (d4 < d5) {
+                    if (j > i1) {
+                        b0 = 0;
+                    } else {
+                        b0 = 1;
+                    }
+
+                    v1.xCoord += d6 * d4;
+                    v1.yCoord = d1;
+                    v1.zCoord += d8 * d4;
+                } else {
+                    if (k > j1) {
+                        b0 = 2;
+                    } else {
+                        b0 = 3;
+                    }
+
+                    v1.xCoord += d6 * d5;
+                    v1.yCoord += d7 * d5;
+                    v1.zCoord = d2;
+                }
+
+                l = MathHelper.floor_double(v1.xCoord);
+                if (b0 == 5) {
+                    --l;
+                }
+
+                i1 = MathHelper.floor_double(v1.yCoord);
+                if (b0 == 1) {
+                    --i1;
+                }
+
+                j1 = MathHelper.floor_double(v1.zCoord);
+                if (b0 == 3) {
+                    --j1;
+                }
+
+                if (l == target.xCoord && i1 == target.yCoord && j1 == target.zCoord)
+                    return true;
+
+                Block block1 = world.getBlock(l, i1, j1);
+                int l1 = world.getBlockMetadata(l, i1, j1);
+                if (block1.canCollideCheck(l1, false)) {
+                    if (block1.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) {
+                        MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, l, i1, j1, v1, v2);
+                        if (movingobjectposition1 != null && movingobjectposition1.typeOfHit != MovingObjectPosition.MovingObjectType.MISS) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
