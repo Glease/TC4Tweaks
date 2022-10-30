@@ -1,6 +1,7 @@
 package net.glease.tc4tweak;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -8,6 +9,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
+import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
@@ -112,15 +114,14 @@ public class ClientProxy extends CommonProxy {
         } catch (Exception err) {
             System.err.println("Cannot find thaumcraft fields. Aspect list scrolling will not properly function!");
             err.printStackTrace();
-            return;
         }
+        String mouseClicked = LoadingPlugin.isDev() ? "mouseClicked" : "func_73864_a";
         try {
-            GuiResearchRecipeMouseClicked = GuiResearchRecipe.class.getDeclaredMethod("mouseClicked", int.class, int.class, int.class);
+            GuiResearchRecipeMouseClicked = GuiResearchRecipe.class.getDeclaredMethod(mouseClicked, int.class, int.class, int.class);
             GuiResearchRecipeMouseClicked.setAccessible(true);
         } catch (Exception err) {
             System.err.println("Cannot find thaumcraft fields. Research page scrolling will not properly function!");
             err.printStackTrace();
-            return;
         }
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(instance);
@@ -157,7 +158,7 @@ public class ClientProxy extends CommonProxy {
             MinecraftForge.EVENT_BUS.unregister(wgSearcher);
             FMLCommonHandler.instance().bus().unregister(wgSearcher);
         } catch (ReflectiveOperationException ignored) {
-            // WG is probably installed, ignoring
+            // WG is probably not installed, ignoring
         }
     }
 
