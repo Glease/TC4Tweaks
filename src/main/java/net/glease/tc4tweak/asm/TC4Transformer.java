@@ -31,7 +31,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.visnet.VisNetHandler", new TransformerFactory(VisNetHandlerVisitor::new))
             .put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
-            .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
+            .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(AddHandleMouseInputVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.lib.UtilsFX", new TransformerFactory(UtilsFXVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)

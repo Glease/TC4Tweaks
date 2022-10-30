@@ -10,6 +10,7 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
+import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
@@ -68,6 +69,14 @@ public class ASMCallhook {
      */
     @Callhook
     public static void handleMouseInput(GuiResearchTable screen) {
+        ClientProxy.handleMouseInput(screen);
+    }
+
+    /**
+     * called from GuiResearchRecipe. first arg is this
+     */
+    @Callhook
+    public static void handleMouseInput(GuiResearchRecipe screen) {
         ClientProxy.handleMouseInput(screen);
     }
 
