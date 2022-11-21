@@ -22,7 +22,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.9'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.11'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         classpath "se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.65"
     }
