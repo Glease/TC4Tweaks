@@ -3,6 +3,7 @@ package net.glease.tc4tweak.modules.objectTag;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPotion;
@@ -250,21 +251,28 @@ public class GetObjectTags {
         @Override
         public AspectList put(List key, AspectList value) {
             mutateObjectTagsSubmap(key, (submap, meta) -> submap.put(meta, value));
+            GenerateItemHash.onNewObjectTag(key);
             return super.put(key, value);
         }
 
         @Override
         public AspectList remove(Object key) {
-            if (key instanceof List) mutateObjectTagsSubmap((List<?>) key, TIntObjectMap::remove);
+            if (key instanceof List) {
+                List<?> key1 = (List<?>) key;
+                mutateObjectTagsSubmap(key1, TIntObjectMap::remove);
+                GenerateItemHash.onRemoveObjectTag(key1);
+            }
             return super.remove(key);
         }
 
         @Override
         public boolean remove(Object key, Object value) {
             if (key instanceof List && value instanceof AspectList) {
-                mutateObjectTagsSubmap((List<?>) key, (submap, meta) -> {
+                List<?> key1 = (List<?>) key;
+                mutateObjectTagsSubmap(key1, (submap, meta) -> {
                     if (value.equals(submap.get(meta))) submap.remove(meta);
                 });
+                GenerateItemHash.onRemoveObjectTag(key1);
             }
             return super.remove(key, value);
         }

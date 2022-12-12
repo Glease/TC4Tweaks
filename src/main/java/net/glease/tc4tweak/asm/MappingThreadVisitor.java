@@ -7,8 +7,17 @@ import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
 import static org.objectweb.asm.Opcodes.*;
 
 class MappingThreadVisitor extends ClassVisitor {
+
+    private String className;
+
     public MappingThreadVisitor(int api, ClassVisitor cv) {
         super(api, cv);
+    }
+
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        className = name;
+        super.visit(version, access, className, signature, superName, interfaces);
     }
 
     @Override
@@ -22,7 +31,7 @@ class MappingThreadVisitor extends ClassVisitor {
         }
     }
 
-    private static class RunVisitor extends MethodVisitor {
+    private class RunVisitor extends MethodVisitor {
         public RunVisitor(int api, MethodVisitor mv) {
             super(api, mv);
         }
@@ -30,10 +39,10 @@ class MappingThreadVisitor extends ClassVisitor {
         @Override
         public void visitCode() {
             super.visitCode();
-            TC4Transformer.log.debug("Injecting thread priority change");
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-            mv.visitInsn(ICONST_1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "setPriority", "(I)V", false);
+            TC4Transformer.log.debug("Injecting callhook at HEAD");
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitFieldInsn(GETFIELD, className, "idMappings", "Ljava/util/Map;");
+            mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "onMappingStart", "(Ljava/util/Map;)V", false);
         }
 
         @Override
@@ -43,6 +52,15 @@ class MappingThreadVisitor extends ClassVisitor {
                 TC4Transformer.log.debug("Injecting callhook before Iterator#next()");
                 mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "onMappingDidWork", "()V", false);
             }
+        }
+
+        @Override
+        public void visitInsn(int opcode) {
+            if (opcode == RETURN) {
+                TC4Transformer.log.debug("Injecting callhook before {}", opcode);
+                mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "onMappingFinished", "()V", false);
+            }
+            super.visitInsn(opcode);
         }
     }
 }

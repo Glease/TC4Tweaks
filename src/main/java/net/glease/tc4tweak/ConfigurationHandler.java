@@ -21,6 +21,7 @@ public enum ConfigurationHandler {
     private boolean checkWorkbenchRecipes;
     private int arcaneCraftingHistorySize;
     private boolean addTooltip;
+    private boolean mappingThreadNice;
     private float browserScale;
     private boolean limitBookSearchToCategory;
     private float nodeVisualSizeLimit;
@@ -68,6 +69,21 @@ public enum ConfigurationHandler {
         inverted = config.getBoolean("inverted", "client", false, "Flip it if you find the scrolling unintuitive");
         updateInterval = config.getInt("updateInterval", "client", 4, 0, 40, "How often should Arcane Workbench update displayed crafting result. Unit is in game ticks.");
         addTooltip = config.getBoolean("addTooltip", "client", true, "If false, no tooltip will be added.");
+        int mappingThreadNiceType = config.getInt("mappingThreadNiceType", "client", 0, 0, 2, "Whether to adjust mapping thread priority. 0 means auto. 1 means force enable. 2 means force disable.");
+        switch (mappingThreadNiceType) {
+            case 1:
+                mappingThreadNice = true;
+                break;
+            case 2:
+                mappingThreadNice = false;
+                break;
+            default:
+                // 1 for integrated server. 1 for client thread. both of these are critical foreground tasks
+                // so if less than 3 hardware threads available, let's be nice. otherwise, being nice only cause more
+                // preemption and does no good to preserve good CPU time for foreground tasks
+                mappingThreadNice = Runtime.getRuntime().availableProcessors() < 3;
+                break;
+        }
         browserScale = config.getFloat("scale", "client.browser_scale", 1, 1, 4, "Tweak the size of the book gui. No longer works if inferBrowserScale is set to true.");
         limitBookSearchToCategory = config.getBoolean("limitBookSearchToCategory", "client", false, "Whether the book gui search should search current tab only.");
         nodeVisualSizeLimit = config.getFloat("limitOversizedNodeRender", "client", 1, 0.5f, 1e10f, "The upper limit on how big nodes can be rendered. This is purely a visual thing and will not affect how big your node can actually grow. Setting a value like 10000.0 will effectively turn off this functionality, i.e. not limit the rendered size.");
@@ -113,6 +129,10 @@ public enum ConfigurationHandler {
 
     public boolean isAddTooltip() {
         return addTooltip;
+    }
+
+    public boolean isMappingThreadNice() {
+        return mappingThreadNice;
     }
 
     public float getBrowserScale() {
