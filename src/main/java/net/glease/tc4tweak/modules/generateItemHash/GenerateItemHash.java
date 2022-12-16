@@ -157,7 +157,7 @@ public class GenerateItemHash {
     }
 
     private static int hash(Item item, int meta, ItemStack t) {
-        return updateHash(getUniqueIdentifierHash(item, t), meta);
+        return updateHash(updateHashColon(getUniqueIdentifierHash(item, t)), meta);
     }
 
     private static int getUniqueIdentifierHash(Item item, ItemStack t) {
