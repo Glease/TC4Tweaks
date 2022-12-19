@@ -48,6 +48,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
             .put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
             .put("thaumcraft.common.blocks.BlockFluxGas", new TransformerFactory(BlockFluxGasVisitor::new))
+            .put("thaumcraft.common.blocks.BlockJar", new TransformerFactory(BlockJarVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
@@ -61,6 +62,9 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.lib.world.dim.CellLoc", new TransformerFactory(CellLocVisitor::new))
             .put("thaumcraft.common.lib.world.dim.MazeHandler", new TransformerFactory(MazeHandlerVisitor::new))
             .put("thaumcraft.common.tiles.TileInfusionMatrix", new TransformerFactory(TileInfusionMatrixVisitor::new))
+            .put("thaumcraft.common.tiles.TileTube", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
+            .put("thaumcraft.common.tiles.TileJarFillable", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
+//            .put("", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
             .put("thaumcraft.common.Thaumcraft", new TransformerFactory(ThaumcraftVisitor::new))
             .build();
 
