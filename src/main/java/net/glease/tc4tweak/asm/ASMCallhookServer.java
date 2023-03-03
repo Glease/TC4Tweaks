@@ -291,4 +291,28 @@ public class ASMCallhookServer {
     public static float getBlockJarEntityCollisionBoxParameter(int index) {
         return EntityCollisionBox.getBlockJarEntityCollisionBoxParameter(index);
     }
+
+    @Callhook
+    public static boolean addToPlayerInventoryBiased(InventoryPlayer inv, ItemStack s) {
+        if (s == null || s.stackSize == 0 || s.getItem() == null) return false;
+        // logic: first try to stack, then try to place in original slot, last fallback to vanilla logic
+        for (ItemStack stack : inv.mainInventory) {
+            if (stack != null && stack.isStackable() &&
+                    stack.stackSize < Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit())
+                    && (!stack.getHasSubtypes() || stack.getItemDamage() == s.getItemDamage()) &&
+                    ItemStack.areItemStackTagsEqual(stack, s)) {
+                int toAdd = Math.min(s.stackSize, Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit()) - stack.stackSize);
+                s.stackSize -= toAdd;
+                stack.stackSize += toAdd;
+                stack.animationsToGo = 5;
+                if (s.stackSize == 0) return true;
+            }
+        }
+        if (inv.currentItem >= 0 && inv.currentItem < InventoryPlayer.getHotbarSize() && inv.getCurrentItem() == null) {
+            inv.setInventorySlotContents(inv.currentItem, s);
+            return true;
+        } else {
+            return inv.addItemStackToInventory(s);
+        }
+    }
 }

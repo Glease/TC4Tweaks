@@ -49,6 +49,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
             .put("thaumcraft.common.blocks.BlockFluxGas", new TransformerFactory(BlockFluxGasVisitor::new))
             .put("thaumcraft.common.blocks.BlockJar", new TransformerFactory(BlockJarVisitor::new))
+            .put("thaumcraft.common.blocks.BlockMetalDevice", new TransformerFactory(BlockMetalDeviceVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
