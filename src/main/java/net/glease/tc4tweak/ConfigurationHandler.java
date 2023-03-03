@@ -3,6 +3,7 @@ package net.glease.tc4tweak;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -29,6 +30,7 @@ public enum ConfigurationHandler {
     private float inferBrowserScaleUpperBound;
     private float inferBrowserScaleLowerBound;
     private boolean inferBrowserScaleConsiderSearch;
+    private boolean smallerJars;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -91,6 +93,7 @@ public enum ConfigurationHandler {
         inferBrowserScaleUpperBound = config.getFloat("maximum", "client.browser_scale", 4, 1, 16, "The minimum inferred scale. Cannot be smaller than the value of inferBrowserScaleLowerBound. This shouldn't be too high as a huge browser would be rendered with really poor image quality.");
         inferBrowserScaleLowerBound = config.getFloat("minimum", "client.browser_scale", 1, 1, 16, "The maximum inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
         inferBrowserScaleConsiderSearch = config.getBoolean("considerSearchArea", "client.browser_scale", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
+        smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -98,8 +101,8 @@ public enum ConfigurationHandler {
 
         browserWidth = (int) (browserScale * 256);
         browserHeight = (int) (browserScale * 230);
-        // if allow checking (vanilla behavior) no need to force client to have this mod
-        TC4Tweak.INSTANCE.setAllowAll(checkWorkbenchRecipes);
+        // it has been proven that the lack of this mod on client side is not a concern at all, for now
+        TC4Tweak.INSTANCE.setAllowAll(true);
         if (send) {
             TC4Tweak.INSTANCE.detectAndSendConfigChanges();
             BrowserPaging.flushCache();
@@ -167,5 +170,9 @@ public enum ConfigurationHandler {
 
     public boolean isInferBrowserScaleConsiderSearch() {
         return inferBrowserScaleConsiderSearch;
+    }
+
+    public boolean isSmallerJars() {
+        return smallerJars;
     }
 }

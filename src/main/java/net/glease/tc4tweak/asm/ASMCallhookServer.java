@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.modules.blockJar.EntityCollisionBox;
 import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
 import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
@@ -284,5 +285,10 @@ public class ASMCallhookServer {
             }
         }
         return false;
+    }
+
+    @Callhook
+    public static float getBlockJarEntityCollisionBoxParameter(int index) {
+        return EntityCollisionBox.getBlockJarEntityCollisionBoxParameter(index);
     }
 }

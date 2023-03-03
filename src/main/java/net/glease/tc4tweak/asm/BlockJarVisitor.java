@@ -3,6 +3,7 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
@@ -31,6 +32,22 @@ public class BlockJarVisitor extends ClassVisitor {
                         mv.visitVarInsn(ALOAD, 10);
                         mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/tileentity/TileEntity", dev ? "markDirty" : "func_70296_d", "()V", false);
                     }
+                }
+            };
+        } else if (name.equals(dev ? "addCollisionBoxesToList" : "")) {
+            return new MethodVisitor(api, mv) {
+                private int visited = 0;
+
+                @Override
+                public void visitInsn(int opcode) {
+                    if (opcode == FCONST_1 || opcode == FCONST_0) {
+                        if (visited >= 6)
+                            throw new IllegalStateException();
+                        mv.visitInsn(ICONST_0 + visited);
+                        mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "getBlockJarEntityCollisionBoxParameter", "(I)F", false);
+                        visited++;
+                    } else
+                        super.visitInsn(opcode);
                 }
             };
         }
