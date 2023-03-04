@@ -52,6 +52,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.blocks.BlockMetalDevice", new TransformerFactory(BlockMetalDeviceVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
+            .put("thaumcraft.common.items.equipment.ItemElementalShovel", new TransformerFactory(ItemElementalShovelVisitor::new, true))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
             .put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
             .put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
