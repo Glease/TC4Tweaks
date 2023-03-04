@@ -63,6 +63,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.lib.world.dim.CellLoc", new TransformerFactory(CellLocVisitor::new))
             .put("thaumcraft.common.lib.world.dim.MazeHandler", new TransformerFactory(MazeHandlerVisitor::new))
             .put("thaumcraft.common.tiles.TileInfusionMatrix", new TransformerFactory(TileInfusionMatrixVisitor::new))
+            .put("thaumcraft.common.tiles.TileHole", new TransformerFactory(TileHoleVisitor::new))
             .put("thaumcraft.common.tiles.TileTube", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
             .put("thaumcraft.common.tiles.TileJarFillable", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
 //            .put("", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))

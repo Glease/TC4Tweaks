@@ -12,6 +12,7 @@ import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.MessageSendConfigurationV2;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
+import net.glease.tc4tweak.network.TileHoleSyncPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.research.ResearchCategories;
@@ -24,6 +25,8 @@ public class CommonProxy {
             MTCompat.preInit();
 
         TC4Tweak.INSTANCE.CHANNEL.registerMessage(MessageSendConfiguration.class, MessageSendConfiguration.class, 0, Side.CLIENT);
+        TC4Tweak.INSTANCE.CHANNEL.registerMessage(MessageSendConfigurationV2.class, MessageSendConfigurationV2.class, 1, Side.CLIENT);
+        TC4Tweak.INSTANCE.CHANNEL.registerMessage(TileHoleSyncPacket.class, TileHoleSyncPacket.class, 2, Side.CLIENT);
         int debugadd = Integer.getInteger("glease.debug.addtc4tabs.pre", 0);
         addDummyCategories(debugadd, "DUMMYPRE");
     }

@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.TC4Tweak;
 import net.glease.tc4tweak.modules.blockJar.EntityCollisionBox;
 import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
@@ -8,6 +9,7 @@ import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
+import net.glease.tc4tweak.network.TileHoleSyncPacket;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +21,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -313,6 +317,16 @@ public class ASMCallhookServer {
             return true;
         } else {
             return inv.addItemStackToInventory(s);
+        }
+    }
+
+    @Callhook
+    public static Packet createTileHoleSyncPacket(S35PacketUpdateTileEntity origin) {
+        try {
+            return TC4Tweak.INSTANCE.CHANNEL.getPacketFrom(new TileHoleSyncPacket(origin));
+        } catch (Exception ex) {
+            // fallback to original packet if anything goes wrong
+            return origin;
         }
     }
 }
