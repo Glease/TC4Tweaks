@@ -34,7 +34,7 @@ public class BlockJarVisitor extends ClassVisitor {
                     }
                 }
             };
-        } else if (name.equals(dev ? "addCollisionBoxesToList" : "")) {
+        } else if (name.equals(dev ? "addCollisionBoxesToList" : "func_149743_a")) {
             return new MethodVisitor(api, mv) {
                 private int visited = 0;
 
