@@ -297,7 +297,7 @@ public class ASMCallhookServer {
         if (s == null || s.stackSize == 0 || s.getItem() == null) return false;
         // logic: first try to stack, then try to place in original slot, last fallback to vanilla logic
         for (ItemStack stack : inv.mainInventory) {
-            if (stack != null && stack.isStackable() &&
+            if (stack != null && stack.isStackable() && stack.getItem() == s.getItem() &&
                     stack.stackSize < Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit())
                     && (!stack.getHasSubtypes() || stack.getItemDamage() == s.getItemDamage()) &&
                     ItemStack.areItemStackTagsEqual(stack, s)) {
