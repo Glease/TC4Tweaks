@@ -1,201 +1,186 @@
-package net.glease.tc4tweak.modules.generateItemHash;
+package net.glease.tc4tweak.modules.generateItemHash
 
-import com.google.common.collect.ImmutableList;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import thaumcraft.api.ThaumcraftApi;
-import thaumcraft.api.aspects.AspectList;
+import cpw.mods.fml.common.registry.GameRegistry
+import cpw.mods.fml.relauncher.ReflectionHelper
+import net.minecraft.block.Block
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import thaumcraft.api.ThaumcraftApi
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static net.glease.tc4tweak.TC4Tweak.log;
-
-public class GenerateItemHash {
-    private static final String DEFAULT_NAMESPACE = "oops:";
-    private static final int DEFAULT_NAMESPACE_HASH_BASE = DEFAULT_NAMESPACE.hashCode() * 31;
-    private static final ConcurrentHashMap<List<?>, int[]> groupedObjectTags;
-    private static final CustomItemStacks customItemStacksCache = new CustomItemStacks();
-    private static final RangedObjectTags rangedObjectTags = new RangedObjectTags();
-    private static final ThreadLocal<StringBuilder> buffer = ThreadLocal.withInitial(StringBuilder::new);
-
-    static {
-        ConcurrentHashMap<List<?>, int[]> tmp;
-        try {
-            tmp = ReflectionHelper.getPrivateValue(ThaumcraftApi.class, null, "groupedObjectTags");
-        } catch (Exception e) {
-            tmp = new ConcurrentHashMap<>();
-        }
-        groupedObjectTags = tmp;
+object GenerateItemHash {
+    private const val DEFAULT_NAMESPACE = "oops:"
+    private val DEFAULT_NAMESPACE_HASH_BASE = DEFAULT_NAMESPACE.hashCode() * 31
+    private val groupedObjectTags: ConcurrentHashMap<List<*>, IntArray> = try {
+        ReflectionHelper.getPrivateValue<ConcurrentHashMap<List<*>, IntArray>, ThaumcraftApi>(
+            ThaumcraftApi::class.java, null, "groupedObjectTags"
+        )
+    } catch (e: Exception) {
+        ConcurrentHashMap()
     }
+    private val customItemStacksCache = CustomItemStacks()
+    private val rangedObjectTags = RangedObjectTags()
+    private val buffer = ThreadLocal.withInitial { StringBuilder() }
 
     /**
-     * give hash as if the whole thing was a string: {@code (earlierString+":").hashCode()}
+     * give hash as if the whole thing was a string: `(earlierString+":").hashCode()`
      *
-     * @param hash   {@code earlierString.hashCode()}
+     * @param hash   `earlierString.hashCode()`
      */
-    private static int updateHashColon(int hash) {
-        return hash * 31 + ':';
+    private fun updateHashColon(hash: Int): Int {
+        return hash * 31 + ':'.toInt()
     }
 
     /**
-     * give hash as if the whole thing was a string: {@code (earlierString+Integer.toString(number)).hashCode()}
+     * give hash as if the whole thing was a string: `(earlierString+Integer.toString(number)).hashCode()`
      *
-     * @param hash   {@code earlierString.hashCode()}
+     * @param hash   `earlierString.hashCode()`
      * @param number the number part
      */
-    private static int updateHash(int hash, int number) {
+    private fun updateHash(hash: Int, number: Int): Int {
         // AbstractStringBuilder.append(int) is the only way to call into JDK's optimized int toString implementation
         // using a mutable buffer we control.
         // Integer.getChars() requires allocation and I hate it.
         // nasty, but it improves performance by up to 33% per JMH tests
         // not to mention the GC savings
-        StringBuilder buffer = GenerateItemHash.buffer.get();
-        buffer.delete(0, buffer.length());
-        buffer.append(number);
-        return updateHash(hash, buffer);
+        val buffer = buffer.get()
+        buffer.delete(0, buffer.length)
+        buffer.append(number)
+        return updateHash(hash, buffer)
     }
 
     /**
-     * give hash as if the whole thing was a string: {@code (earlierString+later).hashCode()}
+     * give hash as if the whole thing was a string: `(earlierString+later).hashCode()`
      *
-     * @param hash  {@code earlierString.hashCode()}
+     * @param hash  `earlierString.hashCode()`
      * @param later the later part
      */
-    private static int updateHash(int hash, CharSequence later) {
+    private fun updateHash(hash: Int, later: CharSequence): Int {
         // this has to be done this way to preserve integer overflow behavior
-        int length = later.length();
-        for (int i = 0; i < length; i++) {
-            hash = hash * 31 + later.charAt(i);
+        var hash = hash
+        val length = later.length
+        for (i in 0 until length) {
+            hash = hash * 31 + later[i].toInt()
         }
-        return hash;
+        return hash
     }
 
     /**
-     * Replacement of {@link thaumcraft.common.lib.research.ScanManager#generateItemHash(Item, int)}.
+     * Replacement of [thaumcraft.common.lib.research.ScanManager.generateItemHash].
      * Basically remove all string creation. Blocks of logic is rearranged to minimize unnecessary hash generation
      * The returned hash code should be the same.
-     * <p>
+     *
+     *
      * ALERT!!!
      * This hashCode is persisted across server restarts. Changing it means all scanned data will be lost!
      */
-    public static int generateItemHash(Item item, int meta) {
-        ItemStack t = new ItemStack(item, 1, meta);
-
+    @JvmStatic
+    fun generateItemHash(item: Item, meta: Int): Int {
+        var meta = meta
+        val t = ItemStack(item, 1, meta)
         try {
-            if (t.isItemStackDamageable() || !t.getHasSubtypes()) {
-                meta = -1;
+            if (t.isItemStackDamageable || !t.hasSubtypes) {
+                meta = -1
             }
-        } catch (Exception ignored) {
+        } catch (ignored: Exception) {
         }
-
-        List<Object> key = Arrays.asList(item, meta);
-        final int[] value = groupedObjectTags.get(key);
+        val key = Arrays.asList(item, meta)
+        val value = groupedObjectTags[key]
         if (value != null) {
-            meta = value[0];
+            meta = value[0]
         }
-
-        key.set(1, meta);
+        key[1] = meta
         if (ThaumcraftApi.objectTags.containsKey(key)) {
-            return hash(item, meta, t);
+            return hash(item, meta, t)
         }
 
         // NOTE!! This block does not function 100% the same as vanilla TC4, but this SHOULD be the correct way to handle
         // it.
         // nobody uses ranged object tag specification anyway
-        if (rangedObjectTags.isEnabled()) {
-            List<int[]> ints = rangedObjectTags.getCache().get(item);
+        if (rangedObjectTags.isEnabled) {
+            val ints = rangedObjectTags.cache[item]
             if (ints != null) {
-                for (int[] range : ints) {
-                    Arrays.sort(range);
+                for (range in ints) {
+                    Arrays.sort(range)
                     if (Arrays.binarySearch(range, meta) >= 0) {
-                        return hash(item, t, range);
+                        return hash(item, t, range)
                     }
                 }
             }
         } else {
-            for (List<?> l : ThaumcraftApi.objectTags.keySet()) {
-                String name = ((Item) l.get(0)).getUnlocalizedName();
+            for (l in ThaumcraftApi.objectTags.keys) {
+                val name = (l[0] as Item).unlocalizedName
                 // this is probably not correct, but vanilla TC4 does it.
-                if (l.get(1) instanceof int[] && (Item.itemRegistry.getObject(name) == item || Block.blockRegistry.getObject(name) == Block.getBlockFromItem(item))) {
-                    int[] range = (int[]) l.get(1);
-                    Arrays.sort(range);
+                if (l[1] is IntArray && (Item.itemRegistry.getObject(name) === item || Block.blockRegistry.getObject(
+                        name
+                    ) === Block.getBlockFromItem(item))
+                ) {
+                    val range = l[1] as IntArray
+                    Arrays.sort(range)
                     if (Arrays.binarySearch(range, meta) >= 0) {
-                        return hash(item, t, range);
+                        return hash(item, t, range)
                     }
                 }
             }
         }
-
         if (meta == -1) {
-            for (int i = 0; i < 16; i++) {
-                key.set(1, i);
-                if (ThaumcraftApi.objectTags.containsKey(key))
-                    return hash(item, i, t);
+            for (i in 0..15) {
+                key[1] = i
+                if (ThaumcraftApi.objectTags.containsKey(key)) return hash(item, i, t)
             }
         }
-        return hash(item, meta, t);
+        return hash(item, meta, t)
     }
 
-    private static int hash(Item item, ItemStack t, int[] range) {
-        int hash = getUniqueIdentifierHash(item, t);
-
-        for (int r : range) {
-            hash = updateHash(updateHashColon(hash), r);
+    private fun hash(item: Item, t: ItemStack, range: IntArray): Int {
+        var hash = getUniqueIdentifierHash(item, t)
+        for (r in range) {
+            hash = updateHash(updateHashColon(hash), r)
         }
-
-        return hash;
+        return hash
     }
 
-    private static int hash(Item item, int meta, ItemStack t) {
-        return updateHash(updateHashColon(getUniqueIdentifierHash(item, t)), meta);
+    private fun hash(item: Item, meta: Int, t: ItemStack): Int {
+        return updateHash(updateHashColon(getUniqueIdentifierHash(item, t)), meta)
     }
 
-    private static int getUniqueIdentifierHash(Item item, ItemStack t) {
-        if (customItemStacksCache.isEnabled()) {
-            String name = Item.itemRegistry.getNameForObject(item);
-            if (name == null)
-                return DEFAULT_NAMESPACE_HASH_BASE;
-            if (customItemStacksCache.getCache().contains(name))
-                return t.getUnlocalizedName().hashCode();
-            return name.hashCode();
+    private fun getUniqueIdentifierHash(item: Item, t: ItemStack): Int {
+        return if (customItemStacksCache.isEnabled) {
+            val name = Item.itemRegistry.getNameForObject(item)
+                ?: return DEFAULT_NAMESPACE_HASH_BASE
+            if (customItemStacksCache.cache.contains(name)) t.unlocalizedName.hashCode() else name.hashCode()
         } else {
             try {
-                GameRegistry.UniqueIdentifier ui = GameRegistry.findUniqueIdentifierFor(item);
-                if (ui == null)
-                    return t.getUnlocalizedName().hashCode();
-                return updateHash(updateHashColon(ui.modId.hashCode()), ui.name);
-            } catch (Exception e) {
-                return DEFAULT_NAMESPACE_HASH_BASE;
+                val ui = GameRegistry.findUniqueIdentifierFor(item) ?: return t.unlocalizedName.hashCode()
+                updateHash(updateHashColon(ui.modId.hashCode()), ui.name)
+            } catch (e: Exception) {
+                DEFAULT_NAMESPACE_HASH_BASE
             }
         }
     }
 
-    public static void onNewObjectTag(List<?> key) {
-        if (key.get(1) instanceof int[] && rangedObjectTags.isEnabled()) {
-            rangedObjectTags.getCache().merge((Item) key.get(0), Collections.singletonList((int[]) key.get(1)), (a, b) -> Stream.concat(a.stream(), b.stream()).collect(Collectors.toList()));
+    @JvmStatic
+    fun onNewObjectTag(key: List<*>) {
+        if (key[1] is IntArray && rangedObjectTags.isEnabled) {
+            rangedObjectTags.cache.merge(key[0] as Item?, listOf(key[1] as IntArray)) { a, b ->
+                Stream.concat(a.stream(), b.stream()).collect(Collectors.toList())
+            }
         }
     }
 
-    public static void onRemoveObjectTag(List<?> key) {
-        if (key.get(1) instanceof int[] && rangedObjectTags.isEnabled()) {
-            rangedObjectTags.getCache()
-                    .computeIfPresent((Item) key.get(0), (k, a) -> toNullIfEmpty(a.stream().filter(arr -> !Arrays.equals(arr, (int[]) key.get(1))).collect(Collectors.toList())));
+    @JvmStatic
+    fun onRemoveObjectTag(key: List<*>) {
+        if (key[1] is IntArray && rangedObjectTags.isEnabled) {
+            rangedObjectTags.cache
+                .computeIfPresent(key[0] as Item?) { _, a -> toNullIfEmpty(a.stream().filter { arr -> !Arrays.equals(arr, key[1] as IntArray?) }.collect(Collectors.toList()))
+                }
         }
     }
 
-    private static <C extends Collection<?>> C toNullIfEmpty(C c) {
-        if (c == null || c.isEmpty())
-            return null;
-        return c;
+    private fun <C : Collection<*>?> toNullIfEmpty(c: C): C? {
+        return if (c.isNullOrEmpty()) null else c
     }
 }
