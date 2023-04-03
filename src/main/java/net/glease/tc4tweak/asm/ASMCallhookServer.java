@@ -1,7 +1,9 @@
 package net.glease.tc4tweak.asm;
 
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.TC4Tweak;
+import net.glease.tc4tweak.asm.PacketAspectCombinationToServerVisitor.PacketAspectCombinationToServerAccess;
 import net.glease.tc4tweak.modules.blockJar.EntityCollisionBox;
 import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
@@ -13,6 +15,7 @@ import net.glease.tc4tweak.network.TileHoleSyncPacket;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -28,23 +31,34 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
+import thaumcraft.common.lib.network.playerdata.PacketAspectCombinationToServer;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileResearchTable;
 
 import java.util.Map.Entry;
 
+import static net.glease.tc4tweak.TC4Tweak.log;
+
 public class ASMCallhookServer {
+    private static final Marker securityMarker = MarkerManager.getMarker("SuspiciousPackets");
     private ASMCallhookServer() {
     }
 
@@ -328,5 +342,27 @@ public class ASMCallhookServer {
             // fallback to original packet if anything goes wrong
             return origin;
         }
+    }
+
+    @Callhook
+    public static boolean sanityCheckAspectCombination(PacketAspectCombinationToServerAccess packet, MessageContext ctx) {
+        if (sanityCheckAspectCombination0(packet))
+            return true;
+        EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+        log.info(securityMarker, "Player {} sent suspicious packet to get more aspects", playerEntity.getGameProfile());
+        return false;
+    }
+
+    private static boolean sanityCheckAspectCombination0(PacketAspectCombinationToServerAccess packet) {
+        TileResearchTable table = packet.table();
+        if (table == null) return false;
+        EntityPlayerMP player = packet.player();
+        if (player == null) return false;
+        return hasAspect(table, player, packet.lhs()) && hasAspect(table, player, packet.rhs());
+    }
+
+    private static boolean hasAspect(TileResearchTable table, EntityPlayerMP player, Aspect aspect) {
+        return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > 0 ||
+                table.bonusAspects.getAmount(aspect) > 0;
     }
 }
