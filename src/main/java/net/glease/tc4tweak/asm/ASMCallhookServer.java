@@ -4,6 +4,7 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.TC4Tweak;
 import net.glease.tc4tweak.asm.PacketAspectCombinationToServerVisitor.PacketAspectCombinationToServerAccess;
+import net.glease.tc4tweak.asm.PacketPlayerCompleteToServerVisitor.PacketPlayerCompleteToServerAccess;
 import net.glease.tc4tweak.modules.blockJar.EntityCollisionBox;
 import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
@@ -26,13 +27,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import thaumcraft.api.ThaumcraftApi;
@@ -44,10 +42,10 @@ import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
-import thaumcraft.common.lib.network.playerdata.PacketAspectCombinationToServer;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
@@ -345,6 +343,29 @@ public class ASMCallhookServer {
     }
 
     @Callhook
+    public static boolean sanityPlayerComplete(PacketPlayerCompleteToServerAccess packet, MessageContext ctx) {
+        if (packet.type() != 0) return true;
+        EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+        ResearchItem research = packet.research();
+        if (research == null) return false;
+        boolean secondary = isSecondaryResearch(research);
+        if (secondary) {
+            if (hasAspect(playerEntity, research))
+                return true;
+        }
+        log.info(securityMarker, "Player {} sent suspicious packet to complete research {}@{}", playerEntity.getGameProfile(), research.key, research.category);
+        return false;
+    }
+
+    private static boolean hasAspect(EntityPlayerMP playerEntity, ResearchItem research) {
+        return research.tags.aspects.entrySet().stream().noneMatch(e -> e.getValue() != null && !hasAspect(playerEntity, e.getKey(), e.getValue()));
+    }
+
+    private static boolean isSecondaryResearch(ResearchItem research) {
+        return research.tags != null && research.tags.size() > 0 && (Config.researchDifficulty == -1 || Config.researchDifficulty == 0 && research.isSecondary());
+    }
+
+    @Callhook
     public static boolean sanityCheckAspectCombination(PacketAspectCombinationToServerAccess packet, MessageContext ctx) {
         if (sanityCheckAspectCombination0(packet))
             return true;
@@ -362,7 +383,10 @@ public class ASMCallhookServer {
     }
 
     private static boolean hasAspect(TileResearchTable table, EntityPlayerMP player, Aspect aspect) {
-        return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > 0 ||
-                table.bonusAspects.getAmount(aspect) > 0;
+        return hasAspect(player, aspect, 0) || table.bonusAspects.getAmount(aspect) > 0;
+    }
+
+    private static boolean hasAspect(EntityPlayerMP player, Aspect aspect, int threshold) {
+        return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > threshold;
     }
 }

@@ -56,6 +56,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
             .put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
             .put("thaumcraft.common.lib.network.playerdata.PacketAspectCombinationToServer", new TransformerFactory(PacketAspectCombinationToServerVisitor::new))
+            .put("thaumcraft.common.lib.network.playerdata.PacketPlayerCompleteToServer", new TransformerFactory(PacketPlayerCompleteToServerVisitor::new))
             .put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
                 @Override
                 public boolean isInactive() {
