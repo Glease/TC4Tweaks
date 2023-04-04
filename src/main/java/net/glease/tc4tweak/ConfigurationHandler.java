@@ -31,6 +31,7 @@ public enum ConfigurationHandler {
     private float inferBrowserScaleLowerBound;
     private boolean inferBrowserScaleConsiderSearch;
     private boolean smallerJars;
+    private boolean moreRandomizedLoot;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -94,6 +95,7 @@ public enum ConfigurationHandler {
         inferBrowserScaleLowerBound = config.getFloat("minimum", "client.browser_scale", 1, 1, 16, "The maximum inferred scale. Cannot be bigger than the value of inferBrowserScaleUpperBound.");
         inferBrowserScaleConsiderSearch = config.getBoolean("considerSearchArea", "client.browser_scale", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
         smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
+        moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -174,5 +176,9 @@ public enum ConfigurationHandler {
 
     public boolean isSmallerJars() {
         return smallerJars;
+    }
+
+    public boolean isMoreRandomizedLoot() {
+        return moreRandomizedLoot;
     }
 }

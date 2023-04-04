@@ -43,7 +43,9 @@ import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.container.ContainerDummy;
+import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.world.dim.CellLoc;
@@ -52,6 +54,7 @@ import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileResearchTable;
 
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static net.glease.tc4tweak.TC4Tweak.log;
 
@@ -388,5 +391,24 @@ public class ASMCallhookServer {
 
     private static boolean hasAspect(EntityPlayerMP player, Aspect aspect, int threshold) {
         return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > threshold;
+    }
+
+    @Callhook
+    public static ItemStack copyIfNotNull(ItemStack stack) {
+        if (!ConfigurationHandler.INSTANCE.isMoreRandomizedLoot()) return stack;
+        return stack == null ? null : stack.copy();
+    }
+
+    @Callhook
+    public static ItemStack mutateGeneratedLoot(ItemStack stack) {
+        if (!ConfigurationHandler.INSTANCE.isMoreRandomizedLoot()) return stack.copy();
+        if (stack.getItem() == ConfigItems.itemAmuletVis) {
+            ItemAmuletVis ai = (ItemAmuletVis)stack.getItem();
+
+            for(Aspect a : Aspect.getPrimalAspects()) {
+                ai.storeVis(stack, a, ThreadLocalRandom.current().nextInt(5) * 100);
+            }
+        }
+        return stack;
     }
 }
