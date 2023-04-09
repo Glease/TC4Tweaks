@@ -9,6 +9,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.tiles.TileResearchTable;
 
 import static net.glease.tc4tweak.asm.ASMUtils.arrayAppend;
+import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
@@ -46,7 +47,7 @@ public class PacketAspectCombinationToServerVisitor extends ClassVisitor {
             mv.visitFieldInsn(GETFIELD, "thaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer", "y", "I");
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, "thaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer", "z", "I");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getTileEntity", "(III)Lnet/minecraft/tileentity/TileEntity;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", dev ? "getTileEntity" : "func_147438_o", "(III)Lnet/minecraft/tileentity/TileEntity;", false);
             mv.visitVarInsn(ASTORE, 2);
             mv.visitVarInsn(ALOAD, 2);
             writeNotInstanceOf(mv, "thaumcraft/common/tiles/TileResearchTable");
@@ -65,7 +66,7 @@ public class PacketAspectCombinationToServerVisitor extends ClassVisitor {
             mv.visitLabel(label0);
             writeGetWorld(mv);
             mv.visitFieldInsn(GETFIELD, "thaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer", "playerid", "I");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getEntityByID", "(I)Lnet/minecraft/entity/Entity;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", dev ? "getEntityByID" : "func_73045_a", "(I)Lnet/minecraft/entity/Entity;", false);
             mv.visitVarInsn(ASTORE, 2);
             mv.visitVarInsn(ALOAD, 2);
             writeNotInstanceOf(mv, "net/minecraft/entity/player/EntityPlayerMP");
