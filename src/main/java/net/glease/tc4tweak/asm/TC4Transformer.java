@@ -29,6 +29,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
             .put("makeo.gadomancy.client.renderers.tile", NodeLikeRendererVisitor.createFactory("renderNode"))
             .put("thaumcraft.api.visnet.VisNetHandler", new TransformerFactory(VisNetHandlerVisitor::new))
+            .put("thaumcraft.api.crafting.InfusionRecipe", new TransformerFactory(InfusionRecipeVisitor::new))
             .put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(AddHandleMouseInputVisitor::new, Side.CLIENT))

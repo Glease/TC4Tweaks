@@ -4,11 +4,15 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import gnu.trove.set.hash.TIntHashSet;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.oredict.OreDictionary;
+import thaumcraft.api.ThaumcraftApiHelper;
 
 import java.io.File;
 import java.util.Map;
@@ -180,5 +184,47 @@ public enum ConfigurationHandler {
 
     public boolean isMoreRandomizedLoot() {
         return moreRandomizedLoot;
+    }
+
+    public InfusionOreDictMode getInfusionOreDictMode() {
+        return InfusionOreDictMode.Default; // TODO
+    }
+
+    public enum InfusionOreDictMode {
+        Default {
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
+                int od = OreDictionary.getOreID(playerInput);
+                if (od == -1) return false;
+                ItemStack[] ores = OreDictionary.getOres(od).toArray(new ItemStack[0]);
+                return ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{recipeSpec}, ores);
+            }
+        },
+        Strict {
+            @Override
+            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
+                return new TIntHashSet(OreDictionary.getOreIDs(playerInput)).equals(new TIntHashSet(OreDictionary.getOreIDs(recipeSpec)));
+            }
+        },
+        Relaxed {
+            @Override
+            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
+                TIntHashSet set = new TIntHashSet(OreDictionary.getOreIDs(playerInput));
+                for (int i : OreDictionary.getOreIDs(recipeSpec)) {
+                    if (set.contains(i))
+                        return true;
+                }
+                return false;
+            }
+        },
+        None {
+            @Override
+            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
+                return false;
+            }
+        };
+
+        public abstract boolean test(ItemStack playerInput, ItemStack recipeSpec);
     }
 }
