@@ -5,7 +5,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class BlockFluxGasVisitor extends ClassVisitor {
+class BlockFluxGasVisitor extends ClassVisitor {
     private String className;
 
     public BlockFluxGasVisitor(int api, ClassVisitor cv) {

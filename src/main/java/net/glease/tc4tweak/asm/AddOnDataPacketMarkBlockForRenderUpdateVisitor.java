@@ -7,7 +7,7 @@ import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class AddOnDataPacketMarkBlockForRenderUpdateVisitor extends ClassVisitor {
+class AddOnDataPacketMarkBlockForRenderUpdateVisitor extends ClassVisitor {
 
     private String className;
     private String superClass;

@@ -34,6 +34,7 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
@@ -410,5 +411,23 @@ public class ASMCallhookServer {
             }
         }
         return stack;
+    }
+
+    @Callhook
+    public static boolean infusionItemMatches(ItemStack playerInput, ItemStack recipeSpec, boolean fuzzy) {
+        if (playerInput == null) {
+            return recipeSpec == null;
+        }
+        if (recipeSpec == null) return false;
+        if (!ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(playerInput, recipeSpec)) return false;
+        if (fuzzy) {
+            if (ConfigurationHandler.INSTANCE.getInfusionOreDictMode().test(playerInput, recipeSpec)) {
+                return true;
+            }
+        }
+
+        return playerInput.getItem() == recipeSpec.getItem() &&
+                (playerInput.getItemDamage() == recipeSpec.getItemDamage() || recipeSpec.getItemDamage() == 32767) &&
+                playerInput.stackSize <= playerInput.getMaxStackSize();
     }
 }

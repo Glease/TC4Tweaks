@@ -7,7 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class ThaumcraftVisitor extends ClassVisitor {
+class ThaumcraftVisitor extends ClassVisitor {
     public ThaumcraftVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

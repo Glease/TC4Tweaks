@@ -8,7 +8,7 @@ import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class UtilsVisitor extends ClassVisitor {
+class UtilsVisitor extends ClassVisitor {
     public UtilsVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

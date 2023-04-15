@@ -9,7 +9,7 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
-public class BlockMetalDeviceVisitor extends ClassVisitor {
+class BlockMetalDeviceVisitor extends ClassVisitor {
     public BlockMetalDeviceVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

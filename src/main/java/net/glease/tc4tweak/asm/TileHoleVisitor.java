@@ -9,7 +9,7 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-public class TileHoleVisitor extends ClassVisitor {
+class TileHoleVisitor extends ClassVisitor {
     public TileHoleVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

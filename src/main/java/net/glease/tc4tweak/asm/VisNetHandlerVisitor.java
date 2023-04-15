@@ -5,7 +5,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 
-public class VisNetHandlerVisitor extends ClassVisitor {
+class VisNetHandlerVisitor extends ClassVisitor {
     public VisNetHandlerVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

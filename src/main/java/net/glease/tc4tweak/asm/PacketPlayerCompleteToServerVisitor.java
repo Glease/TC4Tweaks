@@ -8,7 +8,7 @@ import static net.glease.tc4tweak.asm.ASMUtils.arrayAppend;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class PacketPlayerCompleteToServerVisitor extends ClassVisitor {
+class PacketPlayerCompleteToServerVisitor extends ClassVisitor {
 
     private String className;
 

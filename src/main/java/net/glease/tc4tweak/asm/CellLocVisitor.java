@@ -5,7 +5,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 
-public class CellLocVisitor extends ClassVisitor {
+class CellLocVisitor extends ClassVisitor {
     public CellLocVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

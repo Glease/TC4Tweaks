@@ -8,7 +8,7 @@ import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class BlockJarVisitor extends ClassVisitor {
+class BlockJarVisitor extends ClassVisitor {
     public BlockJarVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }

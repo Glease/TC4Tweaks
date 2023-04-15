@@ -4,7 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-public class TileInfusionMatrixVisitor extends ClassVisitor {
+class TileInfusionMatrixVisitor extends ClassVisitor {
 
     public TileInfusionMatrixVisitor(int api, ClassVisitor cv) {
         super(api, cv);

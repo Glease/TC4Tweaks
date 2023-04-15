@@ -8,7 +8,7 @@ import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
-public class ItemElementalShovelVisitor extends ClassVisitor {
+class ItemElementalShovelVisitor extends ClassVisitor {
     public ItemElementalShovelVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }
