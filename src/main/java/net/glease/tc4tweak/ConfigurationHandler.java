@@ -15,6 +15,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 
 public enum ConfigurationHandler {
@@ -39,6 +40,7 @@ public enum ConfigurationHandler {
 
     private int browserHeight = 230;
     private int browserWidth = 256;
+    private InfusionOreDictMode infusionOreDictMode = InfusionOreDictMode.Default;
 
     ConfigurationHandler() {
         FMLCommonHandler.instance().bus().register(this);
@@ -100,6 +102,7 @@ public enum ConfigurationHandler {
         inferBrowserScaleConsiderSearch = config.getBoolean("considerSearchArea", "client.browser_scale", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
         smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
         moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
+        infusionOreDictMode = InfusionOreDictMode.get(config.getString("infusionOreDictMode", "general", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -226,5 +229,13 @@ public enum ConfigurationHandler {
         };
 
         public abstract boolean test(ItemStack playerInput, ItemStack recipeSpec);
+
+        public static InfusionOreDictMode get(String name) {
+            for (InfusionOreDictMode value : values()) {
+                if (value.name().equals(name))
+                    return value;
+            }
+            return Default;
+        }
     }
 }
