@@ -31,15 +31,17 @@ class ThaumcraftVisitor extends ClassVisitor {
         public void visitCode() {
             super.visitCode();
             log.debug("Adding fake player check");
-            Label l = new Label(), l2 = new Label();
+            Label l = new Label(), l2 = new Label(), l3 = new Label();
             mv.visitLabel(l);
             mv.visitLineNumber(114514, l);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitTypeInsn(INSTANCEOF, "net/minecraftforge/common/util/FakePlayer");
-            mv.visitJumpInsn(IFEQ, l2);
+            mv.visitJumpInsn(IFNE, l3);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitTypeInsn(INSTANCEOF, "thaumcraft/common/lib/FakeThaumcraftPlayer");
             mv.visitJumpInsn(IFEQ, l2);
+            mv.visitLabel(l3);
+            mv.visitFrame(F_SAME, 3, null, 0, null);
             mv.visitInsn(RETURN);
             mv.visitLabel(l2);
             mv.visitFrame(F_SAME, 3, null, 0, null);
