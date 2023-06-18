@@ -5,6 +5,8 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +58,15 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
         debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
         //noinspection ResultOfMethodCallIgnored
         debugOutputDir.mkdir();
+        // mixingasm (or mods that include it) compat
+        markTransformersSafe(data);
+    }
+
+    private void markTransformersSafe(Map<String, Object> data) {
+        // my transformers are idempotent, as it should be
+        @SuppressWarnings("unchecked")
+        List<String> list = (List<String>) data.computeIfAbsent("mixingasm.transformerInclusionList", k -> new ArrayList<>());
+        list.addAll(Arrays.asList(getASMTransformerClass()));
     }
 
     @Override
