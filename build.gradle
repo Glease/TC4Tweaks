@@ -65,7 +65,7 @@ dependencies {
     compile "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
     compile "thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev"
     compileOnly "MineTweaker3:MineTweaker3-API:3.0.11.23"
-    compile "com.github.GTNewHorizons:NotEnoughItems:2.3.13-GTNH:dev"
+    compile "com.github.GTNewHorizons:NotEnoughItems:2.3.54-GTNH:dev"
 }
 
 processResources

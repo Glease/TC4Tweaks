@@ -53,6 +53,8 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.blocks.BlockMetalDevice", new TransformerFactory(BlockMetalDeviceVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
+            .put("thaumcraft.common.entities.golems.EntityGolemBase", ReadMarkerNoCastVisitor.createFactory(dev ? "readEntityFromNBT" : "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V"))
+            .put("thaumcraft.common.entities.golems.ItemGolemBell", ReadMarkerNoCastVisitor.createFactory("getMarkers", "(Lnet/minecraft/item/ItemStack;)Ljava/util/ArrayList;"))
             .put("thaumcraft.common.items.equipment.ItemElementalShovel", new TransformerFactory(ItemElementalShovelVisitor::new, true))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
             .put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))

@@ -5,9 +5,26 @@ import org.objectweb.asm.Type;
 
 import java.util.Arrays;
 
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 final class ASMUtils {
+    private static final Object configHodgePodge;
+
+    static  {
+        Object cfg;
+        try {
+            Class<?> common = Class.forName("com.mitchej123.hodgepodge.Common", true, ASMUtils.class.getClassLoader());
+            cfg = common.getField("config").get(null);
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            cfg = null;
+        } catch (IllegalAccessException e) {
+            log.warn("Unforeseen changes in hodgepodge. Nothing will be disabled automatically!");
+            cfg = null;
+        }
+        configHodgePodge = cfg;
+    }
+
     private ASMUtils() {
 
     }
@@ -55,5 +72,23 @@ final class ASMUtils {
         T[] out = Arrays.copyOf(arr, arr.length + 1);
         out[arr.length]  = newLast;
         return out;
+    }
+
+    /**
+     *
+     * @param configName a boolean field name in HodgePodge LoadingConfig class.
+     * @return true if foreign field is true or HodgePodge changed in unforeseen ways, false if foreign field is missing
+     * or is false.
+     */
+    static boolean isHodgepodgeFixActive(@SuppressWarnings("SameParameterValue") String configName) {
+        if (configHodgePodge == null) return false;
+        try {
+            return (boolean) configHodgePodge.getClass().getField(configName).get(configHodgePodge);
+        } catch (NoSuchFieldException e) {
+            return false;
+        } catch (IllegalAccessException e) {
+            log.warn("Unforeseen changes in hodgepodge. Disabling conflicting patches just in case.");
+            return false;
+        }
     }
 }
