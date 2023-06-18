@@ -8,18 +8,18 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class NetworkedConfiguration {
     static boolean checkWorkbenchRecipes = true;
+    static boolean smallerJar = true;
 
     public static boolean isCheckWorkbenchRecipes() {
         return checkWorkbenchRecipes;
     }
 
-    public static void resetCheckWorkbenchRecipes() {
-        checkWorkbenchRecipes = true;
+    public static void reset() {
+        checkWorkbenchRecipes = ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes();
+        smallerJar = ConfigurationHandler.INSTANCE.isSmallerJars();
     }
 
-    @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent e) {
-        if (e.player instanceof EntityPlayerMP && !ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes())
-            TC4Tweak.INSTANCE.CHANNEL.sendTo(new MessageSendConfiguration(), (EntityPlayerMP) e.player);
+    public static boolean isSmallerJar() {
+        return smallerJar;
     }
 }

@@ -13,17 +13,13 @@ public abstract class FlushableCache<E> {
     private E cache;
 
     protected FlushableCache() {
-        register(this);
+        allCaches.add(new WeakReference<>(this));
         if (enabled)
             populate(true);
     }
 
     private static void cleanStale() {
         allCaches.removeIf(r -> r.get() == null);
-    }
-
-    static void register(FlushableCache<?> cache) {
-        allCaches.add(new WeakReference<>(cache));
     }
 
     public static void enableAll(boolean doCreate) {

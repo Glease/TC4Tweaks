@@ -1,8 +1,12 @@
 # TC4Tweaks
 
-A mod that adds a bit of functionality and a bit of performance into thaumcraft 4.
+A mod that adds a bit of functionality, a bit of performance and a bit of robustness into thaumcraft 4.
 
 ## Creating derivation
+
+### License
+
+See [COPYING](./COPYING).
 
 ### If you wish to upload to curseforge
 
@@ -10,7 +14,7 @@ If this repo is archived, or you cannot reach me via GitHub Issues, [this discor
 or email within 90 full days, you can safely assume I have give up maintaining this mod. 
 If I'm no longer maintaining this mod, and you happen to find an opportunity to improve it, you can create a fork of this
 mod and *upload it to curseforge under a different name*,
-provided you still follow the license (AGPL) AND signing the jar with a key.
+provided you still follow the license (AGPL 3.0 with forge exception) AND signing the jar with a key.
 
 HOWEVER, please do remember to add the digest of your signing key to list of known keys
 in [`./src/main/java/net/glease/tc4tweak/TC4Tweak.java`](src/main/java/net/glease/tc4tweak/TC4Tweak.java)
@@ -49,6 +53,10 @@ Monumental features falls in the category of item 4, thus bypassing the above re
 
 ## Compat
 
+### Thaumic Fixer
+
+Not compatible. It's compiled using an ancient version of thaumcraft (yes ancient even by 1.7.10 standards).
+
 ### NotEnoughThaumcraftTabs
 
 Not compatible. This mod supersedes that mod anyway.
@@ -72,10 +80,8 @@ The mod is tested under the following two configurations:
 2. Only this mod and latest thaumcraft 4.
 
 I used to install GT6 into my test env, but that slows down client down too much and is hampering my development speed.
-Therefore the compatibility with it would no longer comes as guarenteed.
-However I do wish to fix any future incompatibility if any more happens.
+Therefore, the compatibility with it would no longer comes as guarenteed.
+However, I do wish to fix any future incompatibility if any more of these happens.
 
-Other configuration should work but is not guaranteed.
+Other mod combination should also work but is not guaranteed.
 Open a ticket in issues should you meet any problem.
-
-

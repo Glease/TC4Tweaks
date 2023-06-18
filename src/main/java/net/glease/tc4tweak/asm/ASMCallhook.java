@@ -10,6 +10,7 @@ import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
+import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
@@ -20,12 +21,15 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static net.glease.tc4tweak.TC4Tweak.log;
+
 public class ASMCallhook {
     private static final WeakHashMap<TileMagicWorkbench, Void> postponed = new WeakHashMap<>();
     private static final AtomicBoolean cacheUsed = new AtomicBoolean(false);
     // workbench throttling
     private static long lastUpdate = 0;
     private static boolean priorityChanged = false;
+    private static long start;
     private static Field fieldParticleTexture;
 
     private ASMCallhook() {
@@ -43,11 +47,35 @@ public class ASMCallhook {
      * Called from {@link thaumcraft.client.gui.MappingThread#run()}
      */
     @Callhook
+    public static void onMappingStart(Map<String, Integer> mapping) {
+        if (ConfigurationHandler.INSTANCE.isMappingThreadNice())
+            Thread.currentThread().setPriority(1);
+        else
+            priorityChanged = true;
+        log.info("TC4 Mapping start. {} entries to work with.", mapping.size());
+        start = System.nanoTime();
+    }
+
+    /**
+     * Called from {@link thaumcraft.client.gui.MappingThread#run()}
+     */
+    @Callhook
     public static void onMappingDidWork() {
         if (!priorityChanged && cacheUsed.get()) {
             Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
             priorityChanged = true;
         }
+    }
+
+    /**
+     * Called from {@link thaumcraft.client.gui.MappingThread#run()}
+     */
+    @Callhook
+    public static void onMappingFinished() {
+        if (ConfigurationHandler.INSTANCE.isMappingThreadNice())
+            log.info("TC4 Mapping finish. Took {}ns.", System.nanoTime() - start);
+        else
+            log.info("TC4 Mapping finish. Took {}ns. Priority boosted: {}", System.nanoTime() - start, priorityChanged);
     }
 
     public static void updatePostponed() {
@@ -68,6 +96,14 @@ public class ASMCallhook {
      */
     @Callhook
     public static void handleMouseInput(GuiResearchTable screen) {
+        ClientProxy.handleMouseInput(screen);
+    }
+
+    /**
+     * called from GuiResearchRecipe. first arg is this
+     */
+    @Callhook
+    public static void handleMouseInput(GuiResearchRecipe screen) {
         ClientProxy.handleMouseInput(screen);
     }
 

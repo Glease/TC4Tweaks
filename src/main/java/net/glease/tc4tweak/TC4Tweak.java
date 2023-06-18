@@ -14,6 +14,9 @@ import cpw.mods.fml.common.versioning.VersionRange;
 import cpw.mods.fml.relauncher.Side;
 import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
+import net.glease.tc4tweak.network.MessageSendConfigurationV2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 public class TC4Tweak {
     public static final String MOD_ID = "tc4tweak";
     public static final String VERSION = "${version}";
-    private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.2.0-beta1,)");
+    public static final Logger log = LogManager.getLogger("TC4Tweaks");
+    private static final VersionRange ACCEPTED_CLIENT_VERSION = VersionParser.parseRange("[1.4.27,2)");
     private static final ImmutableMap<String, String> KNOWN_SIGNATURE = ImmutableMap.<String, String>builder()
             .put("473C3A397676978FF4877ABA2D57860DDA20E2FC", "glease")
             .put("004227A857B097EDE4E36FACB9B5491BC9808464", "glease")
@@ -72,12 +76,18 @@ public class TC4Tweak {
     }
 
     void detectAndSendConfigChanges() {
-        if (FMLCommonHandler.instance().getMinecraftServerInstance() != null)
+        if (FMLCommonHandler.instance().getMinecraftServerInstance() != null) {
             INSTANCE.CHANNEL.sendToAll(new MessageSendConfiguration());
+            INSTANCE.CHANNEL.sendToAll(new MessageSendConfigurationV2());
+        }
     }
 
     void setAllowAll(boolean allowAll) {
         this.allowAll = allowAll;
+    }
+
+    public boolean isAllowAll() {
+        return allowAll;
     }
 
     @Mod.EventHandler

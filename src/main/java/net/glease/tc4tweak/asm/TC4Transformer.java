@@ -28,9 +28,11 @@ public class TC4Transformer implements IClassTransformer {
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
             .put("makeo.gadomancy.client.renderers.tile", NodeLikeRendererVisitor.createFactory("renderNode"))
+            .put("thaumcraft.api.visnet.VisNetHandler", new TransformerFactory(VisNetHandlerVisitor::new))
+            .put("thaumcraft.api.crafting.InfusionRecipe", new TransformerFactory(InfusionRecipeVisitor::new))
             .put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchRecipe", new TransformerFactory(GuiResearchRecipeVisitor::new, Side.CLIENT))
-            .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(GuiResearchTableVisitor::new, Side.CLIENT))
+            .put("thaumcraft.client.gui.GuiResearchTable", new TransformerFactory(AddHandleMouseInputVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.MappingThread", new TransformerFactory(MappingThreadVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.lib.UtilsFX", new TransformerFactory(UtilsFXVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
@@ -47,19 +49,31 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.research.ResearchCategories", new TransformerFactory(ResearchCategoriesVisitor::new))
             .put("thaumcraft.api.ThaumcraftApi", new TransformerFactory(ThaumcraftApiVisitor::new))
             .put("thaumcraft.common.blocks.BlockFluxGas", new TransformerFactory(BlockFluxGasVisitor::new))
+            .put("thaumcraft.common.blocks.BlockJar", new TransformerFactory(BlockJarVisitor::new))
+            .put("thaumcraft.common.blocks.BlockMetalDevice", new TransformerFactory(BlockMetalDeviceVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
+            .put("thaumcraft.common.entities.golems.EntityGolemBase", ReadMarkerNoCastVisitor.createFactory(dev ? "readEntityFromNBT" : "func_70037_a", "(Lnet/minecraft/nbt/NBTTagCompound;)V"))
+            .put("thaumcraft.common.entities.golems.ItemGolemBell", ReadMarkerNoCastVisitor.createFactory("getMarkers", "(Lnet/minecraft/item/ItemStack;)Ljava/util/ArrayList;"))
+            .put("thaumcraft.common.items.equipment.ItemElementalShovel", new TransformerFactory(ItemElementalShovelVisitor::new, true))
             .put("thaumcraft.common.items.wands.ItemWandCasting", new TransformerFactory(ItemWandCastingVisitor::new, true))
             .put("thaumcraft.common.lib.crafting.ThaumcraftCraftingManager", new TransformerFactory(ThaumcraftCraftingManagerVisitor::new))
+            .put("thaumcraft.common.lib.network.playerdata.PacketAspectCombinationToServer", new TransformerFactory(PacketAspectCombinationToServerVisitor::new))
+            .put("thaumcraft.common.lib.network.playerdata.PacketPlayerCompleteToServer", new TransformerFactory(PacketPlayerCompleteToServerVisitor::new))
             .put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
                 @Override
                 public boolean isInactive() {
                     return super.isInactive() || LoadingPlugin.gt6;
                 }
             })
+            .put("thaumcraft.common.lib.utils.Utils", new TransformerFactory(UtilsVisitor::new))
             .put("thaumcraft.common.lib.world.dim.CellLoc", new TransformerFactory(CellLocVisitor::new))
             .put("thaumcraft.common.lib.world.dim.MazeHandler", new TransformerFactory(MazeHandlerVisitor::new))
             .put("thaumcraft.common.tiles.TileInfusionMatrix", new TransformerFactory(TileInfusionMatrixVisitor::new))
+            .put("thaumcraft.common.tiles.TileHole", new TransformerFactory(TileHoleVisitor::new))
+            .put("thaumcraft.common.tiles.TileTube", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
+            .put("thaumcraft.common.tiles.TileJarFillable", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
+//            .put("", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
             .put("thaumcraft.common.Thaumcraft", new TransformerFactory(ThaumcraftVisitor::new))
             .build();
 

@@ -34,3 +34,5 @@ tc4tweaks.config.general.checkWorkbenchRecipes.tooltip=When false, Arcane Workbe
 nei.options.tools.dump.tc4tweaks=TC4Tweaks
 nei.options.tools.dump.tc4tweaks.tc4tags=Registered ItemStack tags
 nei.options.tools.dump.tc4tweaks.tc4tags.dumped=Tags were dumped to %s
+nei.options.tools.dump.tc4tweaks.tc4research=Registered Researches
+nei.options.tools.dump.tc4tweaks.tc4research.dumped=Researches were dumped to %s

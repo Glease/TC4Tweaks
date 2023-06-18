@@ -4,6 +4,7 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * getResearch speed up
@@ -21,6 +22,10 @@ public class GetResearch {
         if (key == null) return null;
         final Map<String, ResearchItem> map = cache.getCache();
         return map == null ? getResearchSlow(key) : map.get(key);
+    }
+
+    public static Stream<ResearchItem> stream() {
+        return cache.getCache().values().stream();
     }
 
     /**

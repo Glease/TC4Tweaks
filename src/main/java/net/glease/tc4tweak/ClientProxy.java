@@ -1,6 +1,7 @@
 package net.glease.tc4tweak;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -8,6 +9,7 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
+import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
@@ -21,6 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import org.lwjgl.input.Mouse;
 import thaumcraft.client.fx.other.FXSonic;
+import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.common.config.ConfigItems;
 
@@ -34,8 +37,12 @@ public class ClientProxy extends CommonProxy {
     static Field fieldLastPage = null;
     static Method methodPlayScroll = null;
     static Field fieldModel = null;
+    static Method GuiResearchRecipeMouseClicked = null;
+    private static final int mPrevX = 261, mPrevY = 189, mNextX = -17, mNextY = 189;
+    private static final int paneWidth = 256, paneHeight = 181;
 
     public static void handleMouseInput(GuiResearchTable screen) {
+        if (fieldLastPage == null || fieldPage == null || methodPlayScroll == null) return;
         final int dwheel = Mouse.getEventDWheel();
         if (dwheel == 0)
             return;
@@ -63,22 +70,58 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    public static void handleMouseInput(GuiResearchRecipe screen) {
+        if (GuiResearchRecipeMouseClicked == null) return;
+        final int dwheel = Mouse.getEventDWheel();
+        if (dwheel == 0)
+            return;
+        final long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - lastScroll > 50) {
+            lastScroll = currentTimeMillis;
+            // emulate a click into respective buttons
+            int mX, mY;
+            if ((dwheel < 0) != ConfigurationHandler.INSTANCE.isInverted()) {
+                mX = mPrevX;
+                mY= mPrevY;
+            } else {
+                mX = mNextX;
+                mY = mNextY;
+            }
+            mX += (screen.width - paneWidth) / 2;
+            mY += (screen.height - paneHeight) / 2;
+            try {
+                GuiResearchRecipeMouseClicked.invoke(screen, mX, mY, 1);
+            } catch (ReflectiveOperationException err) {
+                System.err.println("Error scrolling through research page!");
+                err.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
         try {
-            fieldPage = GuiResearchTable.class.getDeclaredField("page");
+            Class<GuiResearchTable> guiResearchTableClass = GuiResearchTable.class;
+            fieldPage = guiResearchTableClass.getDeclaredField("page");
             fieldPage.setAccessible(true);
-            fieldLastPage = GuiResearchTable.class.getDeclaredField("lastPage");
+            fieldLastPage = guiResearchTableClass.getDeclaredField("lastPage");
             fieldLastPage.setAccessible(true);
-            methodPlayScroll = GuiResearchTable.class.getDeclaredMethod("playButtonScroll");
+            methodPlayScroll = guiResearchTableClass.getDeclaredMethod("playButtonScroll");
             methodPlayScroll.setAccessible(true);
             fieldModel = FXSonic.class.getDeclaredField("model");
             fieldModel.setAccessible(true);
         } catch (Exception err) {
-            System.err.println("Cannot find thaumcraft fields. The mod will not properly function!");
+            System.err.println("Cannot find thaumcraft fields. Aspect list scrolling will not properly function!");
             err.printStackTrace();
-            return;
+        }
+        String mouseClicked = LoadingPlugin.isDev() ? "mouseClicked" : "func_73864_a";
+        try {
+            GuiResearchRecipeMouseClicked = GuiResearchRecipe.class.getDeclaredMethod(mouseClicked, int.class, int.class, int.class);
+            GuiResearchRecipeMouseClicked.setAccessible(true);
+        } catch (Exception err) {
+            System.err.println("Cannot find thaumcraft fields. Research page scrolling will not properly function!");
+            err.printStackTrace();
         }
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(instance);
@@ -115,7 +158,7 @@ public class ClientProxy extends CommonProxy {
             MinecraftForge.EVENT_BUS.unregister(wgSearcher);
             FMLCommonHandler.instance().bus().unregister(wgSearcher);
         } catch (ReflectiveOperationException ignored) {
-            // WG is probably installed, ignoring
+            // WG is probably not installed, ignoring
         }
     }
 

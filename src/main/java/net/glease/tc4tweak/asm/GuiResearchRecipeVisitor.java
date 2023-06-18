@@ -8,7 +8,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 class GuiResearchRecipeVisitor extends ClassVisitor {
     public GuiResearchRecipeVisitor(int api, ClassVisitor cv) {
-        super(api, cv);
+        super(api, new AddHandleMouseInputVisitor(api, cv));
     }
 
     @Override
