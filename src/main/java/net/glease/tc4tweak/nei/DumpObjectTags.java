@@ -1,17 +1,12 @@
 package net.glease.tc4tweak.nei;
 
-import codechicken.nei.config.DataDumper;
 import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 
-import java.io.File;
-
-public class DumpObjectTags extends DataDumper {
+public class DumpObjectTags extends TC4TweaksDataDump {
     public DumpObjectTags() {
         super("tools.dump.tc4tweaks.tc4tag");
     }
@@ -40,11 +35,6 @@ public class DumpObjectTags extends DataDumper {
         } catch (Exception e) {
             return "~~ERROR~~";
         }
-    }
-
-    @Override
-    public IChatComponent dumpMessage(File file) {
-        return new ChatComponentTranslation("nei.options.tools.dump.tc4tweaks.tc4tags.dumped", "dumps/" + file.getName());
     }
 
     @Override

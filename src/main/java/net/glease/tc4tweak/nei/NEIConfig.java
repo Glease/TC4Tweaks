@@ -9,6 +9,7 @@ public class NEIConfig implements IConfigureNEI {
     public void loadConfig() {
         API.addOption(new DumpObjectTags());
         API.addOption(new DumpResearch());
+        API.addOption(new DumpResearchCategories());
     }
 
     @Override

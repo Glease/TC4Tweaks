@@ -1,20 +1,13 @@
 package net.glease.tc4tweak.nei;
 
-import codechicken.nei.config.DataDumper;
 import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.IChatComponent;
 import thaumcraft.api.aspects.Aspect;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class DumpResearch extends DataDumper {
+public class DumpResearch extends TC4TweaksDataDump {
     public DumpResearch() {
         super("tools.dump.tc4tweaks.tc4research");
     }
@@ -62,16 +55,6 @@ public class DumpResearch extends DataDumper {
     @Override
     public String renderName() {
         return translateN(name);
-    }
-
-    @Override
-    public IChatComponent dumpMessage(File file) {
-        ChatComponentTranslation msg = new ChatComponentTranslation("nei.options.tools.dump.tc4tweaks.tc4research.dumped", "dumps/" + file.getName());
-        try {
-            return msg.setChatStyle(new ChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getCanonicalPath())).setUnderlined(true));
-        } catch (Exception ex) {
-            return msg.appendSibling(new ChatComponentText("Error preparing chat message: " + ex.getLocalizedMessage()));
-        }
     }
 
     @Override
