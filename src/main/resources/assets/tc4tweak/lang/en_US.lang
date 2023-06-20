@@ -32,6 +32,12 @@ tc4tweaks.config.general.arcaneCraftingHistorySize=Arcane Crafting History Size
 tc4tweaks.config.general.arcaneCraftingHistorySize.tooltip=The maximum size of arcane crafting cache. 0 will effectively turn off the cache. It is suggested to keep a size of at least 1 to ensure shift crafting does not lag the server. \n[range: 0 ~ 256]
 tc4tweaks.config.general.checkWorkbenchRecipes=checkWorkbenchRecipes
 tc4tweaks.config.general.checkWorkbenchRecipes.tooltip=When false, Arcane Workbench will not perform vanilla crafting bench recipes. Arcane Workbench GUI will behave slightly awkwardly if the client has it false but not on server, but nothing would be broken. See curseforge mod page for a detailed explanation.
+tc4tweaks.config.general.smallerJars=Smaller Jars
+tc4tweaks.config.general.smallerJars.tooltip=If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.
+tc4tweaks.config.general.moreRandomizedLoot=More randomized lootbags
+tc4tweaks.config.general.moreRandomizedLoot.tooltip=If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.
+tc4tweaks.config.general.infusionOreDictMode=Infusion OreDict Mode
+tc4tweaks.config.general.infusionOreDictMode.tooltip=Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.
 
 nei.options.tools.dump.tc4tweaks=TC4Tweaks
 nei.options.tools.dump.tc4tweaks.tc4tags=Registered ItemStack tags
