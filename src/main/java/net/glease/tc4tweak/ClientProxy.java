@@ -1,7 +1,6 @@
 package net.glease.tc4tweak;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -21,6 +20,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import org.lwjgl.input.Mouse;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.gui.GuiResearchRecipe;
@@ -160,6 +160,13 @@ public class ClientProxy extends CommonProxy {
         } catch (ReflectiveOperationException ignored) {
             // WG is probably not installed, ignoring
         }
+        FMLCommonHandler.instance().bus().register(this);
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load e) {
+        if (e.world.isRemote)
+            CommonUtils.sortResearchCategories(false);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

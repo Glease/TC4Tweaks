@@ -1,5 +1,6 @@
 package net.glease.tc4tweak;
 
+import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -15,8 +16,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 
 public enum ConfigurationHandler {
     INSTANCE;
@@ -41,6 +41,7 @@ public enum ConfigurationHandler {
     private int browserHeight = 230;
     private int browserWidth = 256;
     private InfusionOreDictMode infusionOreDictMode = InfusionOreDictMode.Default;
+    private List<String> categoryOrder = new ArrayList<>();
 
     ConfigurationHandler() {
         FMLCommonHandler.instance().bus().register(this);
@@ -68,6 +69,7 @@ public enum ConfigurationHandler {
         if (e.modID.equals(TC4Tweak.MOD_ID)) {
             loadConfig(true);
             FlushableCache.enableAll(false);
+            CommonUtils.sortResearchCategories(true);
         }
     }
 
@@ -103,6 +105,7 @@ public enum ConfigurationHandler {
         smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
         moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
         infusionOreDictMode = InfusionOreDictMode.get(config.getString("infusionOreDictMode", "general", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
+        categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[] {"BASICS","THAUMATURGY","ALCHEMY","ARTIFICE","GOLEMANCY","ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -185,12 +188,17 @@ public enum ConfigurationHandler {
         return smallerJars;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isMoreRandomizedLoot() {
         return moreRandomizedLoot;
     }
 
     public InfusionOreDictMode getInfusionOreDictMode() {
         return InfusionOreDictMode.Default; // TODO
+    }
+
+    public List<String> getCategoryOrder() {
+        return categoryOrder;
     }
 
     public enum InfusionOreDictMode {

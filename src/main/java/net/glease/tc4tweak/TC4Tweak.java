@@ -107,7 +107,7 @@ public class TC4Tweak {
 
     @Mod.EventHandler
     public void serverStarted(FMLServerStartedEvent e) {
-        proxy.serverStarted();
+        proxy.serverStarted(e);
     }
 
     @NetworkCheckHandler

@@ -5,6 +5,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -31,7 +32,7 @@ public class CommonProxy {
         addDummyCategories(debugadd, "DUMMYPRE");
     }
 
-    public void serverStarted() {
+    public void serverStarted(FMLServerStartedEvent e) {
         FlushableCache.enableAll(true);
         NetworkedConfiguration.reset();
         FMLCommonHandler.instance().bus().register(this);
