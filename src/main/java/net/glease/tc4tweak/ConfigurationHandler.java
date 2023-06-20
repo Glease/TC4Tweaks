@@ -54,6 +54,15 @@ public enum ConfigurationHandler {
         setLanguageKeys();
     }
 
+    private void breakLongCommentLines() {
+        for (String categoryName : config.getCategoryNames()) {
+            ConfigCategory category = config.getCategory(categoryName);
+            for (Map.Entry<String, Property> entry : category.entrySet()) {
+                entry.getValue().comment = entry.getValue().comment.replace(". ", ".\n");
+            }
+        }
+    }
+
     private void setLanguageKeys() {
         for (String categoryName : config.getCategoryNames()) {
             ConfigCategory category = config.getCategory(categoryName);
@@ -119,6 +128,7 @@ public enum ConfigurationHandler {
             TC4Tweak.INSTANCE.detectAndSendConfigChanges();
             BrowserPaging.flushCache();
         }
+        breakLongCommentLines();
         config.save();
     }
 
