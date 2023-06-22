@@ -48,3 +48,10 @@ nei.options.tools.dump.tc4tweaks.tc4researchtab=Registered Research Tabs
 nei.options.tools.dump.tc4tweaks.tc4researchtab.dumped=Research tabs were dumped to %s
 nei.options.tools.dump.tc4tweaks.tc4researchtab.mode.0=Full
 nei.options.tools.dump.tc4tweaks.tc4researchtab.mode.1=Only Names
+
+tc4tweaks.configgui.tooltip.moveUp=Move up
+tc4tweaks.configgui.tooltip.moveUp.shift=Move up by 5
+tc4tweaks.configgui.tooltip.moveUp.ctrl=Move to top
+tc4tweaks.configgui.tooltip.moveDown=Move down
+tc4tweaks.configgui.tooltip.moveDown.shift=Move down by 5
+tc4tweaks.configgui.tooltip.moveDown.ctrl=Move to bottom

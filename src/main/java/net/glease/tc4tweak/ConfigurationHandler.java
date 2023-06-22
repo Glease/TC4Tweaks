@@ -6,6 +6,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import gnu.trove.set.hash.TIntHashSet;
+import net.glease.tc4tweak.config.StringOrderingEntry;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.minecraft.item.ItemStack;
@@ -115,6 +116,9 @@ public enum ConfigurationHandler {
         moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
         infusionOreDictMode = InfusionOreDictMode.get(config.getString("infusionOreDictMode", "general", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
         categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[] {"BASICS","THAUMATURGY","ALCHEMY","ARTIFICE","GOLEMANCY","ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
+
+        // config GUI stuff
+        config.getCategory("client").get("categoryOrder").setArrayEntryClass(StringOrderingEntry.class);
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)

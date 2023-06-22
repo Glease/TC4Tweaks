@@ -5,6 +5,7 @@ import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,15 @@ public class CommonUtils {
                     newCategories.put(tab, categories.get(tab));
             }
             ResearchCategories.researchCategories = newCategories;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T reflectGet(Field f, Object instance) {
+        try {
+            return (T) f.get(instance);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
         }
     }
 }
