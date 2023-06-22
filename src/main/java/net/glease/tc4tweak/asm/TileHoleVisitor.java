@@ -23,7 +23,7 @@ class TileHoleVisitor extends ClassVisitor {
                 @Override
                 public void visitInsn(int opcode) {
                     if (opcode == ARETURN) {
-                        log.debug("Modifying return value");
+                        log.trace("Modifying return value");
                         mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "createTileHoleSyncPacket", "(Lnet/minecraft/network/play/server/S35PacketUpdateTileEntity;)Lnet/minecraft/network/Packet;", false);
                     }
                     super.visitInsn(opcode);

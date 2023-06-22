@@ -1,24 +1,17 @@
 package net.glease.tc4tweak.asm;
 
+import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
-import java.util.Map;
-
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_HEIGHT;
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.BORDER_WIDTH;
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.BIPUSH;
-import static org.objectweb.asm.Opcodes.GETFIELD;
-import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-import static org.objectweb.asm.Opcodes.ISUB;
-import static org.objectweb.asm.Opcodes.POP;
-import static org.objectweb.asm.Opcodes.PUTSTATIC;
+import static org.objectweb.asm.Opcodes.*;
 
 class GuiResearchBrowserVisitor extends ClassVisitor {
     private static final String TARGET_INTERNAL_NAME = "thaumcraft/client/gui/GuiResearchBrowser";
@@ -39,14 +32,14 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = new FieldAccessDeflector(api, super.visitMethod(access, name, desc, signature, exceptions));
         if ("genResearchBackground".equals(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting genResearchBackground(IIF)V");
+            log.debug("Visiting genResearchBackground(IIF)V");
             return new GenResearchBackgroundVisitor(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide", 1));
         } else if ("updateResearch".equals(name) && "()V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting updateResearch()V");
+            log.debug("Visiting updateResearch()V");
             return new UpdateResearchVisitor(api, new LimitResearchCategoryToPageVisitor(api, mv, 1));
         } else if (isMouseClickedMethod(name) && "(III)V".equals(desc) ||
                 isDrawScreenMethod(name) && "(IIF)V".equals(desc)) {
-            TC4Transformer.log.debug("Visiting {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new ConstantToDynamicReplacer(api, new ConstantToDynamicReplacer(api, new LimitResearchCategoryToPageVisitor(api, mv, 1), 9, "getTabPerSide"),
                     280, "getTabIconDistance");
         }
@@ -62,7 +55,7 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             if (opcode == PUTSTATIC && TARGET_INTERNAL_NAME.equals(owner) && name.startsWith("guiMap") && "I".equals(desc)) {
                 String side = name.substring(6);
-                TC4Transformer.log.debug("Injecting modify callhook getNewGuiMap{}() before PUTSTATIC {}", side, name);
+                log.trace("Injecting modify callhook getNewGuiMap{}() before PUTSTATIC {}", side, name);
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getNewGuiMap" + side, "(I)I", false);
             }
             super.visitFieldInsn(opcode, owner, name, desc);
@@ -85,10 +78,10 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         @Override
         public void visitIntInsn(int opcode, int operand) {
             if (!found112 && operand == 112) {
-                TC4Transformer.log.debug("Found 112");
+                log.trace("Found 112");
                 found112 = true;
             } else if (operand == 264) {
-                TC4Transformer.log.debug("Replacing 264 with getTabDistance()");
+                log.trace("Replacing 264 with getTabDistance()");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getTabDistance", "()I", false);
                 return;
             }
@@ -101,7 +94,7 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
             if (opcode == GETFIELD && "thaumcraft/client/gui/GuiResearchBrowser".equals(owner) && "paneWidth".equals(name) && "I".equals(desc)) {
                 counterPaneWidth++;
                 if (counterPaneWidth > 2)
-                    TC4Transformer.log.warn("GuiResearchBrowser has been changed by other people! Things are not going to work right!");
+                    log.error("GuiResearchBrowser has been changed by other people! Things are not going to work right!");
             }
         }
 
@@ -109,14 +102,14 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (found112 && !backgroundDrawChanged && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
                 backgroundDrawChanged = true;
-                TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBackground");
+                log.trace("Deflecting drawTexturedModalRect to drawResearchBrowserBackground");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBackground", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
             } else if (!borderDrawChanged && counterPaneWidth == 2 && opcode == INVOKEVIRTUAL && owner.equals(TARGET_INTERNAL_NAME) && isDrawTexturedModalRect(name) && desc.equals("(IIIIII)V")) {
                 borderDrawChanged = true;
-                TC4Transformer.log.debug("Deflecting drawTexturedModalRect to drawResearchBrowserBorders");
+                log.trace("Deflecting drawTexturedModalRect to drawResearchBrowserBorders");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchBrowserBorders", "(L" + TARGET_INTERNAL_NAME + ";IIIIII)V", false);
             } else if (opcode == INVOKESTATIC && owner.equals("thaumcraft/client/lib/UtilsFX") && name.equals("drawTexturedQuad") && desc.equals("(IIIIIID)V") && counterParticleDraw++ == 1) {
-                TC4Transformer.log.debug("Deflecting drawTexturedQuad to drawResearchCategoryHintParticles");
+                log.trace("Deflecting drawTexturedQuad to drawResearchCategoryHintParticles");
                 super.visitVarInsn(ALOAD, 0);
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "drawResearchCategoryHintParticles", "(IIIIIIDL" + TARGET_INTERNAL_NAME + ";)V", false);
             } else {
@@ -127,13 +120,13 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         @Override
         public void visitEnd() {
             if (counterParticleDraw < 2)
-                TC4Transformer.log.warn("MISSED HINT PARTICLE REDIRECT. This fix will not work!");
+                log.error("MISSED HINT PARTICLE REDIRECT. This fix will not work!");
             else if (counterParticleDraw > 2)
-                TC4Transformer.log.warn("WEIRD HINT PARTICLE REDIRECT. This fix will most likely not work!");
+                log.error("WEIRD HINT PARTICLE REDIRECT. This fix will most likely not work!");
             if (!borderDrawChanged)
-                TC4Transformer.log.warn("MISSED BORDER DRAW INJECT. Research browser resizing will not work!");
+                log.error("MISSED BORDER DRAW INJECT. Research browser resizing will not work!");
             if (!backgroundDrawChanged)
-                TC4Transformer.log.warn("MISSED BACKGROUND DRAW INJECT. Research browser resizing will not work!");
+                log.error("MISSED BACKGROUND DRAW INJECT. Research browser resizing will not work!");
             super.visitEnd();
         }
     }
@@ -150,7 +143,7 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             String target;
             if (opcode == GETFIELD && TARGET_INTERNAL_NAME.equals(owner) && (target = TARGET_FIELDS.get(name)) != null && "I".equals(desc)) {
-                TC4Transformer.log.debug("Replaced GETFIELD {} to INVOKESTATIC {}", name, target);
+                log.trace("Replaced GETFIELD {} to INVOKESTATIC {}", name, target);
                 super.visitInsn(POP);
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, target, "()I", false);
             } else {
@@ -162,13 +155,13 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         public void visitIntInsn(int opcode, int operand) {
             if (operand == 224 && widthReplaced < 2) {
                 // third 224 in genResearchBackground is u coord
-                TC4Transformer.log.debug("Replacing inner width 224 with getResearchBrowserWidth() - 2 * BORDER_WIDTH");
+                log.trace("Replacing inner width 224 with getResearchBrowserWidth() - 2 * BORDER_WIDTH");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getResearchBrowserWidth", "()I", false);
                 super.visitIntInsn(BIPUSH, BORDER_WIDTH * 2);
                 super.visitInsn(ISUB);
                 widthReplaced++;
             } else if (operand == 196) {
-                TC4Transformer.log.debug("Replacing inner height 196 with getResearchBrowserHeight() - 2 * BORDER_HEIGHT");
+                log.trace("Replacing inner height 196 with getResearchBrowserHeight() - 2 * BORDER_HEIGHT");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getResearchBrowserHeight", "()I", false);
                 super.visitIntInsn(BIPUSH, BORDER_HEIGHT * 2);
                 super.visitInsn(ISUB);
@@ -190,7 +183,7 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             if (replaced < maxReplacement && opcode == GETSTATIC && "thaumcraft/api/research/ResearchCategories".equals(owner) && "researchCategories".equals(name) && "Ljava/util/LinkedHashMap;".equals(desc)) {
-                TC4Transformer.log.debug("Replacing ResearchCategories.researchCategories with getTabsOnCurrentPage()");
+                log.trace("Replacing ResearchCategories.researchCategories with getTabsOnCurrentPage()");
                 super.visitVarInsn(ALOAD, 0);
                 super.visitFieldInsn(GETFIELD, TARGET_INTERNAL_NAME, "player", "Ljava/lang/String;");
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, "getTabsOnCurrentPage", "(Ljava/lang/String;)Ljava/util/LinkedHashMap;", false);
@@ -220,7 +213,7 @@ class GuiResearchBrowserVisitor extends ClassVisitor {
         @Override
         public void visitIntInsn(int opcode, int operand) {
             if (replaced < maxReplacement && operand == toReplace) {
-                TC4Transformer.log.debug("Replacing constant {} with {}()I", toReplace, target);
+                log.trace("Replacing constant {} with {}()I", toReplace, target);
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOK_INTERNAL_NAME, target, "()I", false);
                 replaced++;
             } else {

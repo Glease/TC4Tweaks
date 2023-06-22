@@ -1,14 +1,14 @@
 package net.glease.tc4tweak.modules.generateItemHash;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.Table;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.minecraft.item.ItemStack;
-
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CustomItemStacks extends FlushableCache<Set<String>> {
     @Override

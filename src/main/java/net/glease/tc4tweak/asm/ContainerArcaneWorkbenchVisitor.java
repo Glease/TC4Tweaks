@@ -5,6 +5,7 @@ import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class ContainerArcaneWorkbenchVisitor extends ClassVisitor {
@@ -16,7 +17,7 @@ class ContainerArcaneWorkbenchVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (desc.equals("(Lnet/minecraft/inventory/IInventory;)V") && dev ? name.equals("onCraftMatrixChanged") : name.equals("func_75130_a")) {
-            TC4Transformer.log.debug("Replacing {}", name);
+            log.debug("Replacing {}", name);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, "thaumcraft/common/container/ContainerArcaneWorkbench", "tileEntity", "Lthaumcraft/common/tiles/TileArcaneWorkbench;");

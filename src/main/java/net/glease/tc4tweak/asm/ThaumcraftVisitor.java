@@ -30,7 +30,7 @@ class ThaumcraftVisitor extends ClassVisitor {
         @Override
         public void visitCode() {
             super.visitCode();
-            log.debug("Adding fake player check");
+            log.trace("Adding fake player check");
             Label l = new Label(), l2 = new Label(), l3 = new Label();
             mv.visitLabel(l);
             mv.visitLineNumber(114514, l);

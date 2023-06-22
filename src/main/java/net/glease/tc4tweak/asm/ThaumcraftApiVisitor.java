@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
 
@@ -16,10 +17,10 @@ class ThaumcraftApiVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("<clinit>".equals(name) && "()V".equals(desc)) {
-            TC4Transformer.log.debug("Adding callhook to end of clinit");
+            log.debug("Adding callhook to end of clinit");
             return new ClinitVisitor(api, mv);
         } else if ("getCrucibleRecipeFromHash".equals(name) && "(I)Lthaumcraft/api/crafting/CrucibleRecipe;".equals(desc)) {
-            TC4Transformer.log.debug("Replacing getCrucibleRecipeFromHash(I)Lthaumcraft/api/crafting/CrucibleRecipe;");
+            log.debug("Replacing getCrucibleRecipeFromHash(I)Lthaumcraft/api/crafting/CrucibleRecipe;");
             ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "getCrucibleRecipeFromHash", mv, null, desc);
             return null;
         } else {

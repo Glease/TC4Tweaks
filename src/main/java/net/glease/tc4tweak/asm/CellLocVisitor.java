@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 
 class CellLocVisitor extends ClassVisitor {
     public CellLocVisitor(int api, ClassVisitor cv) {
@@ -14,7 +15,7 @@ class CellLocVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("hashCode") && desc.equals("()I")) {
-            TC4Transformer.log.debug("Replacing hashCode()I");
+            log.debug("Replacing hashCode()I");
             ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "hashCellLoc", mv, "thaumcraft/common/lib/world/dim/CellLoc", desc);
             return null;
         }

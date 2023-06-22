@@ -1,9 +1,9 @@
 package net.glease.tc4tweak.asm;
 
+import java.util.Arrays;
+
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-
-import java.util.Arrays;
 
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
@@ -19,7 +19,7 @@ final class ASMUtils {
         } catch (ClassNotFoundException | NoSuchFieldException e) {
             cfg = null;
         } catch (IllegalAccessException e) {
-            log.warn("Unforeseen changes in hodgepodge. Nothing will be disabled automatically!");
+            log.error("Unforeseen changes in hodgepodge. Nothing will be disabled automatically!");
             cfg = null;
         }
         configHodgePodge = cfg;
@@ -87,7 +87,7 @@ final class ASMUtils {
         } catch (NoSuchFieldException e) {
             return false;
         } catch (IllegalAccessException e) {
-            log.warn("Unforeseen changes in hodgepodge. Disabling conflicting patches just in case.");
+            log.error("Unforeseen changes in hodgepodge. Disabling conflicting patches just in case.");
             return false;
         }
     }

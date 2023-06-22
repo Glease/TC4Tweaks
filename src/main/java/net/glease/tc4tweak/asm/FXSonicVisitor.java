@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class FXSonicVisitor extends ClassVisitor {
@@ -18,7 +19,7 @@ class FXSonicVisitor extends ClassVisitor {
     @Override
     public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
         if (name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
-            TC4Transformer.log.debug("Making field model static");
+            log.debug("Making field model static");
             return super.visitField(access | ACC_STATIC, name, desc, signature, value);
         } else {
             return super.visitField(access, name, desc, signature, value);
@@ -43,7 +44,7 @@ class FXSonicVisitor extends ClassVisitor {
         @Override
         public void visitFieldInsn(int opcode, String owner, String name, String desc) {
             if (owner.equals("thaumcraft/client/fx/other/FXSonic") && name.equals(FIELD_MODEL_NAME) && desc.equals(FIELD_MODEL_DESC)) {
-                TC4Transformer.log.debug("Replacing opcode {} with {} in method {}{}", opcode, opcode - 2, this.name, this.desc);
+                log.trace("Replacing opcode {} with {} in method {}{}", opcode, opcode - 2, this.name, this.desc);
                 if (opcode == GETFIELD) {
                     // before
                     // ..., this, -> ..., model,

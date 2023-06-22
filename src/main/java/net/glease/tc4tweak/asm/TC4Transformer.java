@@ -1,5 +1,11 @@
 package net.glease.tc4tweak.asm;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import com.google.common.collect.ImmutableMap;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.crash.CrashReport;
@@ -11,16 +17,26 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import static net.glease.tc4tweak.asm.LoadingPlugin.debugOutputDir;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static org.objectweb.asm.Opcodes.ASM5;
 
+/*
+ * Logging convention:
+ * 1. INFO
+ *   * Start transforming a class
+ *   * Not transforming a class due to wrong side
+ * 2. WARNING
+ *   * Error saving debug output
+ *   * Not transforming a class due to mod compat
+ * 3. ERROR
+ *   * Unrecoverable transform error
+ *   * Input class bytes does not match expectation
+ * 4. Trace
+ *   * Instruction level transforming detail.
+ * 5. DEBUG
+ *   * Everything else
+ */
 public class TC4Transformer implements IClassTransformer {
     static final Logger log = LogManager.getLogger("TC4TweakTransformer");
     private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
@@ -63,7 +79,12 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.lib.research.ScanManager", new TransformerFactory(ScanManagerVisitor::new) {
                 @Override
                 public boolean isInactive() {
-                    return super.isInactive() || LoadingPlugin.gt6;
+                    if (super.isInactive()) return true;
+                    if (LoadingPlugin.gt6) {
+                        log.warn("generateItemHash patch disabled for GT6 compat.");
+                        return true;
+                    }
+                    return false;
                 }
             })
             .put("thaumcraft.common.lib.utils.Utils", new TransformerFactory(UtilsVisitor::new))
@@ -123,7 +144,7 @@ public class TC4Transformer implements IClassTransformer {
             if (DEBUG) {
                 catching(new RuntimeException("Null or empty byte array created. This will not work well!"));
             } else {
-                log.fatal("Null or empty byte array created. Transforming will rollback as a last effort attempt to make things work! However features will not function!");
+                log.error("Null or empty byte array created. Transforming will rollback as a last effort attempt to make things work! However features will not function!");
                 return basicClass;
             }
         }

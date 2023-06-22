@@ -1,5 +1,8 @@
 package net.glease.tc4tweak;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -26,9 +29,6 @@ import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.common.config.ConfigItems;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class ClientProxy extends CommonProxy {
     static final FMLEventHandler instance = new FMLEventHandler();

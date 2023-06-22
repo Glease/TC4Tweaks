@@ -1,13 +1,13 @@
 package net.glease.tc4tweak.modules.findCrucibleRecipe;
 
+import java.util.List;
+
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.FlushableCache;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.crafting.CrucibleRecipe;
-
-import java.util.List;
 
 import static net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe.log;
 

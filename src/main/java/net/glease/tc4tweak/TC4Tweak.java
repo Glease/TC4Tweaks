@@ -1,5 +1,13 @@
 package net.glease.tc4tweak;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.cert.Certificate;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableMap;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -17,14 +25,6 @@ import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.MessageSendConfigurationV2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.cert.Certificate;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Mod(modid = TC4Tweak.MOD_ID, name = "TC4 Tweak", version = TC4Tweak.VERSION, dependencies = "required-after:Thaumcraft", guiFactory = "net.glease.tc4tweak.GuiFactory")
 public class TC4Tweak {

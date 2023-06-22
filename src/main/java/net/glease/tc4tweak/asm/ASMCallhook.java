@@ -1,5 +1,11 @@
 package net.glease.tc4tweak.asm;
 
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ClientProxy;
 import net.glease.tc4tweak.ClientUtils;
@@ -14,12 +20,6 @@ import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
-
-import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static net.glease.tc4tweak.TC4Tweak.log;
 

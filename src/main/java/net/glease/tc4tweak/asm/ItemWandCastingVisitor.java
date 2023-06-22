@@ -5,6 +5,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class ItemWandCastingVisitor extends ClassVisitor {
@@ -17,7 +18,7 @@ class ItemWandCastingVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((("getFocus".equals(name) && "(Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/wands/ItemFocusBasic;".equals(desc))) ||
                 ("getFocusItem".equals(name) && "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;".equals(desc))) {
-            TC4Transformer.log.debug("Visiting method {}", name);
+            log.debug("Visiting method {}", name);
             return new LoadItemStackNullCheckVisitor(api, mv);
         } else {
             return mv;
@@ -45,7 +46,7 @@ class ItemWandCastingVisitor extends ClassVisitor {
                     "net/minecraft/item/ItemStack".equals(owner) &&
                     ("func_77949_a".equals(name) || "loadItemStackFromNBT".equals(name)) &&
                     "(Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/item/ItemStack;".equals(desc)) {
-                TC4Transformer.log.debug("Adding null check");
+                log.trace("Adding null check");
                 mv.visitInsn(DUP);
                 Label branchNonnull = new Label();
                 mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "isValidFocusItemStack", "(Lnet/minecraft/item/ItemStack;)Z", false);

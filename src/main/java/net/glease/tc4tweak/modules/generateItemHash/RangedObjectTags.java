@@ -1,13 +1,12 @@
 package net.glease.tc4tweak.modules.generateItemHash;
 
-import net.glease.tc4tweak.modules.FlushableCache;
-import net.minecraft.item.Item;
-import thaumcraft.api.ThaumcraftApi;
-
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
+
+import net.glease.tc4tweak.modules.FlushableCache;
+import net.minecraft.item.Item;
+import thaumcraft.api.ThaumcraftApi;
 
 import static java.util.stream.Collectors.*;
 

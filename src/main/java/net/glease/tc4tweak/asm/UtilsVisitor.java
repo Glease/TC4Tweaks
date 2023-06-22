@@ -18,30 +18,36 @@ class UtilsVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("generateLoot".equals(name)) {
             log.debug("Visiting {}{}", name, desc);
-            return new MethodVisitor(api, mv) {
-                @Override
-                public void visitVarInsn(int opcode, int var) {
-                    if (opcode == ASTORE && var == 2) {
-                        log.trace("Injected copyIfNotNull");
-                        mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "copyIfNotNull", "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", false);
-                    }
-                    super.visitVarInsn(opcode, var);
-                }
-
-                @Override
-                public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-                    if (opcode == INVOKEVIRTUAL &&
-                            "net/minecraft/item/ItemStack".equals(owner) &&
-                            (dev ? "copy" : "func_77946_l").equals(name) &&
-                            "()Lnet/minecraft/item/ItemStack;".equals(desc) && !itf) {
-                        log.trace("Replaced {}#{}{} with mutateGeneratedLoot", owner, name, desc);
-                        super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "mutateGeneratedLoot", "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", false);
-                    } else {
-                        super.visitMethodInsn(opcode, owner, name, desc, itf);
-                    }
-                }
-            };
+            return new GenerateLootVisitor(mv);
         }
         return mv;
+    }
+
+    private class GenerateLootVisitor extends MethodVisitor {
+        public GenerateLootVisitor(MethodVisitor mv) {
+            super(UtilsVisitor.this.api, mv);
+        }
+
+        @Override
+        public void visitVarInsn(int opcode, int var) {
+            if (opcode == ASTORE && var == 2) {
+                log.trace("Injected copyIfNotNull");
+                mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "copyIfNotNull", "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", false);
+            }
+            super.visitVarInsn(opcode, var);
+        }
+
+        @Override
+        public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+            if (opcode == INVOKEVIRTUAL &&
+                    "net/minecraft/item/ItemStack".equals(owner) &&
+                    (dev ? "copy" : "func_77946_l").equals(name) &&
+                    "()Lnet/minecraft/item/ItemStack;".equals(desc) && !itf) {
+                log.trace("Replaced {}#{}{} with mutateGeneratedLoot", owner, name, desc);
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "mutateGeneratedLoot", "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", false);
+            } else {
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+        }
     }
 }

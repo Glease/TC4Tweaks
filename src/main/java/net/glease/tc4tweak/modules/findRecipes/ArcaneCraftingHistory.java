@@ -1,13 +1,13 @@
 package net.glease.tc4tweak.modules.findRecipes;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import thaumcraft.api.crafting.IArcaneRecipe;
-
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * thread local to make integrated server happy

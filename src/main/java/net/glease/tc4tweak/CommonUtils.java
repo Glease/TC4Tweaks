@@ -1,13 +1,15 @@
 package net.glease.tc4tweak;
 
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
-
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommonUtils {
     // only keep the strings, so tab objects doesn't leak if they are ever removed

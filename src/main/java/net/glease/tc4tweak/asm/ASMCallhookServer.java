@@ -1,5 +1,8 @@
 package net.glease.tc4tweak.asm;
 
+import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
+
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.TC4Tweak;
@@ -53,9 +56,6 @@ import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileResearchTable;
-
-import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static net.glease.tc4tweak.TC4Tweak.log;
 

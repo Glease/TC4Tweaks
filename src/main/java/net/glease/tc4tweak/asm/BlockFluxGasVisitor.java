@@ -3,6 +3,7 @@ package net.glease.tc4tweak.asm;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class BlockFluxGasVisitor extends ClassVisitor {
@@ -20,14 +21,14 @@ class BlockFluxGasVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        TC4Transformer.log.debug("Adding canDrain to {}", className);
+        log.debug("Adding canDrain to {}", className);
         MethodVisitor mv = super.visitMethod(ACC_PUBLIC, "canDrain", "(Lnet/minecraft/world/World;III)Z", null, null);
         mv.visitCode();
         mv.visitInsn(ICONST_0);
         mv.visitInsn(IRETURN);
         mv.visitMaxs(1, 5);
         mv.visitEnd();
-        TC4Transformer.log.debug("Adding drain to {}", className);
+        log.debug("Adding drain to {}", className);
         mv = super.visitMethod(ACC_PUBLIC, "drain", "(Lnet/minecraft/world/World;IIIZ)Lnet/minecraftforge/fluids/FluidStack;", null, null);
         mv.visitCode();
         mv.visitInsn(ACONST_NULL);

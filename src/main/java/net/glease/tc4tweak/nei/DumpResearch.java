@@ -1,11 +1,11 @@
 package net.glease.tc4tweak.nei;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import thaumcraft.api.aspects.Aspect;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class DumpResearch extends TC4TweaksDataDump {
     public DumpResearch() {

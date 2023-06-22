@@ -1,7 +1,5 @@
 package net.glease.tc4tweak.asm;
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -9,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 

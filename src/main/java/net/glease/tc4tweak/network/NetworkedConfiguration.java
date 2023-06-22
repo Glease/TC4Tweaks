@@ -1,10 +1,6 @@
 package net.glease.tc4tweak.network;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
 import net.glease.tc4tweak.ConfigurationHandler;
-import net.glease.tc4tweak.TC4Tweak;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 public class NetworkedConfiguration {
     static boolean checkWorkbenchRecipes = true;

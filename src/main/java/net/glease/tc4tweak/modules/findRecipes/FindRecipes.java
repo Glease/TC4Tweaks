@@ -1,11 +1,11 @@
 package net.glease.tc4tweak.modules.findRecipes;
 
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.crafting.IArcaneRecipe;
-
-import java.util.List;
 
 public class FindRecipes {
     private static final ArcaneCraftingHistory cache = new ArcaneCraftingHistory();

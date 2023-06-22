@@ -1,5 +1,11 @@
 package net.glease.tc4tweak;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -15,9 +21,6 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
-
-import java.io.File;
-import java.util.*;
 
 public enum ConfigurationHandler {
     INSTANCE;

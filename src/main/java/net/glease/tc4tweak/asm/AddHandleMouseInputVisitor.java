@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOK_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class AddHandleMouseInputVisitor extends ClassVisitor {
@@ -27,7 +28,7 @@ class AddHandleMouseInputVisitor extends ClassVisitor {
             name = "handleMouseInput";
         else
             name = "func_146274_d";
-        TC4Transformer.log.debug("Adding {} to {}", name, className);
+        log.debug("Adding {} to {}", name, className);
         MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, name, "()V", null, null);
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0);

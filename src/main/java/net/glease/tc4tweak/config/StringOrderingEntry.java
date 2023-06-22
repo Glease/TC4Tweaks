@@ -1,5 +1,8 @@
 package net.glease.tc4tweak.config;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.client.config.*;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -7,9 +10,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
-
-import java.lang.reflect.Field;
-import java.util.List;
 
 import static cpw.mods.fml.client.config.GuiUtils.INVALID;
 import static cpw.mods.fml.client.config.GuiUtils.VALID;

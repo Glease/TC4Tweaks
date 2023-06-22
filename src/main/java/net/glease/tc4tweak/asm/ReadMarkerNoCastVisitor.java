@@ -23,7 +23,7 @@ public class ReadMarkerNoCastVisitor extends ClassVisitor {
             public boolean isInactive() {
                 if (super.isInactive()) return true;
                 if (hodgepodge)
-                    log.info("Disabling TC4Tweaks's golem marker patch to prevent conflict with hodgepodge.");
+                    log.warn("Disabling TC4Tweaks's golem marker patch to prevent conflict with hodgepodge.");
                 return hodgepodge;
             }
         };
@@ -49,7 +49,7 @@ public class ReadMarkerNoCastVisitor extends ClassVisitor {
         @Override
         public void visitInsn(int opcode) {
             if (active && opcode == I2B) {
-                log.debug("Dropped I2B");
+                log.trace("Dropped I2B");
                 return;
             }
             super.visitInsn(opcode);

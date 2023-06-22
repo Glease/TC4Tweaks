@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.network;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
+import java.io.IOException;
+
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -12,11 +13,11 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileHole;
 
-import java.io.IOException;
-
 public class TileHoleSyncPacket implements IMessage, IMessageHandler<TileHoleSyncPacket, IMessage> {
     private S35PacketUpdateTileEntity origin;
 
+    // used by packet pipeline to reflectively construct this
+    @SuppressWarnings("unused")
     public TileHoleSyncPacket() {
     }
 

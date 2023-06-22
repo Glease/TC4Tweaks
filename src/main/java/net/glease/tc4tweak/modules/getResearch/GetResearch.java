@@ -1,10 +1,10 @@
 package net.glease.tc4tweak.modules.getResearch;
 
-import thaumcraft.api.research.ResearchCategories;
-import thaumcraft.api.research.ResearchItem;
-
 import java.util.Map;
 import java.util.stream.Stream;
+
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchItem;
 
 /**
  * getResearch speed up

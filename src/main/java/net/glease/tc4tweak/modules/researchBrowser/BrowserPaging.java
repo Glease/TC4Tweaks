@@ -1,5 +1,9 @@
 package net.glease.tc4tweak.modules.researchBrowser;
 
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -17,10 +21,6 @@ import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.lib.research.ResearchManager;
-
-import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders.*;
 

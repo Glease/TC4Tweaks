@@ -23,7 +23,7 @@ class BlockJarVisitor extends ClassVisitor {
                 public void visitFieldInsn(int opcode, String owner, String name, String desc) {
                     super.visitFieldInsn(opcode, owner, name, desc);
                     if (opcode == PUTFIELD && name.equals("aspectFilter")) {
-                        log.debug("Adding markDirty & markBlockForUpdate");
+                        log.trace("Adding markDirty & markBlockForUpdate");
                         mv.visitVarInsn(ALOAD, 1);
                         mv.visitVarInsn(ILOAD, 2);
                         mv.visitVarInsn(ILOAD, 3);
@@ -35,6 +35,7 @@ class BlockJarVisitor extends ClassVisitor {
                 }
             };
         } else if (name.equals(dev ? "addCollisionBoxesToList" : "func_149743_a")) {
+            log.debug("Modifying {}", name);
             return new MethodVisitor(api, mv) {
                 private int visited = 0;
 
@@ -42,7 +43,7 @@ class BlockJarVisitor extends ClassVisitor {
                 public void visitInsn(int opcode) {
                     if (opcode == FCONST_1 || opcode == FCONST_0) {
                         if (visited >= 6)
-                            throw new IllegalStateException();
+                            throw new IllegalStateException("unexpected class bytes");
                         mv.visitInsn(ICONST_0 + visited);
                         mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "getBlockJarEntityCollisionBoxParameter", "(I)F", false);
                         visited++;

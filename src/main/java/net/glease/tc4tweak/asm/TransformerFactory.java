@@ -1,10 +1,10 @@
 package net.glease.tc4tweak.asm;
 
+import java.util.function.BiFunction;
+
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.Side;
 import org.objectweb.asm.ClassVisitor;
-
-import java.util.function.BiFunction;
 
 class TransformerFactory {
     private final BiFunction<Integer, ClassVisitor, ClassVisitor> factory;

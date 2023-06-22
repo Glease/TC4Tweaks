@@ -1,11 +1,11 @@
 package net.glease.tc4tweak.modules;
 
-import gnu.trove.map.TIntObjectMap;
-
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import gnu.trove.map.TIntObjectMap;
 
 public abstract class FlushableCache<E> {
     private static final List<WeakReference<FlushableCache<?>>> allCaches = new CopyOnWriteArrayList<>();

@@ -28,7 +28,7 @@ class BlockMetalDeviceVisitor extends ClassVisitor {
                             owner.equals("net/minecraft/entity/player/InventoryPlayer") &&
                             name.equals(dev ? "addItemStackToInventory" : "func_70441_a") &&
                             desc.equals("(Lnet/minecraft/item/ItemStack;)Z")) {
-                        log.debug("Redirecting {}", name);
+                        log.trace("Redirecting {}", name);
                         super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "addToPlayerInventoryBiased", "(Lnet/minecraft/entity/player/InventoryPlayer;Lnet/minecraft/item/ItemStack;)Z", false);
                         visited = true;
                     } else {

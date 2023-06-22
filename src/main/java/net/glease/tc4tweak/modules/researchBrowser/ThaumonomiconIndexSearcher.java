@@ -1,5 +1,9 @@
 package net.glease.tc4tweak.modules.researchBrowser;
 
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.util.*;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -26,13 +30,11 @@ import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.config.ConfigItems;
 
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-import java.util.*;
-
 /**
- * Adapted from Witching Gadgets
- * https://github.com/GTNewHorizons/WitchingGadgets/blob/1.2.13-GTNH/src/main/java/witchinggadgets/client/ThaumonomiconIndexSearcher.java
+ * Adapted from
+ * <a href="https://github.com/GTNewHorizons/WitchingGadgets/blob/1.2.13-GTNH/src/main/java/witchinggadgets/client/ThaumonomiconIndexSearcher.java">Witching Gadgets</a>
+ * Credit to BluSunrize for originally creating this class.
+ * Slightly modified to adapt to research browser scaling functionality of this mod.
  */
 public class ThaumonomiconIndexSearcher {
     private static final int mouseBufferIdent = 17;

@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class ResearchCategoriesVisitor extends ClassVisitor {
@@ -15,7 +16,7 @@ class ResearchCategoriesVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("getResearch") && desc.equals("(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;")) {
-            TC4Transformer.log.debug("Replacing getResearch(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;");
+            log.debug("Replacing getResearch(Ljava/lang/String;)Lthaumcraft/api/research/ResearchItem;");
             mv.visitParameter("key", 0);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);

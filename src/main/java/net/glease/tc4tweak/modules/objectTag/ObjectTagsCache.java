@@ -1,16 +1,16 @@
 package net.glease.tc4tweak.modules.objectTag;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.minecraft.item.Item;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.AspectList;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Collectors;
 
 class ObjectTagsCache extends FlushableCache<ConcurrentMap<Item, TIntObjectMap<AspectList>>> {
 

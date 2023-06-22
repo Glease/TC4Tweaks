@@ -1,11 +1,11 @@
 package net.glease.tc4tweak.nei;
 
+import java.io.File;
+
 import codechicken.lib.vec.Rectangle4i;
 import codechicken.nei.config.DataDumper;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.*;
-
-import java.io.File;
 
 abstract class TC4TweaksDataDump extends DataDumper {
     protected static final int DEFAULT_MODE = 0;

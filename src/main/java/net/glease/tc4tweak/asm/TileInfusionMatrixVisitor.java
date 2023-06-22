@@ -4,6 +4,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
+
 class TileInfusionMatrixVisitor extends ClassVisitor {
 
     public TileInfusionMatrixVisitor(int api, ClassVisitor cv) {
@@ -14,7 +16,7 @@ class TileInfusionMatrixVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         final MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("craftCycle") && desc.equals("()V")) {
-            TC4Transformer.log.debug("Injecting Math#max before Random#nextInt calls in CraftCycle()");
+            log.debug("Injecting Math#max before Random#nextInt calls in CraftCycle()");
             return new LoadMathAbsVisitor(api, mv);
         } else {
             return mv;

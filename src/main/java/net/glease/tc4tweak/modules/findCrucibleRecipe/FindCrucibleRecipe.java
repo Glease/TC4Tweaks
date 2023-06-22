@@ -1,11 +1,11 @@
 package net.glease.tc4tweak.modules.findCrucibleRecipe;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.crafting.CrucibleRecipe;
-
-import java.util.List;
 
 public class FindCrucibleRecipe {
 	static final Logger log = LogManager.getLogger("FindCrucibleRecipe");
