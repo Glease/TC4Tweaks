@@ -205,3 +205,5 @@ idea {
         testOutputDir = new File(compileTestJava.destinationDir.parentFile.parentFile, "ideaTest")
     }
 }
+
+compileJava.options.encoding = 'UTF-8'

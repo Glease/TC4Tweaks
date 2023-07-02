@@ -14,9 +14,19 @@ import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.MessageSendConfigurationV2;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.glease.tc4tweak.network.TileHoleSyncPacket;
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.IBlockSource;
+import net.minecraft.dispenser.IPosition;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.projectile.EntityPrimalArrow;
 
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
@@ -39,6 +49,33 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
+        BlockDispenser.dispenseBehaviorRegistry.putObject(ConfigItems.itemPrimalArrow, new BehaviorProjectileDispense() {
+            @Override
+            public ItemStack dispenseStack(IBlockSource dispenser, ItemStack stack) {
+                EnumFacing facing = BlockDispenser.func_149937_b(dispenser.getBlockMetadata());
+                IPosition pos = BlockDispenser.func_149939_a(dispenser);
+                ItemStack toDrop = stack.splitStack(1);
+                if (ConfigurationHandler.INSTANCE.isDispenserShootPrimalArrow()) {
+                    World w = dispenser.getWorld();
+                    EntityPrimalArrow e = (EntityPrimalArrow) getProjectileEntity(w, pos);
+                    e.type = toDrop.getItemDamage();
+                    if (e.type == 3)
+                        // inherent power of earth arrow
+                        // this is unfortunately not done on hit, but at bow draw time, so we must emulate this as well
+                        e.setKnockbackStrength(1);
+                    e.setThrowableHeading(facing.getFrontOffsetX(), facing.getFrontOffsetY() + 0.1F, facing.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
+                    w.spawnEntityInWorld(e);
+                } else {
+                    doDispense(dispenser.getWorld(), toDrop, 6, facing, pos);
+                }
+                return stack;
+            }
+
+            @Override
+            protected IProjectile getProjectileEntity(World w, IPosition iposition) {
+                return new EntityPrimalArrow(w, iposition.getX(), iposition.getY(), iposition.getZ());
+            }
+        });
     }
 
     public void postInit(FMLPostInitializationEvent e) {
