@@ -101,6 +101,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
+        ConfigurationHandler.INSTANCE.setGUISettings();
         try {
             Class<GuiResearchTable> guiResearchTableClass = GuiResearchTable.class;
             fieldPage = guiResearchTableClass.getDeclaredField("page");

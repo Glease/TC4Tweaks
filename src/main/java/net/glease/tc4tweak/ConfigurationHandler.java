@@ -122,9 +122,6 @@ public enum ConfigurationHandler {
         categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[] {"BASICS","THAUMATURGY","ALCHEMY","ARTIFICE","GOLEMANCY","ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
         dispenserShootPrimalArrow = config.getBoolean("dispenserShootPrimalArrow", "general", false, "If true, dispenser will shoot primal arrow instead of dropping it into world.");
 
-        // config GUI stuff
-        config.getCategory("client").get("categoryOrder").setArrayEntryClass(StringOrderingEntry.class);
-
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
             config.getCategory("client").get("inferBrowserScaleLowerBound").set(inferBrowserScaleUpperBound);
@@ -139,6 +136,11 @@ public enum ConfigurationHandler {
         }
         breakLongCommentLines();
         config.save();
+    }
+
+    void setGUISettings() {
+        // config GUI stuff
+        config.getCategory("client").get("categoryOrder").setArrayEntryClass(StringOrderingEntry.class);
     }
 
     public boolean isInverted() {
