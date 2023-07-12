@@ -10,6 +10,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
 import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
@@ -31,7 +32,6 @@ import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.common.config.ConfigItems;
 
 public class ClientProxy extends CommonProxy {
-    static final FMLEventHandler instance = new FMLEventHandler();
     static long lastScroll = 0;
     static Field fieldPage = null;
     static Field fieldLastPage = null;
@@ -40,6 +40,8 @@ public class ClientProxy extends CommonProxy {
     static Method GuiResearchRecipeMouseClicked = null;
     private static final int mPrevX = 261, mPrevY = 189, mNextX = -17, mNextY = 189;
     private static final int paneWidth = 256, paneHeight = 181;
+
+    private long updateCounter = 0;
 
     public static void handleMouseInput(GuiResearchTable screen) {
         if (fieldLastPage == null || fieldPage == null || methodPlayScroll == null) return;
@@ -98,6 +100,11 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    public ClientProxy() {
+        super();
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         super.preInit(e);
@@ -124,8 +131,6 @@ public class ClientProxy extends CommonProxy {
             System.err.println("Cannot find thaumcraft fields. Research page scrolling will not properly function!");
             err.printStackTrace();
         }
-        MinecraftForge.EVENT_BUS.register(this);
-        FMLCommonHandler.instance().bus().register(instance);
         final IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
         if (resourceManager instanceof IReloadableResourceManager) {
             //noinspection Convert2Lambda
@@ -161,7 +166,6 @@ public class ClientProxy extends CommonProxy {
         } catch (ReflectiveOperationException ignored) {
             // WG is probably not installed, ignoring
         }
-        FMLCommonHandler.instance().bus().register(this);
     }
 
     @SubscribeEvent
@@ -183,17 +187,20 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
-    public static class FMLEventHandler {
-        private long updateCounter = 0;
-
-        @SubscribeEvent
-        public void onTickEnd(TickEvent.ClientTickEvent e) {
-            if (e.phase == TickEvent.Phase.END) {
-                if (++updateCounter > ConfigurationHandler.INSTANCE.getUpdateInterval()) {
-                    updateCounter = 0;
-                    ASMCallhook.updatePostponed();
-                }
+    @SubscribeEvent
+    public void onTickEnd(TickEvent.ClientTickEvent e) {
+        if (e.phase == TickEvent.Phase.END) {
+            if (++updateCounter > ConfigurationHandler.INSTANCE.getUpdateInterval()) {
+                updateCounter = 0;
+                ASMCallhook.updatePostponed();
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerConnected(FMLNetworkEvent.ClientConnectedToServerEvent e) {
+        if (!e.isLocal) {
+            NetworkedConfiguration.resetClient();
         }
     }
 }

@@ -20,12 +20,12 @@ public class MessageSendConfigurationV2 implements IMessage,  IMessageHandler<Me
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        ByteBufUtils.writeTag(buf, tag);
+        tag = ByteBufUtils.readTag(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        tag = ByteBufUtils.readTag(buf);
+        ByteBufUtils.writeTag(buf, tag);
     }
 
     @Override

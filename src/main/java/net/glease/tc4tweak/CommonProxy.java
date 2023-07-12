@@ -29,6 +29,10 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.projectile.EntityPrimalArrow;
 
 public class CommonProxy {
+    public CommonProxy() {
+        FMLCommonHandler.instance().bus().register(this);
+    }
+
     public void preInit(FMLPreInitializationEvent e) {
         ConfigurationHandler.INSTANCE.init(e.getSuggestedConfigurationFile());
 
@@ -44,8 +48,7 @@ public class CommonProxy {
 
     public void serverStarted(FMLServerStartedEvent e) {
         FlushableCache.enableAll(true);
-        NetworkedConfiguration.reset();
-        FMLCommonHandler.instance().bus().register(this);
+        NetworkedConfiguration.resetServer();
     }
 
     public void init(FMLInitializationEvent e) {
@@ -93,7 +96,8 @@ public class CommonProxy {
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent e) {
-        if (e.player instanceof EntityPlayerMP && !TC4Tweak.INSTANCE.isAllowAll()) {
+        if (e.player instanceof EntityPlayerMP && !((EntityPlayerMP) e.player).playerNetServerHandler.netManager.isLocalChannel()) {
+            // no point sending config over to a local client
             TC4Tweak.INSTANCE.CHANNEL.sendTo(new MessageSendConfiguration(), (EntityPlayerMP) e.player);
             TC4Tweak.INSTANCE.CHANNEL.sendTo(new MessageSendConfigurationV2(), (EntityPlayerMP) e.player);
         }
