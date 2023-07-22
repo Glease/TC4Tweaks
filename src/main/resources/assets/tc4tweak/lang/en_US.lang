@@ -1,4 +1,5 @@
 tc4tweaks.gui.search=Search
+tc4tweaks.gui.clear_notification=Clear Notification
 tc4tweaks.enabled_scrolling=Scrolling aspect list with mouse wheel at research table enabled
 tc4tweaks.disable_vanilla=Arcane workbench will no longer work as an vanilla crafting table
 tc4tweaks.config.client=Client Side Configurations
@@ -26,6 +27,8 @@ tc4tweaks.config.client.updateInterval=Arcane Workbench GUI Update Interval
 tc4tweaks.config.client.updateInterval.tooltip=How often should Arcane Workbench update displayed crafting result. Unit is in game ticks. \n[range: 0 ~ 40]
 tc4tweaks.config.client.categoryOrder=Reorder Research Tabs
 tc4tweaks.config.client.categoryOrder.tooltip=Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs, i.e. no change.
+tc4tweaks.config.client.addClearButton=Add Clear Notification Button
+tc4tweaks.config.client.addClearButton.tooltip=If true, a button will be shown when there is any amount of tc4 notifications AND when sending chat.
 tc4tweaks.config.general=General Configurations
 tc4tweaks.config.general.tooltip=Configurations that can alter the mechanisms of the game
 tc4tweaks.config.general.arcaneCraftingHistorySize=Arcane Crafting History Size

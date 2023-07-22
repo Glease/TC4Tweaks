@@ -13,6 +13,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
 import net.glease.tc4tweak.asm.LoadingPlugin;
+import net.glease.tc4tweak.modules.hudNotif.HUDNotification;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
@@ -153,6 +154,7 @@ public class ClientProxy extends CommonProxy {
     public void init(FMLInitializationEvent e) {
         super.init(e);
         ThaumonomiconIndexSearcher.init();
+        HUDNotification.init();
         BrowserPaging.init();
     }
 
