@@ -191,11 +191,23 @@ public class BrowserPaging {
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public void onGuiInitPre(GuiScreenEvent.InitGuiEvent.Pre e) {
             if (e.gui instanceof GuiResearchBrowser && ConfigurationHandler.INSTANCE.isInferBrowserScale()) {
-                int searchAreaSizeTimesTwo = ConfigurationHandler.INSTANCE.isInferBrowserScaleConsiderSearch() ? ThaumonomiconIndexSearcher.getResultDisplayAreaWidth(e.gui) * 2 : 0;
                 // factors to consider:
                 // width: browser itself. tab icons on both sides. search area. a visual gap (BORDER_WIDTH * 2) between the furthest element and window border
                 // height: browser itself. a visual gap (BORDER_HEIGHT * 2) between the furthest element and window border
-                ConfigurationHandler.INSTANCE.setBrowserScale(Math.max(1, Math.min(((float) e.gui.width - BORDER_WIDTH * 2 - searchAreaSizeTimesTwo - 24 * Math.min(2, ResearchCategories.researchCategories.size() / getTabPerSide())) / TEXTURE_WIDTH, ((float) e.gui.height - BORDER_HEIGHT * 2) / TEXTURE_HEIGHT)));
+                // search area width affects and depends on browser scale by width at the same time
+                // tabs per side affects browser scale by height and depends on browser scale by widh at the same time
+                // so in order to not make this iteratively smaller/bigger on each reopen we simulate this process (Glease/TC4Tweaks#40)
+                // the process is rather complicated since >3 factors are affecting each other
+                // simulating the process is the most straightforward and most bugfree way
+                int iterations = 0;
+                float oldScale;
+                do {
+                    oldScale = ConfigurationHandler.INSTANCE.getBrowserScale();
+                    int searchAreaSizeTimesTwo = ConfigurationHandler.INSTANCE.isInferBrowserScaleConsiderSearch() ? ThaumonomiconIndexSearcher.getResultDisplayAreaWidth(e.gui) * 2 : 0;
+                    float factorByWidth = ((float) e.gui.width - BORDER_WIDTH * 2 - searchAreaSizeTimesTwo - 24 * Math.min(2, ResearchCategories.researchCategories.size() / getTabPerSide())) / TEXTURE_WIDTH;
+                    float factorByHeight = ((float) e.gui.height - BORDER_HEIGHT * 2) / TEXTURE_HEIGHT;
+                    ConfigurationHandler.INSTANCE.setBrowserScale(Math.max(1, Math.min(factorByWidth, factorByHeight)));
+                } while (Math.abs(oldScale - ConfigurationHandler.INSTANCE.getBrowserScale()) > 1e-4 && iterations++ < 1000);
             }
         }
 
