@@ -5,6 +5,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
@@ -27,8 +28,28 @@ class ThaumcraftCraftingManagerVisitor extends ClassVisitor {
             log.debug("Replacing {}", name);
             ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
             return null;
+        } else if ("generateTagsFromCrucibleRecipes".equals(name)) {
+            log.debug("Visiting {}", name);
+            return new GenerateTagsFromCrucibleRecipesVisitor(api, mv);
         } else {
             return mv;
+        }
+    }
+
+    private static class GenerateTagsFromCrucibleRecipesVisitor extends MethodVisitor {
+        public GenerateTagsFromCrucibleRecipesVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+        @Override
+        public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+            if ("generateTags".equals(name) && "(Lnet/minecraft/item/Item;I)Lthaumcraft/api/aspects/AspectList;".equals(desc)) {
+                String newDesc = "(Lnet/minecraft/item/Item;ILjava/util/ArrayList;)Lthaumcraft/api/aspects/AspectList;";
+                log.trace("Fixing wrong overload of generateTags being called. Old desc {}, new desc {}", desc, newDesc);
+                mv.visitVarInsn(Opcodes.ALOAD, 2);
+                desc = newDesc;
+            }
+            super.visitMethodInsn(opcode, owner, name, desc, itf);
         }
     }
 }
