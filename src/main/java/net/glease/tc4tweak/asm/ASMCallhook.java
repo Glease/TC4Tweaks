@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -10,14 +11,22 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ClientProxy;
 import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.modules.hudNotif.HUDNotification;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
 import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.INode;
+import thaumcraft.api.nodes.NodeModifier;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
+import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
@@ -38,7 +47,7 @@ public class ASMCallhook {
     /**
      * Called from {@link thaumcraft.client.gui.GuiResearchRecipe#getFromCache(int)}
      */
-    @Callhook
+    @Callhook(adder = GuiResearchRecipeVisitor.class, module = ASMConstants.Modules.MappingThreadLowPriority)
     public static void onCacheLookupHead() {
         cacheUsed.lazySet(true);
     }
@@ -46,7 +55,7 @@ public class ASMCallhook {
     /**
      * Called from {@link thaumcraft.client.gui.MappingThread#run()}
      */
-    @Callhook
+    @Callhook(adder = MappingThreadVisitor.class, module = ASMConstants.Modules.MappingThreadLowPriority)
     public static void onMappingStart(Map<String, Integer> mapping) {
         if (ConfigurationHandler.INSTANCE.isMappingThreadNice())
             Thread.currentThread().setPriority(1);
@@ -59,7 +68,7 @@ public class ASMCallhook {
     /**
      * Called from {@link thaumcraft.client.gui.MappingThread#run()}
      */
-    @Callhook
+    @Callhook(adder = MappingThreadVisitor.class, module = ASMConstants.Modules.MappingThreadLowPriority)
     public static void onMappingDidWork() {
         if (!priorityChanged && cacheUsed.get()) {
             Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
@@ -70,7 +79,7 @@ public class ASMCallhook {
     /**
      * Called from {@link thaumcraft.client.gui.MappingThread#run()}
      */
-    @Callhook
+    @Callhook(adder = MappingThreadVisitor.class, module = ASMConstants.Modules.MappingThreadLowPriority)
     public static void onMappingFinished() {
         if (ConfigurationHandler.INSTANCE.isMappingThreadNice())
             log.info("TC4 Mapping finish. Took {}ns.", System.nanoTime() - start);
@@ -92,26 +101,27 @@ public class ASMCallhook {
     }
 
     /**
-     * called from GuiResearchTable. first arg is this
+     * called from {@link GuiResearchTable}. first arg is this
      */
-    @Callhook
+    @Callhook(adder = AddHandleMouseInputVisitor.class, module = ASMConstants.Modules.ScrollFix)
     public static void handleMouseInput(GuiResearchTable screen) {
         ClientProxy.handleMouseInput(screen);
     }
 
     /**
-     * called from GuiResearchRecipe. first arg is this
+     * called from {@link GuiResearchRecipe}. first arg is this
      */
-    @Callhook
+    @Callhook(adder = AddHandleMouseInputVisitor.class, module = ASMConstants.Modules.ScrollFix)
     public static void handleMouseInput(GuiResearchRecipe screen) {
         ClientProxy.handleMouseInput(screen);
     }
 
     /**
      * Throttle the amount of arcane workbench update on client side
-     * called from TileMagicWorkbench.
+     * called from {@link TileMagicWorkbench#setInventorySlotContents(int, ItemStack)}.
+     * replaces the onCraftMatrixChanged call in target method.
      */
-    @Callhook
+    @Callhook(adder = TileMagicWorkbenchVisitor.class, module = ASMConstants.Modules.WorkbenchLagFix)
     public static void updateCraftingMatrix(TileMagicWorkbench self) {
         if (!self.getWorldObj().isRemote) {
             self.eventHandler.onCraftMatrixChanged(self);
@@ -128,82 +138,73 @@ public class ASMCallhook {
         }
     }
 
-    @Callhook
+    /**
+     * called from various classes like {@link thaumcraft.client.renderers.tile.TileNodeRenderer#renderNode(EntityLivingBase, double, boolean, boolean, float, int, int, int, float, AspectList, NodeType, NodeModifier)}
+     * generally replace a call of {@link UtilsFX#renderFacingStrip}.
+     */
+    @Callhook(adder = NodeLikeRendererVisitor.class, module = ASMConstants.Modules.NodeRenderUpperLimit)
     public static void renderFacingStrip(double px, double py, double pz, float angle, float scale, float alpha, int frames, int strip, int frame, float partialTicks, int color) {
         UtilsFX.renderFacingStrip(px, py, pz, angle, Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, frame, partialTicks, color);
     }
 
-    @Callhook
+    /**
+     * Called from {@link thaumcraft.client.renderers.tile.ItemNodeRenderer#renderItemNode(INode)}
+     * replaces a call to {@link UtilsFX#renderAnimatedQuadStrip(float, float, int, int, int, float, int)}
+     */
+    @Callhook(adder = ItemNodeRendererVisitor.class, module = ASMConstants.Modules.NodeRenderUpperLimit)
     public static void renderAnimatedQuadStrip(float scale, float alpha, int frames, int strip, int cframe, float partialTicks, int color) {
         UtilsFX.renderAnimatedQuadStrip(Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, cframe, partialTicks, color);
     }
 
     /**
-     * Draw research browser borders. Called from GuiResearchBrowser#genResearchBackground
+     * Draw research browser borders. Called from {@link GuiResearchBrowser#genResearchBackground(int, int, float)}
      */
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static void drawResearchBrowserBorders(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {
         DrawResearchBrowserBorders.drawResearchBrowserBorders(gui, x, y, u, v, width, height);
     }
 
-    @Callhook
+    /**
+     * Draw research browser background. Called from {@link GuiResearchBrowser#genResearchBackground(int, int, float)}
+     */
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static void drawResearchBrowserBackground(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {
         DrawResearchBrowserBorders.drawResearchBrowserBackground(gui, x, y, u, v, width, height);
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static int getResearchBrowserHeight() {
         return ConfigurationHandler.INSTANCE.getBrowserHeight();
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static int getResearchBrowserWidth() {
         return ConfigurationHandler.INSTANCE.getBrowserWidth();
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static int getTabDistance() {
         // why is this 8?
         return ConfigurationHandler.INSTANCE.getBrowserWidth() + 8;
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static int getTabIconDistance() {
         // why is this 24?
         return ConfigurationHandler.INSTANCE.getBrowserWidth() + 24;
     }
 
-    @Callhook
-    public static int getNewGuiMapTop(int oldVal) {
-        return (int) (oldVal - 85 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
-    }
-
-    @Callhook
-    public static int getNewGuiMapLeft(int oldVal) {
-        return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
-    }
-
-    @Callhook
-    public static int getNewGuiMapBottom(int oldVal) {
-        return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
-    }
-
-    @Callhook
-    public static int getNewGuiMapRight(int oldVal) {
-        return (int) (oldVal - 61 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
-    }
-
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static int getTabPerSide() {
         return BrowserPaging.getTabPerSide();
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static LinkedHashMap<String, ResearchCategoryList> getTabsOnCurrentPage(String player) {
         return BrowserPaging.getTabsOnCurrentPage(player);
     }
 
-    @Callhook
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
     public static void drawResearchCategoryHintParticles(int x, int y, int u, int v, int width, int height, double zLevel, GuiResearchBrowser gui) {
         if (x < gui.width / 2)
             UtilsFX.drawTexturedQuad(x, y, u, v, width, height, zLevel);
@@ -213,7 +214,7 @@ public class ASMCallhook {
         }
     }
 
-    @Callhook
+    @Callhook(adder = UtilsFXVisitor.class, module = ASMConstants.Modules.Optimization)
     public static ResourceLocation getParticleTexture() {
         try {
             if (fieldParticleTexture == null)

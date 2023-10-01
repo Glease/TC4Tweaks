@@ -70,12 +70,12 @@ public class ASMCallhookServer {
      * @param stack reconstructed focus stack, not wand stack
      * @return true if the stack is valid
      */
-    @Callhook
+    @Callhook(adder = ItemWandCastingVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static boolean isValidFocusItemStack(ItemStack stack) {
         return stack != null && stack.getItem() instanceof ItemFocusBasic;
     }
 
-    @Callhook
+    @Callhook(adder = ResearchCategoriesVisitor.class, module = ASMConstants.Modules.Optimization)
     public static ResearchItem getResearch(String key) {
         return GetResearch.getResearch(key);
     }
@@ -83,7 +83,7 @@ public class ASMCallhookServer {
     /**
      * Called from {@link thaumcraft.common.lib.crafting.ThaumcraftCraftingManager#findMatchingArcaneRecipe(IInventory, EntityPlayer)}
      */
-    @Callhook
+    @Callhook(adder = ThaumcraftCraftingManagerVisitor.class, module = ASMConstants.Modules.Optimization)
     public static ItemStack findMatchingArcaneRecipe(IInventory awb, EntityPlayer player) {
         IArcaneRecipe recipe = FindRecipes.findArcaneRecipe(awb, player);
         return recipe == null ? null : recipe.getCraftingResult(awb);
@@ -92,18 +92,18 @@ public class ASMCallhookServer {
     /**
      * Called from {@link thaumcraft.common.lib.crafting.ThaumcraftCraftingManager#findMatchingArcaneRecipeAspects(IInventory, EntityPlayer)}
      */
-    @Callhook
+    @Callhook(adder = ThaumcraftCraftingManagerVisitor.class, module = ASMConstants.Modules.Optimization)
     public static AspectList findMatchingArcaneRecipeAspects(IInventory awb, EntityPlayer player) {
         IArcaneRecipe recipe = FindRecipes.findArcaneRecipe(awb, player);
         return recipe == null ? new AspectList() : recipe.getAspects() == null ? recipe.getAspects(awb) : recipe.getAspects();
     }
 
-    @Callhook
+    @Callhook(adder = ScanManagerVisitor.class, module = ASMConstants.Modules.Optimization)
     public static int generateItemHash(Item item, int meta) {
         return GenerateItemHash.generateItemHash(item, meta);
     }
 
-    @Callhook
+    @Callhook(adder = ThaumcraftCraftingManagerVisitor.class, module = ASMConstants.Modules.ObjectTagsLagFix)
     public static AspectList getObjectTags(ItemStack itemstack) {
         return GetObjectTags.getObjectTags(itemstack);
     }
@@ -111,7 +111,7 @@ public class ASMCallhookServer {
     /**
      * Called from {@link thaumcraft.common.container.ContainerArcaneWorkbench#onCraftMatrixChanged(IInventory)}
      */
-    @Callhook
+    @Callhook(adder = ContainerArcaneWorkbenchVisitor.class, module = ASMConstants.Modules.WorkbenchLagFix)
     public static void onArcaneWorkbenchChanged(TileArcaneWorkbench tileEntity, InventoryPlayer ip) {
         // only check synced config if in remote world
         if (ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes() && (!tileEntity.getWorldObj().isRemote || NetworkedConfiguration.isCheckWorkbenchRecipes())) {
@@ -131,17 +131,20 @@ public class ASMCallhookServer {
         }
     }
 
-    @Callhook
+    @Callhook(adder = CellLocVisitor.class, module = ASMConstants.Modules.Optimization)
     public static int hashCellLoc(CellLoc thiz) {
         return ((1664525 * thiz.x) + 1013904223) ^ ((1664525 * (thiz.z ^ -559038737)) + 1013904223);
     }
 
-    @Callhook
+    @Callhook(adder = ThaumcraftApiVisitor.class, module = ASMConstants.Modules.ObjectTagsLagFix)
     public static void postThaumcraftApiClinit() {
         ThaumcraftApi.objectTags = GetObjectTags.newReplacementObjectTagsMap();
     }
 
-    @Callhook
+    /**
+     * called from {@link MazeHandler#writeNBT()} as an overwrite.
+     */
+    @Callhook(adder = MazeHandlerVisitor.class, module = ASMConstants.Modules.Optimization)
     public static NBTTagCompound writeMazeToNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
         NBTTagList tagList = new NBTTagList();
@@ -162,17 +165,17 @@ public class ASMCallhookServer {
         return nbt;
     }
 
-    @Callhook
+    @Callhook(adder = ThaumcraftApiVisitor.class, module = ASMConstants.Modules.Optimization)
     public static CrucibleRecipe getCrucibleRecipeFromHash(int hash) {
         return FindCrucibleRecipe.getCrucibleRecipeFromHash(hash);
     }
 
-    @Callhook
+    @Callhook(adder = AIItemPickupVisitor.class, module = ASMConstants.Modules.ExploitFix)
     public static Entity onlyIfAlive(Entity sus) {
         return sus != null && sus.isEntityAlive() ? sus : null;
     }
 
-    @Callhook
+    @Callhook(adder = VisNetHandlerVisitor.class, module = ASMConstants.Modules.Optimization)
     public static boolean canNodeBeSeen(TileVisNode source, TileVisNode target) {
         World world = source.getWorldObj();
         Vec3 v1 = Vec3.createVectorHelper((double) source.xCoord + 0.5D, (double) source.yCoord + 0.5D, (double) source.zCoord + 0.5D);
@@ -307,12 +310,12 @@ public class ASMCallhookServer {
         return false;
     }
 
-    @Callhook
+    @Callhook(adder = BlockJarVisitor.class, module = ASMConstants.Modules.Misc)
     public static float getBlockJarEntityCollisionBoxParameter(int index) {
         return EntityCollisionBox.getBlockJarEntityCollisionBoxParameter(index);
     }
 
-    @Callhook
+    @Callhook(adder = BlockMetalDeviceVisitor.class, module = ASMConstants.Modules.Misc)
     public static boolean addToPlayerInventoryBiased(InventoryPlayer inv, ItemStack s) {
         if (s == null || s.stackSize == 0 || s.getItem() == null) return false;
         // logic: first try to stack, then try to place in original slot, last fallback to vanilla logic
@@ -336,7 +339,7 @@ public class ASMCallhookServer {
         }
     }
 
-    @Callhook
+    @Callhook(adder = TileHoleVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static Packet createTileHoleSyncPacket(S35PacketUpdateTileEntity origin) {
         try {
             return TC4Tweak.INSTANCE.CHANNEL.getPacketFrom(new TileHoleSyncPacket(origin));
@@ -346,7 +349,7 @@ public class ASMCallhookServer {
         }
     }
 
-    @Callhook
+    @Callhook(adder = PacketPlayerCompleteToServerVisitor.class, module = ASMConstants.Modules.ExploitFix)
     public static boolean sanityPlayerComplete(PacketPlayerCompleteToServerAccess packet, MessageContext ctx) {
         if (packet.type() != 0) return true;
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
@@ -369,7 +372,7 @@ public class ASMCallhookServer {
         return research.tags != null && research.tags.size() > 0 && (Config.researchDifficulty == -1 || Config.researchDifficulty == 0 && research.isSecondary());
     }
 
-    @Callhook
+    @Callhook(adder = PacketAspectCombinationToServerVisitor.class, module = ASMConstants.Modules.ExploitFix)
     public static boolean sanityCheckAspectCombination(PacketAspectCombinationToServerAccess packet, MessageContext ctx) {
         if (sanityCheckAspectCombination0(packet))
             return true;
@@ -394,13 +397,13 @@ public class ASMCallhookServer {
         return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > threshold;
     }
 
-    @Callhook
+    @Callhook(adder = UtilsVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static ItemStack copyIfNotNull(ItemStack stack) {
         if (!ConfigurationHandler.INSTANCE.isMoreRandomizedLoot()) return stack;
         return stack == null ? null : stack.copy();
     }
 
-    @Callhook
+    @Callhook(adder = UtilsVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static ItemStack mutateGeneratedLoot(ItemStack stack) {
         if (!ConfigurationHandler.INSTANCE.isMoreRandomizedLoot()) return stack.copy();
         if (stack.getItem() == ConfigItems.itemAmuletVis) {
@@ -413,7 +416,7 @@ public class ASMCallhookServer {
         return stack;
     }
 
-    @Callhook
+    @Callhook(adder = InfusionRecipeVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static boolean infusionItemMatches(ItemStack playerInput, ItemStack recipeSpec, boolean fuzzy) {
         if (playerInput == null) {
             return recipeSpec == null;

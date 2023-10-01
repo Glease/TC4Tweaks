@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.objectweb.asm.ClassVisitor;
+
 /**
  * Marker interface telling IDE method is not unused.
  * <p>
@@ -12,5 +14,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface Callhook {
+@interface Callhook {
+    Class<? extends ClassVisitor> adder() default ClassVisitor.class;
+    ASMConstants.Modules[] module();
 }
