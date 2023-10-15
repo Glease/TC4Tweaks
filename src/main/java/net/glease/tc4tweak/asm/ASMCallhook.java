@@ -1,7 +1,6 @@
 package net.glease.tc4tweak.asm;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -11,7 +10,6 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ClientProxy;
 import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
-import net.glease.tc4tweak.modules.hudNotif.HUDNotification;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.DrawResearchBrowserBorders;
 import net.minecraft.client.particle.EffectRenderer;
@@ -26,7 +24,6 @@ import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
-import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
@@ -192,6 +189,26 @@ public class ASMCallhook {
     public static int getTabIconDistance() {
         // why is this 24?
         return ConfigurationHandler.INSTANCE.getBrowserWidth() + 24;
+    }
+
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
+    public static int getNewGuiMapTop(int oldVal) {
+        return (int) (oldVal - 85 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
+    }
+
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
+    public static int getNewGuiMapLeft(int oldVal) {
+        return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
+    }
+
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
+    public static int getNewGuiMapBottom(int oldVal) {
+        return (int) (oldVal - 112 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
+    }
+
+    @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
+    public static int getNewGuiMapRight(int oldVal) {
+        return (int) (oldVal - 61 * (ConfigurationHandler.INSTANCE.getBrowserScale() - 1));
     }
 
     @Callhook(adder = GuiResearchBrowserVisitor.class, module = ASMConstants.Modules.BiggerResearchBrowser)
