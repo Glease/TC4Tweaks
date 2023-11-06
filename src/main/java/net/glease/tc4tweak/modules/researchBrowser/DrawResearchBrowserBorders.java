@@ -1,8 +1,18 @@
 package net.glease.tc4tweak.modules.researchBrowser;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.client.gui.GuiResearchBrowser;
 
 public class DrawResearchBrowserBorders {
@@ -29,6 +39,29 @@ public class DrawResearchBrowserBorders {
         }
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glDepthFunc(oldDepthFunc);
+
+        drawCompletionCounter(gui, x, y);
+    }
+
+    private static void drawCompletionCounter(GuiResearchBrowser gui, int x, int y) {
+        ConfigurationHandler.CompletionCounterStyle style = ConfigurationHandler.INSTANCE.getResearchCounterStyle();
+        if (style == ConfigurationHandler.CompletionCounterStyle.None)
+            return;
+        // draw completion text progress text
+        ResearchCategoryList category = ResearchCategories.getResearchList(Utils.getActiveCategory());
+        // filter away stuff that are auto unlocked but never shown. probably should just filter away virtual research,
+        // but I'm not entirely sure how that field is actually used in the field, so let's be conservative for now
+        Set<String> r = category.research.entrySet().stream().filter(e -> !(e.getValue().isAutoUnlock() && e.getValue().isVirtual())).map(Map.Entry::getKey).collect(Collectors.toSet());
+        int total = r.size();
+        List<?> collect = GuiResearchBrowser.completedResearch.get(Minecraft.getMinecraft().thePlayer.getCommandSenderName()).stream().filter(r::contains).collect(Collectors.toList());
+        int completed = collect.size();
+        String tooltip;
+        if (style == ConfigurationHandler.CompletionCounterStyle.Current && completed < total)
+            tooltip = I18n.format("tc4tweaks.gui.progress.partial", completed);
+        else
+            tooltip = I18n.format("tc4tweaks.gui.progress", completed, total);
+        FontRenderer fontRenderer = gui.mc.fontRenderer;
+        fontRenderer.drawString(tooltip, x + BORDER_WIDTH + 2, y + (BORDER_HEIGHT - fontRenderer.FONT_HEIGHT) / 2, 0x777777, true);
     }
 
     public static void drawResearchBrowserBackground(GuiResearchBrowser gui, int x, int y, int u, int v, int width, int height) {

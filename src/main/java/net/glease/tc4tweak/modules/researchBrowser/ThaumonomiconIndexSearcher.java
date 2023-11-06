@@ -7,6 +7,7 @@ import java.util.*;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -38,10 +39,8 @@ import thaumcraft.common.config.ConfigItems;
  */
 public class ThaumonomiconIndexSearcher {
     private static final int mouseBufferIdent = 17;
-    private static final int selectedCategoryIdent = 21;
     public static ThaumonomiconIndexSearcher instance;
     private static ByteBuffer mouseBuffer;
-    private static Field f_selectedCategory = null;
     private static Field f_mouseBuffer;
     private static GuiTextField thaumSearchField;
     private static int listDisplayOffset = 0;
@@ -52,19 +51,7 @@ public class ThaumonomiconIndexSearcher {
         instance = new ThaumonomiconIndexSearcher();
         MinecraftForge.EVENT_BUS.register(instance);
         FMLCommonHandler.instance().bus().register(instance);
-
-        try {
-            f_mouseBuffer = Mouse.class.getDeclaredFields()[mouseBufferIdent];
-            if (!f_mouseBuffer.getName().equalsIgnoreCase("readBuffer"))
-                f_mouseBuffer = Mouse.class.getDeclaredField("readBuffer");
-            f_mouseBuffer.setAccessible(true);
-            f_selectedCategory = GuiResearchBrowser.class.getDeclaredFields()[selectedCategoryIdent];
-            if (!f_selectedCategory.getName().equalsIgnoreCase("selectedCategory"))
-                f_selectedCategory = GuiResearchBrowser.class.getDeclaredField("selectedCategory");
-            f_selectedCategory.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        f_mouseBuffer = CommonUtils.getField(Mouse.class, "readBuffer", mouseBufferIdent);
     }
 
     private static void initMouseEventBuffer() {
@@ -139,16 +126,6 @@ public class ThaumonomiconIndexSearcher {
             }
         valids.sort(ResearchSorter.instance);
         searchResults = valids;
-    }
-
-    private static String getActiveCategory() {
-        String s = null;
-        try {
-            s = (String) f_selectedCategory.get(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return s;
     }
 
     @SubscribeEvent
@@ -264,7 +241,7 @@ public class ThaumonomiconIndexSearcher {
                             thaumSearchField.textboxKeyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
                             listDisplayOffset = 0;
                             if (ConfigurationHandler.INSTANCE.isLimitBookSearchToCategory())
-                                searchCategory = getActiveCategory();
+                                searchCategory = Utils.getActiveCategory();
                             buildEntryList(thaumSearchField.getText());
                         }
                     }

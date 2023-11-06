@@ -18,6 +18,7 @@ public class CommonUtils {
     public static String toString(AspectList al) {
         return al.aspects.entrySet().stream().filter(e -> e.getKey() != null && e.getValue() != null).map(e -> String.format("%dx%s", e.getValue(), e.getKey().getName())).collect(Collectors.joining(";"));
     }
+
     public static String toString(CrucibleRecipe r) {
         return "CrucibleRecipe{key="+r.key+",catalyst="+r.catalyst+",output="+r.getRecipeOutput()+",aspects="+toString(r.aspects)+"}";
     }
@@ -46,6 +47,21 @@ public class CommonUtils {
     public static <T> T reflectGet(Field f, Object instance) {
         try {
             return (T) f.get(instance);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    public static Field getField(Class<?> clazz, String fieldName, int index) {
+        try {
+            Field f = null;
+            Field[] fields = clazz.getDeclaredFields();
+            if (index >= 0 && fields.length > index)
+                f = fields[index];
+            if (f == null || !f.getName().equalsIgnoreCase(fieldName))
+                f = clazz.getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return f;
         } catch (ReflectiveOperationException e) {
             throw new AssertionError(e);
         }

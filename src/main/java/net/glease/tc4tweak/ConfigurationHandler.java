@@ -48,6 +48,7 @@ public enum ConfigurationHandler {
     private int browserWidth = 256;
     private InfusionOreDictMode infusionOreDictMode = InfusionOreDictMode.Default;
     private List<String> categoryOrder = new ArrayList<>();
+    private CompletionCounterStyle counterStyle =  CompletionCounterStyle.Current;
 
     ConfigurationHandler() {
         FMLCommonHandler.instance().bus().register(this);
@@ -123,6 +124,7 @@ public enum ConfigurationHandler {
         categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[] {"BASICS","THAUMATURGY","ALCHEMY","ARTIFICE","GOLEMANCY","ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
         dispenserShootPrimalArrow = config.getBoolean("dispenserShootPrimalArrow", "general", false, "If true, dispenser will shoot primal arrow instead of dropping it into world.");
         addClearButton = config.getBoolean("addClearButton", "client", true, "If true, a button will be shown when there is any amount of tc4 notifications AND when sending chat.");
+        counterStyle = CompletionCounterStyle.get(config.getString("completionCounterStyle", "client", counterStyle.name(), "Select the style of completion counter. Default: Current. None: disable completion progress counter. Current: display how many you have completed already, and only show the total count for this tab when everything here has been learnt. All: show all counters at all times.", Arrays.stream(CompletionCounterStyle.values()).map(Enum::name).toArray(String[]::new)));
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -232,6 +234,10 @@ public enum ConfigurationHandler {
         return addClearButton;
     }
 
+    public CompletionCounterStyle getResearchCounterStyle() {
+        return counterStyle;
+    }
+
     public enum InfusionOreDictMode {
         Default {
             @SuppressWarnings("deprecation")
@@ -275,6 +281,21 @@ public enum ConfigurationHandler {
                     return value;
             }
             return Default;
+        }
+    }
+
+    public enum CompletionCounterStyle {
+        None,
+        Current,
+        All,
+        ;
+
+        public static CompletionCounterStyle get(String name) {
+            for (CompletionCounterStyle value : values()) {
+                if (value.name().equals(name))
+                    return value;
+            }
+            return Current;
         }
     }
 }
