@@ -42,6 +42,7 @@ public class ThaumonomiconIndexSearcher {
     public static ThaumonomiconIndexSearcher instance;
     private static ByteBuffer mouseBuffer;
     private static Field f_selectedCategory = null;
+    private static Field f_mouseBuffer;
     private static GuiTextField thaumSearchField;
     private static int listDisplayOffset = 0;
     private static String searchCategory;
@@ -52,21 +53,23 @@ public class ThaumonomiconIndexSearcher {
         MinecraftForge.EVENT_BUS.register(instance);
         FMLCommonHandler.instance().bus().register(instance);
 
-        if (mouseBuffer == null)
-            try {
-                Field f_buf = Mouse.class.getDeclaredFields()[mouseBufferIdent];
-                if (!f_buf.getName().equalsIgnoreCase("readBuffer"))
-                    f_buf = Mouse.class.getDeclaredField("readBuffer");
-                f_buf.setAccessible(true);
-                mouseBuffer = (ByteBuffer) f_buf.get(null);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         try {
+            f_mouseBuffer = Mouse.class.getDeclaredFields()[mouseBufferIdent];
+            if (!f_mouseBuffer.getName().equalsIgnoreCase("readBuffer"))
+                f_mouseBuffer = Mouse.class.getDeclaredField("readBuffer");
+            f_mouseBuffer.setAccessible(true);
             f_selectedCategory = GuiResearchBrowser.class.getDeclaredFields()[selectedCategoryIdent];
             if (!f_selectedCategory.getName().equalsIgnoreCase("selectedCategory"))
                 f_selectedCategory = GuiResearchBrowser.class.getDeclaredField("selectedCategory");
             f_selectedCategory.setAccessible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void initMouseEventBuffer() {
+        try {
+            mouseBuffer = (ByteBuffer) f_mouseBuffer.get(null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,6 +155,7 @@ public class ThaumonomiconIndexSearcher {
     public void onGuiInit(GuiScreenEvent.InitGuiEvent.Post event) {
         searchResults.clear();
         if (event.gui.getClass().getName().endsWith("GuiResearchBrowser")) {
+            initMouseEventBuffer();
             int width = ConfigurationHandler.INSTANCE.getBrowserWidth();
             int height = ConfigurationHandler.INSTANCE.getBrowserHeight();
             thaumSearchField = new GuiTextField(event.gui.mc.fontRenderer, event.gui.width / 2, event.gui.height / 2 - height / 2 + 5, Math.min(width / 2 - 20, 120), 13);
@@ -243,6 +247,7 @@ public class ThaumonomiconIndexSearcher {
     public void onGuiOpen(GuiOpenEvent event) {
         if (thaumSearchField != null) {
             thaumSearchField = null;
+            mouseBuffer = null;
             Keyboard.enableRepeatEvents(false);
         }
     }
