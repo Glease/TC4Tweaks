@@ -1,4 +1,6 @@
 tc4tweaks.gui.search=Поиск
+tc4tweaks.gui.progress=Изучено %s из %s
+tc4tweaks.gui.progress.partial=Изучено %s из %s..§4?§r
 tc4tweaks.enabled_scrolling=Прокрутка списка аспектов в столе исследований колёсиком мыши включена
 tc4tweaks.disable_vanilla=Магический верстак больше не будет работать как обычный верстак
 tc4tweaks.config.client=Настройки клиента

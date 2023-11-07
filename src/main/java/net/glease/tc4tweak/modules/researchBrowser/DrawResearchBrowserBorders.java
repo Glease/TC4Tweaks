@@ -1,9 +1,8 @@
 package net.glease.tc4tweak.modules.researchBrowser;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.glease.tc4tweak.ClientUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
@@ -13,7 +12,10 @@ import net.minecraft.client.resources.I18n;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
+import thaumcraft.api.research.ResearchItem;
 import thaumcraft.client.gui.GuiResearchBrowser;
+
+import static thaumcraft.client.gui.GuiResearchBrowser.completedResearch;
 
 public class DrawResearchBrowserBorders {
     // I'm actually amazed to see it's not the same...
@@ -43,6 +45,28 @@ public class DrawResearchBrowserBorders {
         drawCompletionCounter(gui, x, y);
     }
 
+    private static boolean canUnlockResearch(ResearchItem res) {
+        String playerName = Minecraft.getMinecraft().thePlayer.getCommandSenderName();
+        if(res.parents != null) {
+            for(String pt : res.parents) {
+                ResearchItem parent = ResearchCategories.getResearch(pt);
+                if(parent != null && !completedResearch.get(playerName).contains(parent.key)) {
+                    return false;
+                }
+            }
+        }
+
+        if(res.parentsHidden != null) {
+            for(String pt : res.parentsHidden) {
+                ResearchItem parent = ResearchCategories.getResearch(pt);
+                if(parent != null && !completedResearch.get(playerName).contains(parent.key)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     private static void drawCompletionCounter(GuiResearchBrowser gui, int x, int y) {
         ConfigurationHandler.CompletionCounterStyle style = ConfigurationHandler.INSTANCE.getResearchCounterStyle();
         if (style == ConfigurationHandler.CompletionCounterStyle.None)
@@ -50,16 +74,18 @@ public class DrawResearchBrowserBorders {
         // draw completion text progress text
         ResearchCategoryList category = ResearchCategories.getResearchList(Utils.getActiveCategory());
         // filter away stuff that are auto unlocked but never shown. probably should just filter away virtual research,
-        // but I'm not entirely sure how that field is actually used in the field, so let's be conservative for now
-        Set<String> r = category.research.entrySet().stream().filter(e -> !(e.getValue().isAutoUnlock() && e.getValue().isVirtual())).map(Map.Entry::getKey).collect(Collectors.toSet());
-        int total = r.size();
-        List<?> collect = GuiResearchBrowser.completedResearch.get(Minecraft.getMinecraft().thePlayer.getCommandSenderName()).stream().filter(r::contains).collect(Collectors.toList());
-        int completed = collect.size();
+        // but I'm not entirely sure how that field is actually used in practice, so let's be conservative for now
+        Map<String, ResearchItem> all = category.research.entrySet().stream().filter(e -> !(e.getValue().isAutoUnlock() && e.getValue().isVirtual())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        int total = all.size();
+        ArrayList<String> completedKeys = completedResearch.get(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+        long completed = completedKeys.stream().filter(all::containsKey).count();
+        long revealed = all.entrySet().stream().filter(e -> completedKeys.contains(e.getKey()) || completedKeys.contains("@" + e.getKey()) || !(e.getValue().isLost() || e.getValue().isHidden() && !completedKeys.contains("@" + e.getValue().key) || e.getValue().isConcealed() && !canUnlockResearch(e.getValue()))).count();
         String tooltip;
-        if (style == ConfigurationHandler.CompletionCounterStyle.Current && completed < total)
-            tooltip = I18n.format("tc4tweaks.gui.progress.partial", completed);
-        else
+        if (style == ConfigurationHandler.CompletionCounterStyle.Current && revealed < total) {
+            tooltip = I18n.format("tc4tweaks.gui.progress.partial", completed, revealed);
+        } else {
             tooltip = I18n.format("tc4tweaks.gui.progress", completed, total);
+        }
         FontRenderer fontRenderer = gui.mc.fontRenderer;
         fontRenderer.drawString(tooltip, x + BORDER_WIDTH + 2, y + (BORDER_HEIGHT - fontRenderer.FONT_HEIGHT) / 2, 0x777777, true);
     }
