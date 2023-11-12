@@ -15,6 +15,7 @@ import net.glease.tc4tweak.asm.ASMCallhook;
 import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.modules.hudNotif.HUDNotification;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
+import net.glease.tc4tweak.modules.researchBrowser.DrawResearchCompletionCounter;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.minecraft.client.Minecraft;
@@ -154,6 +155,7 @@ public class ClientProxy extends CommonProxy {
     public void init(FMLInitializationEvent e) {
         super.init(e);
         ThaumonomiconIndexSearcher.init();
+        DrawResearchCompletionCounter.init();
         HUDNotification.init();
         BrowserPaging.init();
     }

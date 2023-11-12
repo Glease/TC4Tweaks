@@ -26,7 +26,6 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
-import thaumcraft.client.gui.GuiResearchBrowser;
 import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.config.ConfigItems;
@@ -202,6 +201,7 @@ public class ThaumonomiconIndexSearcher {
                 tes.draw();
             }
             UtilsFX.bindTexture("textures/gui/guiresearchtable2.png");
+            GL11.glColor3f(1,1,1);
             event.gui.drawTexturedModalRect(thaumSearchField.xPosition - 2, thaumSearchField.yPosition - 4, 94, 8, thaumSearchField.width + 8, thaumSearchField.height);
             event.gui.drawTexturedModalRect(thaumSearchField.xPosition - 2, thaumSearchField.yPosition + thaumSearchField.height - 4, 138, 158, thaumSearchField.width + 8, 2);
             event.gui.drawTexturedModalRect(thaumSearchField.xPosition + thaumSearchField.width + 6, thaumSearchField.yPosition - 4, 244, 136, 2, thaumSearchField.height + 2);
