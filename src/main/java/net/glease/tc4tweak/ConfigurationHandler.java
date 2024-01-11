@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 import net.glease.tc4tweak.config.StringOrderingEntry;
 import net.glease.tc4tweak.modules.FlushableCache;
@@ -49,7 +52,8 @@ public enum ConfigurationHandler {
     private int browserWidth = 256;
     private InfusionOreDictMode infusionOreDictMode = InfusionOreDictMode.Default;
     private List<String> categoryOrder = new ArrayList<>();
-    private CompletionCounterStyle counterStyle =  CompletionCounterStyle.Current;
+    private CompletionCounterStyle counterStyle = CompletionCounterStyle.Current;
+    private final TObjectDoubleMap<UUID> championMods = new TObjectDoubleHashMap<>();
 
     ConfigurationHandler() {
         FMLCommonHandler.instance().bus().register(this);
@@ -122,11 +126,38 @@ public enum ConfigurationHandler {
         smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
         moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
         infusionOreDictMode = InfusionOreDictMode.get(config.getString("infusionOreDictMode", "general", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
-        categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[] {"BASICS","THAUMATURGY","ALCHEMY","ARTIFICE","GOLEMANCY","ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
+        categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[]{"BASICS", "THAUMATURGY", "ALCHEMY", "ARTIFICE", "GOLEMANCY", "ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
         dispenserShootPrimalArrow = config.getBoolean("dispenserShootPrimalArrow", "general", false, "If true, dispenser will shoot primal arrow instead of dropping it into world.");
         addClearButton = config.getBoolean("addClearButton", "client", true, "If true, a button will be shown when there is any amount of tc4 notifications AND when sending chat.");
         addResearchSearch = config.getBoolean("addResearchSearch", "client", true, "If true, a search box will appear on the top right bar of thaumonomicon gui. This feature is taken from WitchingGadgets due to the said GUI is being upsized by this mod and without modifying its code, the search box would not be positioned correctly. Will disable WitchingGadget's search feature (if it is present) regardless of whether this is true.");
         counterStyle = CompletionCounterStyle.get(config.getString("completionCounterStyle", "client", counterStyle.name(), "Select the style of completion counter. Default: Current. None: disable completion progress counter. Current: display how many you have completed already, and only show the total count for this tab when everything here has been learnt. All: show all counters at all times.", Arrays.stream(CompletionCounterStyle.values()).map(Enum::name).toArray(String[]::new)));
+
+        String[][] championMods = new String[][]{
+                {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
+                {"a340d2db-d881-4c25-ac62-f0ad14cd63b0", "Champion damage buff", "Champion damage buff. +x%, i.e. if configured as 1, the mob will deal double damage.",},
+                {"4b1edd33-caa9-47ae-a702-d86c05701037", "Bold speed boost", "Bold speed boost. Multiplier, i.e. if configured as 2, the mob will have double speed.",},
+                {"7163897f-07f5-49b3-9ce4-b74beb83d2d3", "Mighty damage boost", "Mighty damage boost. +x%, i.e. if configured as 1, the mob will deal double damage.",},
+                {"54d621c1-dd4d-4b43-8bd2-5531c8875797", "HEALTH BUFF 1", "Boss health buff when at least 1 player present when spawned. Plain add.",},
+                {"f51257dc-b7fa-4f7a-92d7-75d68e8592c4", "HEALTH BUFF 2", "Boss health buff when at least 2 player present when spawned. Plain add.",},
+                {"3d6b2e42-4141-4364-b76d-0e8664bbd0bb", "HEALTH BUFF 3", "Boss health buff when at least 3 player present when spawned. Plain add.",},
+                {"02c97a08-801c-4131-afa2-1427a6151934", "HEALTH BUFF 4", "Boss health buff when at least 4 player present when spawned. Plain add.",},
+                {"0f354f6a-33c5-40be-93be-81b1338567f1", "HEALTH BUFF 5", "Boss health buff when at least 5 player present when spawned. Plain add.",},
+                {"534f8c57-929a-48cf-bbd6-0fd851030748", "DAMAGE BUFF 1", "Boss damage buff when at least 1 player present when spawned. Plain add.",},
+                {"d317a76e-0e7c-4c61-acfd-9fa286053b32", "DAMAGE BUFF 2", "Boss damage buff when at least 2 player present when spawned. Plain add.",},
+                {"ff462d63-26a2-4363-830e-143ed97e2a4f", "DAMAGE BUFF 3", "Boss damage buff when at least 3 player present when spawned. Plain add.",},
+                {"cf1eb39e-0c67-495f-887c-0d3080828d2f", "DAMAGE BUFF 4", "Boss damage buff when at least 4 player present when spawned. Plain add.",},
+                {"3cfab9da-2701-43d8-ac07-885f16fa4117", "DAMAGE BUFF 5", "Boss damage buff when at least 5 player present when spawned. Plain add.",},
+        };
+        double[] defaults = new double[]{
+                30.0D, 2.0D, 0.3D, 3.0D, 50.0D, 50.0D, 50.0D, 50.0D, 50.0D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D,
+        };
+
+        for (int i = 0; i < championMods.length; i++) {
+            Property p = config.get("general.champion_mods", championMods[i][1], defaults[i], championMods[i][2]);
+            p.setMinValue(0.0D);
+            this.championMods.put(UUID.fromString(championMods[i][0]), p.getDouble());
+        }
+        config.getCategory("general.champion_mods").setComment("Do note that those boss buffs can stack. If 5 player is present then all of DAMAGE BUFF 1 to DAMAGE BUFF 5 will be applied!");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -242,6 +273,13 @@ public enum ConfigurationHandler {
 
     public CompletionCounterStyle getResearchCounterStyle() {
         return counterStyle;
+    }
+
+    public double getChampionModValue(UUID configKey, double old) {
+        double v = championMods.get(configKey);
+        if (v == championMods.getNoEntryValue())
+            return old;
+        return v;
     }
 
     public enum InfusionOreDictMode {

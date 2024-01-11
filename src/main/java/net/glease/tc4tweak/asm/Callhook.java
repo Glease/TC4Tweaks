@@ -13,7 +13,7 @@ import org.objectweb.asm.ClassVisitor;
  * For supported IDEs add this annotation to the list of entry point to prevent false unused warnings.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @interface Callhook {
     Class<? extends ClassVisitor> adder() default ClassVisitor.class;
     ASMConstants.Modules[] module();

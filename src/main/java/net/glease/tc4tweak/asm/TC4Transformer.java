@@ -87,6 +87,7 @@ public class TC4Transformer implements IClassTransformer {
                     return false;
                 }
             })
+            .put("thaumcraft.common.lib.utils.EntityUtils", new TransformerFactory(EntityUtilsVisitor::new))
             .put("thaumcraft.common.lib.utils.Utils", new TransformerFactory(UtilsVisitor::new))
             .put("thaumcraft.common.lib.world.dim.CellLoc", new TransformerFactory(CellLocVisitor::new))
             .put("thaumcraft.common.lib.world.dim.MazeHandler", new TransformerFactory(MazeHandlerVisitor::new))

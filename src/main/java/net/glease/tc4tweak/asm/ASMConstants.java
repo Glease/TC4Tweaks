@@ -16,5 +16,6 @@ class ASMConstants {
         MappingThreadLowPriority,
         ObjectTagsLagFix,
         ItemHashLagFix,
+        ChampionModConfig,
     }
 }
