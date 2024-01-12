@@ -23,14 +23,18 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.client.model.AdvancedModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.lwjgl.input.Mouse;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.gui.GuiResearchRecipe;
 import thaumcraft.client.gui.GuiResearchTable;
+import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.common.config.ConfigItems;
 
 public class ClientProxy extends CommonProxy {
@@ -38,7 +42,6 @@ public class ClientProxy extends CommonProxy {
     static Field fieldPage = null;
     static Field fieldLastPage = null;
     static Method methodPlayScroll = null;
-    static Field fieldModel = null;
     static Method GuiResearchRecipeMouseClicked = null;
     private static final int mPrevX = 261, mPrevY = 189, mNextX = -17, mNextY = 189;
     private static final int paneWidth = 256, paneHeight = 181;
@@ -119,8 +122,6 @@ public class ClientProxy extends CommonProxy {
             fieldLastPage.setAccessible(true);
             methodPlayScroll = guiResearchTableClass.getDeclaredMethod("playButtonScroll");
             methodPlayScroll.setAccessible(true);
-            fieldModel = FXSonic.class.getDeclaredField("model");
-            fieldModel.setAccessible(true);
         } catch (Exception err) {
             System.err.println("Cannot find thaumcraft fields. Aspect list scrolling will not properly function!");
             err.printStackTrace();
@@ -139,13 +140,8 @@ public class ClientProxy extends CommonProxy {
             ((IReloadableResourceManager) resourceManager).registerReloadListener(new IResourceManagerReloadListener() {
                 @Override
                 public void onResourceManagerReload(IResourceManager ignored) {
-                    try {
-                        fieldModel.set(null, null);
-                    } catch (IllegalAccessException | NullPointerException err) {
-                        // illegal access exception is impossible
-                        // NPE means ASM has failed somehow.
-                        err.printStackTrace();
-                    }
+                    reflectiveReloadModel(FXSonic.class, "MODEL");
+                    reflectiveReloadModel(TileAlchemyFurnaceAdvancedRenderer.class, "FURNACE");
                 }
             });
         }
@@ -205,6 +201,14 @@ public class ClientProxy extends CommonProxy {
     public void onServerConnected(FMLNetworkEvent.ClientConnectedToServerEvent e) {
         if (!e.isLocal) {
             NetworkedConfiguration.resetClient();
+        }
+    }
+
+    private static void reflectiveReloadModel(Class<?> cls, String resLocationField) {
+        try {
+            FieldUtils.writeDeclaredStaticField(cls, "model", AdvancedModelLoader.loadModel((ResourceLocation) FieldUtils.readDeclaredStaticField(cls, resLocationField, true)), true);
+        } catch (ReflectiveOperationException e) {
+            // ignore
         }
     }
 }

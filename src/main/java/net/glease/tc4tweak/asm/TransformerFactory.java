@@ -45,4 +45,8 @@ class TransformerFactory {
     public boolean isExpandFrames() {
         return expandFrames;
     }
+
+    public final TransformerFactory chain(BiFunction<Integer, ClassVisitor, ClassVisitor> factory) {
+        return new TransformerFactory((i, cv) -> this.factory.apply(i, factory.apply(i, cv)), activeSide, expandFrames);
+    }
 }
