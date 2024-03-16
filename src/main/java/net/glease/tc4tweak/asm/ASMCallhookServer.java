@@ -36,8 +36,10 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import thaumcraft.api.BlockCoordinates;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
@@ -131,9 +133,19 @@ public class ASMCallhookServer {
         }
     }
 
-    @Callhook(adder = CellLocVisitor.class, module = ASMConstants.Modules.Optimization)
-    public static int hashCellLoc(CellLoc thiz) {
+    @Callhook(adder = HashCodeVisitor.class, module = ASMConstants.Modules.Optimization)
+    public static int hash(CellLoc thiz) {
         return ((1664525 * thiz.x) + 1013904223) ^ ((1664525 * (thiz.z ^ -559038737)) + 1013904223);
+    }
+
+    @Callhook(adder = HashCodeVisitor.class, module = ASMConstants.Modules.Optimization)
+    public static int hash(BlockCoordinates thiz) {
+        return thiz.y * 31 + thiz.x * 91 + thiz.z * 29303;
+    }
+
+    @Callhook(adder = HashCodeVisitor.class, module = ASMConstants.Modules.Optimization)
+    public static int hash(WorldCoordinates thiz) {
+        return thiz.y * 31 + thiz.x * 91 + thiz.z * 29303 + thiz.dim * 39916801;
     }
 
     @Callhook(adder = ThaumcraftApiVisitor.class, module = ASMConstants.Modules.ObjectTagsLagFix)
