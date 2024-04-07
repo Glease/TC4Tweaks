@@ -1,9 +1,11 @@
 package net.glease.tc4tweak.asm;
 
+import java.lang.reflect.Method;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.TC4Tweak;
 import net.glease.tc4tweak.asm.PacketAspectCombinationToServerVisitor.PacketAspectCombinationToServerAccess;
@@ -63,6 +65,7 @@ import static net.glease.tc4tweak.TC4Tweak.log;
 
 public class ASMCallhookServer {
     private static final Marker securityMarker = MarkerManager.getMarker("SuspiciousPackets");
+    private static Method getRenderDistanceChunks;
     private ASMCallhookServer() {
     }
 
@@ -444,5 +447,22 @@ public class ASMCallhookServer {
         return playerInput.getItem() == recipeSpec.getItem() &&
                 (playerInput.getItemDamage() == recipeSpec.getItemDamage() || recipeSpec.getItemDamage() == 32767) &&
                 playerInput.stackSize <= playerInput.getMaxStackSize();
+    }
+
+    @Callhook(adder = UtilsVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static double getViewDistance(World w) {
+        int chunks;
+        try {
+            if (getRenderDistanceChunks == null) {
+                // the latest mcp mapping calls it getRenderDistanceChunks,
+                // but it remains as a srg name in the mapping comes with forge 1614
+                getRenderDistanceChunks = ReflectionHelper.findMethod(World.class, null, new String[]{"getRenderDistanceChunks", "func_152379_p", "p"});
+            }
+            chunks = (Integer) getRenderDistanceChunks.invoke(w);
+        } catch (ReflectiveOperationException | ReflectionHelper.UnableToFindMethodException ex) {
+            log.error("error calling World#getRenderDistanceChunks", ex);
+            chunks = 12;
+        }
+        return chunks * 16D;
     }
 }

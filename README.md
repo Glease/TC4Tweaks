@@ -2,6 +2,13 @@
 
 A mod that adds a bit of functionality, a bit of performance and a bit of robustness into thaumcraft 4.
 
+## Maven
+
+This project is hosted at https://maven.glease.net/repos/releases/. 
+Snapshot releases are also available at https://maven.glease.net/repos/snapshots/.
+
+No HTTP browsing at the moment.
+
 ## Creating derivation
 
 ### License

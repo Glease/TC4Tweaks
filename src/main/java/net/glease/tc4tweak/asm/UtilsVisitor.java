@@ -18,14 +18,17 @@ class UtilsVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("generateLoot".equals(name)) {
             log.debug("Visiting {}{}", name, desc);
-            return new GenerateLootVisitor(mv);
+            return new GenerateLootVisitor(api, mv);
+        } else if ("setBiomeAt".equals(name)) {
+            log.debug("Visiting {}{}", name, desc);
+            return new SetBiomeAtVisitor(api, mv);
         }
         return mv;
     }
 
-    private class GenerateLootVisitor extends MethodVisitor {
-        public GenerateLootVisitor(MethodVisitor mv) {
-            super(UtilsVisitor.this.api, mv);
+    private static class GenerateLootVisitor extends MethodVisitor {
+        public GenerateLootVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
         }
 
         @Override
@@ -47,6 +50,23 @@ class UtilsVisitor extends ClassVisitor {
                 super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "mutateGeneratedLoot", "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", false);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
+            }
+        }
+    }
+
+    private static class SetBiomeAtVisitor extends MethodVisitor {
+        public SetBiomeAtVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+        @Override
+        public void visitLdcInsn(Object cst) {
+            if (cst instanceof Double && Math.abs((double) cst) - 32D < 0.001D) {
+                log.trace("Replaced LDC {} with ALOAD_0 + getViewDistance", cst);
+                super.visitVarInsn(ALOAD, 0);
+                super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "getViewDistance", "(Lnet/minecraft/world/World;)D", false);
+            } else {
+                super.visitLdcInsn(cst);
             }
         }
     }
