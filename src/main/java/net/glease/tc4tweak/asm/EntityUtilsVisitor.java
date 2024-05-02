@@ -7,7 +7,7 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.NEW;
 
-public class EntityUtilsVisitor extends ClassVisitor {
+class EntityUtilsVisitor extends ClassVisitor {
 
     public static final String TARGET_CLASS_INTERNAL_NAME = "net/glease/tc4tweak/asm/ConfigurationAttributeModifier";
     public static final String ORIGINAL_CLASS_INTERNAL_NAME = "net/minecraft/entity/ai/attributes/AttributeModifier";

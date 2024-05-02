@@ -9,7 +9,7 @@ import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NA
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 
-public class HashCodeVisitor extends ClassVisitor {
+class HashCodeVisitor extends ClassVisitor {
 
     private final String targetName;
     private String className;

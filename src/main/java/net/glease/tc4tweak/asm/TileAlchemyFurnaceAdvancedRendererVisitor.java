@@ -10,7 +10,7 @@ import static org.objectweb.asm.Opcodes.SIPUSH;
 
 // Bug initially discovered by @UnderscoreKilburn on github.
 // inspiration: https://github.com/GTNewHorizons/Hodgepodge/pull/304
-public class TileAlchemyFurnaceAdvancedRendererVisitor extends ClassVisitor {
+class TileAlchemyFurnaceAdvancedRendererVisitor extends ClassVisitor {
     static final TransformerFactory FACTORY = TESRGetBlockTypeNullSafetyVisitor.FACTORY
             .chain(MakeModelStaticVisitor::new)
             .chain(TileAlchemyFurnaceAdvancedRendererVisitor::new);
