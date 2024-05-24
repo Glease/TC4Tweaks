@@ -7,11 +7,11 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class ReadMarkerNoCastVisitor extends ClassVisitor {
-    private static final boolean hodgepodge = ASMUtils.isHodgepodgeFixActive("fixThaumcraftGolemMarkerLoading");
+    static final boolean hodgepodge = ASMUtils.isHodgepodgeFixActive("fixThaumcraftGolemMarkerLoading");
     private final String targetMethod;
     private final String targetDesc;
 
-    private ReadMarkerNoCastVisitor(int api, ClassVisitor cv, String targetMethod, String targetDesc) {
+    public ReadMarkerNoCastVisitor(int api, ClassVisitor cv, String targetMethod, String targetDesc) {
         super(api, cv);
         this.targetMethod = targetMethod;
         this.targetDesc = targetDesc;
