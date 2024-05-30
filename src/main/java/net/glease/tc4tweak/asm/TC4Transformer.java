@@ -44,6 +44,7 @@ public class TC4Transformer implements IClassTransformer {
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
             .put("makeo.gadomancy.client.renderers.tile.RenderTileNodeBasic", NodeLikeRendererVisitor.createFactory("renderNode"))
+            .put("thaumcraft.api.aspects.AspectList", new TransformerFactory(AspectListVisitor::new))
             .put("thaumcraft.api.WorldCoordinates", new TransformerFactory(HashCodeVisitor::new))
             .put("thaumcraft.api.BlockCoordinates", new TransformerFactory(HashCodeVisitor::new))
             .put("thaumcraft.api.visnet.VisNetHandler", new TransformerFactory(VisNetHandlerVisitor::new))
