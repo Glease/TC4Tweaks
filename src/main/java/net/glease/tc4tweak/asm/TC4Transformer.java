@@ -17,8 +17,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import static net.glease.tc4tweak.asm.LoadingPlugin.debugOutputDir;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
+import static net.glease.tc4tweak.asm.LoadingPlugin.getDebugOutputDir;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 /*
@@ -132,8 +132,8 @@ public class TC4Transformer implements IClassTransformer {
         if (DEBUG) {
             int curCount = transformCounts.compute(transformedName, (k, v) -> v == null ? 0 : v + 1);
             String infix = curCount == 0 ? "" : "_" + curCount;
-            try (PrintWriter origOut = new PrintWriter(new File(debugOutputDir, name + infix + "_orig.txt"), "UTF-8");
-                 PrintWriter tranOut = new PrintWriter(new File(debugOutputDir, name + infix + "_tran.txt"), "UTF-8")) {
+            try (PrintWriter origOut = new PrintWriter(new File(getDebugOutputDir(), name + infix + "_orig.txt"), "UTF-8");
+                 PrintWriter tranOut = new PrintWriter(new File(getDebugOutputDir(), name + infix + "_tran.txt"), "UTF-8")) {
                 cr.accept(new TraceClassVisitor(factory.apply(ASM5, new TraceClassVisitor(cw, tranOut)), origOut), factory.isExpandFrames() ? ClassReader.SKIP_FRAMES : 0);
                 transformedBytes = cw.toByteArray();
             } catch (Exception e) {
