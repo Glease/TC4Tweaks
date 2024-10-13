@@ -19,6 +19,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.LoadingPlugin.getDebugOutputDir;
+import static net.glease.tc4tweak.asm.LoadingPlugin.isDebug;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 /*
@@ -39,7 +40,6 @@ import static org.objectweb.asm.Opcodes.ASM5;
  */
 public class TC4Transformer implements IClassTransformer {
     static final Logger log = LogManager.getLogger("TC4TweakTransformer");
-    private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
     private static final ConcurrentMap<String, Integer> transformCounts = new ConcurrentHashMap<>();
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
@@ -129,7 +129,7 @@ public class TC4Transformer implements IClassTransformer {
         ClassWriter cw = new ClassWriter(factory.isExpandFrames() ? ClassWriter.COMPUTE_FRAMES : 0);
         // we are very probably the last one to run.
         byte[] transformedBytes = null;
-        if (DEBUG) {
+        if (isDebug()) {
             int curCount = transformCounts.compute(transformedName, (k, v) -> v == null ? 0 : v + 1);
             String infix = curCount == 0 ? "" : "_" + curCount;
             try (PrintWriter origOut = new PrintWriter(new File(getDebugOutputDir(), name + infix + "_orig.txt"), "UTF-8");
@@ -149,7 +149,7 @@ public class TC4Transformer implements IClassTransformer {
             }
         }
         if (transformedBytes == null || transformedBytes.length == 0) {
-            if (DEBUG) {
+            if (isDebug()) {
                 catching(new RuntimeException("Null or empty byte array created. This will not work well!"));
             } else {
                 log.error("Null or empty byte array created. Transforming will rollback as a last effort attempt to make things work! However features will not function!");

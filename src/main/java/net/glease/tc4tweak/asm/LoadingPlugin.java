@@ -20,6 +20,7 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 @IFMLLoadingPlugin.Name("TC4TweakCoreMod")
 @IFMLLoadingPlugin.SortingIndex(2000)
 public class LoadingPlugin implements IFMLLoadingPlugin {
+    private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
     static boolean dev;
     static boolean gt6;
     private static File debugOutputDir;
@@ -58,6 +59,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
             log.error("#################################################################################");
             throw new RuntimeException(errorMessage);
         }
+        getDebugOutputDir();
         // mixingasm (or mods that include it) compat
         markTransformersSafe(data);
     }
@@ -76,6 +78,10 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     public static boolean isDev() {
         return dev;
+    }
+
+    public static boolean isDebug() {
+        return DEBUG;
     }
 
     public static File getDebugOutputDir() {
