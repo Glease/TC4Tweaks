@@ -3,12 +3,15 @@ package net.glease.tc4tweak.asm;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraft.launchwrapper.Launch;
+import org.apache.commons.io.FileUtils;
 
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 
@@ -17,9 +20,10 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 @IFMLLoadingPlugin.Name("TC4TweakCoreMod")
 @IFMLLoadingPlugin.SortingIndex(2000)
 public class LoadingPlugin implements IFMLLoadingPlugin {
+    private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
     static boolean dev;
     static boolean gt6;
-    static File debugOutputDir;
+    private static File debugOutputDir;
 
     @Override
     public String[] getASMTransformerClass() {
@@ -55,9 +59,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
             log.error("#################################################################################");
             throw new RuntimeException(errorMessage);
         }
-        debugOutputDir = new File((File) data.get("mcLocation"), ".asm");
-        //noinspection ResultOfMethodCallIgnored
-        debugOutputDir.mkdir();
+        getDebugOutputDir();
         // mixingasm (or mods that include it) compat
         markTransformersSafe(data);
     }
@@ -76,5 +78,23 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     public static boolean isDev() {
         return dev;
+    }
+
+    public static boolean isDebug() {
+        return DEBUG;
+    }
+
+    public static File getDebugOutputDir() {
+        if (debugOutputDir == null) {
+            debugOutputDir = new File(Launch.minecraftHome, ".asm");
+            try {
+                FileUtils.deleteDirectory(debugOutputDir);
+            } catch (IOException ignored) {}
+            if (!debugOutputDir.exists()) {
+                // noinspection ResultOfMethodCallIgnored
+                debugOutputDir.mkdirs();
+            }
+        }
+        return debugOutputDir;
     }
 }
