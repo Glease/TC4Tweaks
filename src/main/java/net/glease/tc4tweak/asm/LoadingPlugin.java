@@ -59,7 +59,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
             log.error("#################################################################################");
             throw new RuntimeException(errorMessage);
         }
-        getDebugOutputDir();
+        if (isDebug()) getDebugOutputDir();
         // mixingasm (or mods that include it) compat
         markTransformersSafe(data);
     }
