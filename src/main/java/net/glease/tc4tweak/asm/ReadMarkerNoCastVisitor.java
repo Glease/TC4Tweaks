@@ -7,7 +7,6 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 class ReadMarkerNoCastVisitor extends ClassVisitor {
-    static final boolean hodgepodge = ASMUtils.isHodgepodgeFixActive("fixThaumcraftGolemMarkerLoading");
     private final String targetMethod;
     private final String targetDesc;
 
@@ -22,9 +21,11 @@ class ReadMarkerNoCastVisitor extends ClassVisitor {
             @Override
             public boolean isInactive() {
                 if (super.isInactive()) return true;
-                if (hodgepodge)
+                if (ASMUtils.isHodgepodgeFixActive("fixes", "fixThaumcraftGolemMarkerLoading", true)) {
                     log.warn("Disabling TC4Tweaks's golem marker patch to prevent conflict with hodgepodge.");
-                return hodgepodge;
+                    return true;
+                }
+                return false;
             }
         };
     }

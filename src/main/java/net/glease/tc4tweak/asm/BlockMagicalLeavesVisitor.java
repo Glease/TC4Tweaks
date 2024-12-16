@@ -9,7 +9,6 @@ import static org.objectweb.asm.Opcodes.ALOAD;
 
 // fix initially proposed as mixin by HoleFish at https://github.com/GTNewHorizons/Hodgepodge/pull/359
 class BlockMagicalLeavesVisitor extends ClassVisitor {
-    private static final boolean hodgepodge = ASMUtils.isHodgepodgeFixActive("fixThaumcraftLeavesLag");
 
     private BlockMagicalLeavesVisitor(int api, ClassVisitor cv) {
         super(api, cv);
@@ -20,9 +19,11 @@ class BlockMagicalLeavesVisitor extends ClassVisitor {
             @Override
             public boolean isInactive() {
                 if (super.isInactive()) return true;
-                if (hodgepodge)
+                if (ASMUtils.isHodgepodgeFixActive("fixes", "fixThaumcraftLeavesLag", true)) {
                     log.warn("Disabling TC4Tweaks's leaves lag fix to prevent conflict with hodgepodge.");
-                return hodgepodge;
+                    return true;
+                }
+                return false;
             }
         };
     }

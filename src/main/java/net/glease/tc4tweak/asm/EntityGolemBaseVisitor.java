@@ -14,7 +14,7 @@ class EntityGolemBaseVisitor extends ClassVisitor {
     }
 
     private static ClassVisitor maybePatchMarker(int api, ClassVisitor cv) {
-        if (ReadMarkerNoCastVisitor.hodgepodge) {
+        if (ASMUtils.isHodgepodgeFixActive("fixes", "fixThaumcraftGolemMarkerLoading", true)) {
             log.warn("Disabling TC4Tweaks's golem marker patch to prevent conflict with hodgepodge.");
             return cv;
         }

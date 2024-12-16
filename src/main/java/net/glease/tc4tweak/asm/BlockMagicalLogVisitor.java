@@ -7,7 +7,6 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 
 // fix initially proposed as mixin by HoleFish at https://github.com/GTNewHorizons/Hodgepodge/pull/359
 class BlockMagicalLogVisitor extends ClassVisitor {
-    private static final boolean hodgepodge = ASMUtils.isHodgepodgeFixActive("fixThaumcraftLeavesLag");
     private BlockMagicalLogVisitor(int api, ClassVisitor cv) {
         super(api, cv);
     }
@@ -17,9 +16,11 @@ class BlockMagicalLogVisitor extends ClassVisitor {
             @Override
             public boolean isInactive() {
                 if (super.isInactive()) return true;
-                if (hodgepodge)
+                if (ASMUtils.isHodgepodgeFixActive("fixes", "fixThaumcraftLeavesLag", true)) {
                     log.warn("Disabling TC4Tweaks's leaves lag fix to prevent conflict with hodgepodge.");
-                return hodgepodge;
+                    return true;
+                }
+                return false;
             }
         };
     }

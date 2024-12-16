@@ -1,28 +1,33 @@
 package net.glease.tc4tweak.asm;
 
+import java.io.File;
 import java.util.Arrays;
 
+import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.common.config.Configuration;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
+import static net.glease.tc4tweak.asm.LoadingPlugin.hodgepodge;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
 final class ASMUtils {
-    private static final Object configHodgePodge;
+    private static final Configuration configHodgePodge;
 
     static  {
-        Object cfg;
+        Configuration c;
         try {
-            Class<?> common = Class.forName("com.mitchej123.hodgepodge.Common", true, ASMUtils.class.getClassLoader());
-            cfg = common.getField("config").get(null);
-        } catch (ClassNotFoundException | NoSuchFieldException e) {
-            cfg = null;
-        } catch (IllegalAccessException e) {
-            log.error("Unforeseen changes in hodgepodge. Nothing will be disabled automatically!");
-            cfg = null;
+            if (!hodgepodge) {
+                c = null;
+            } else {
+                c = new Configuration(new File(Launch.minecraftHome, "config/hodgepodge.cfg"));
+            }
+        } catch (Exception e) {
+            log.debug("unable to load hodgepodge.cfg", e);
+            c = null;
         }
-        configHodgePodge = cfg;
+        configHodgePodge = c;
     }
 
     private ASMUtils() {
@@ -80,15 +85,8 @@ final class ASMUtils {
      * @return true if foreign field is true or HodgePodge changed in unforeseen ways, false if foreign field is missing
      * or is false.
      */
-    static boolean isHodgepodgeFixActive(@SuppressWarnings("SameParameterValue") String configName) {
+    static boolean isHodgepodgeFixActive(String category, String configName, boolean defaultValue) {
         if (configHodgePodge == null) return false;
-        try {
-            return (boolean) configHodgePodge.getClass().getField(configName).get(configHodgePodge);
-        } catch (NoSuchFieldException e) {
-            return false;
-        } catch (IllegalAccessException e) {
-            log.error("Unforeseen changes in hodgepodge. Disabling conflicting patches just in case.");
-            return false;
-        }
+        return configHodgePodge.getBoolean(configName, category, defaultValue, "");
     }
 }

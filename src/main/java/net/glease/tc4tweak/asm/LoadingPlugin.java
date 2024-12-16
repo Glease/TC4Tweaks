@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -19,6 +20,7 @@ import static net.glease.tc4tweak.asm.TC4Transformer.log;
 public class LoadingPlugin implements IFMLLoadingPlugin {
     static boolean dev;
     static boolean gt6;
+    static boolean hodgepodge;
     static File debugOutputDir;
 
     @Override
@@ -40,6 +42,7 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
     public void injectData(Map<String, Object> data) {
         dev = !(boolean) data.get("runtimeDeobfuscationEnabled");
         gt6 = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Greg-ASM"));
+        hodgepodge = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().toLowerCase(Locale.ROOT).contains("hodgepodge"));
         if (((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("BTPlugin"))) {
             String errorMessage = "Remove NotEnoughThaumcraftTabs. TC4Tweaks now comes with the same functionality and is incompatible with it.";
             if (!GraphicsEnvironment.isHeadless())
