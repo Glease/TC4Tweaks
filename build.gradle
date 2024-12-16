@@ -1,3 +1,5 @@
+import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
+
 buildscript {
     repositories {
         mavenCentral()
@@ -127,7 +129,20 @@ jar {
     }
 }
 
-task sourceJar(type: Jar) {
+javadoc {
+    source = sourceSets.api.allSource
+    failOnError = false
+    options {
+        encoding = 'utf-8'
+    }
+}
+
+tasks.register('javadocJar', Jar) {
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+
+tasks.register('sourceJar', Jar) {
     from sourceSets.main.allSource
     from sourceSets.api.allSource
     from(layout.projectDirectory) {
@@ -141,7 +156,7 @@ task sourceJar(type: Jar) {
     }
 }
 
-task devJar(type: Jar) {
+tasks.register('devJar', Jar) {
     from sourceSets.main.output
     from sourceSets.api.output
     archiveClassifier = 'dev'
@@ -151,7 +166,7 @@ task devJar(type: Jar) {
     }
 }
 
-task apiJar(type: Jar) {
+tasks.register('apiJar', Jar) {
     from sourceSets.api.output
     from sourceSets.api.allSource
     archiveClassifier = 'api'
@@ -161,6 +176,7 @@ artifacts {
     archives(devJar)
     archives(sourceJar)
     archives(apiJar)
+    archives(javadocJar)
 }
 
 curseforge {
@@ -182,16 +198,16 @@ curseforge {
     }
 }
 
-task createSignedJarDir() {
+tasks.register('createSignedJarDir') {
     onlyIf { // Skip the task if our secret data isn't available
         project.hasProperty('keyStore')
     }
     doLast {
-        mkdir new File(jar.destinationDir, "signed").toString()
+        mkdir new File(jar.destinationDirectory.get().asFile, "signed").toString()
     }
 }
 
-task generateGitChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+tasks.register('generateGitChangelog', GitChangelogTask) {
     file = new File("CHANGELOG.md")
     toRef = "HEAD"
     templateContent = """<!-- Generated file. DO NOT HAND EDIT!!! -->
@@ -209,7 +225,7 @@ Change log generated from git history.
 }
 
 // sign jars
-task signJar() {
+tasks.register('signJar') {
     dependsOn reobf
     dependsOn createSignedJarDir
     onlyIf { // Skip the task if our secret data isn't available
@@ -217,11 +233,11 @@ task signJar() {
     }
     inputs.files jar.outputs.files
     jar.outputs.files.forEach {
-        outputs.file new File(new File(jar.destinationDir, "signed"), it.name)
+        outputs.file jar.destinationDirectory.file("signed/" + it.name)
     }
     doLast {
         jar.outputs.files.forEach {
-            ant.signjar destDir: new File(jar.destinationDir, "signed"),
+            ant.signjar destDir: new File(jar.destinationDirectory.get().asFile, "signed"),
                     sigfile: project.hasProperty("signerName") ? project.signerName : project.keyStoreAlias,
                     keystore: project.keyStore,
                     alias: project.keyStoreAlias,
@@ -261,6 +277,7 @@ publishing {
 
             artifact apiJar
             artifact sourceJar
+            artifact javadocJar
             artifact devJar
             for (f in tasks.signJar.outputs.files) {
                 artifact(f) {
@@ -287,7 +304,7 @@ publishing {
 }
 
 assemble.dependsOn signJar
-tasks.whenTaskAdded { it->
+tasks.configureEach { it->
     if (it.name.startsWith('curseforge')) {
         it.dependsOn generateGitChangelog
         it.onlyIf {
