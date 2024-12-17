@@ -47,6 +47,7 @@ public enum ConfigurationHandler {
     private boolean dispenserShootPrimalArrow;
     private boolean addClearButton;
     private boolean addResearchSearch;
+    private int decantMaxBlocks;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -131,6 +132,7 @@ public enum ConfigurationHandler {
         addClearButton = config.getBoolean("addClearButton", "client", true, "If true, a button will be shown when there is any amount of tc4 notifications AND when sending chat.");
         addResearchSearch = config.getBoolean("addResearchSearch", "client", true, "If true, a search box will appear on the top right bar of thaumonomicon gui. This feature is taken from WitchingGadgets due to the said GUI is being upsized by this mod and without modifying its code, the search box would not be positioned correctly. Will disable WitchingGadget's search feature (if it is present) regardless of whether this is true.");
         counterStyle = CompletionCounterStyle.get(config.getString("completionCounterStyle", "client", counterStyle.name(), "Select the style of completion counter. None: disable completion progress counter. Current: display how many you have completed already, and only show the total count for this tab when everything here has been learnt. All: show all counters at all times.", Arrays.stream(CompletionCounterStyle.values()).map(Enum::name).toArray(String[]::new)));
+        decantMaxBlocks = config.getInt("decantMaxBlocks", "general", 1000, 1, Integer.MAX_VALUE, "Max blocks in queue of decant golem. High values can lead to severe server lag if golem is marked to empty very large body of fluid and has very long visibility range");
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -256,7 +258,7 @@ public enum ConfigurationHandler {
     }
 
     public InfusionOreDictMode getInfusionOreDictMode() {
-        return InfusionOreDictMode.Default; // TODO
+        return infusionOreDictMode;
     }
 
     public List<String> getCategoryOrder() {
@@ -280,6 +282,10 @@ public enum ConfigurationHandler {
         if (v == championMods.getNoEntryValue())
             return old;
         return v;
+    }
+
+    public int getDecantMaxBlocks() {
+        return decantMaxBlocks;
     }
 
     public enum InfusionOreDictMode {

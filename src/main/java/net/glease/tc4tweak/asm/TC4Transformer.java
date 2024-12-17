@@ -42,6 +42,7 @@ public class TC4Transformer implements IClassTransformer {
     private static final boolean DEBUG = Boolean.getBoolean("glease.debugasm");
     private static final ConcurrentMap<String, Integer> transformCounts = new ConcurrentHashMap<>();
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
+            .put("net.minecraft.util.ChunkCoordinates", ChunkCoordinatesVisitor.createFactory())
             .put("com.kentington.thaumichorizons.client.renderer.tile.TileEtherealShardRender", NodeLikeRendererVisitor.createFactory(dev ? "func_147500_a" : "renderTileEntityAt"))
             .put("makeo.gadomancy.client.renderers.tile.RenderTileNodeBasic", NodeLikeRendererVisitor.createFactory("renderNode"))
             .put("thaumcraft.api.aspects.AspectList", new TransformerFactory(AspectListVisitor::new))
@@ -74,6 +75,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.blocks.BlockMagicalLog", BlockMagicalLogVisitor.createFactory())
             .put("thaumcraft.common.blocks.BlockMetalDevice", new TransformerFactory(BlockMetalDeviceVisitor::new))
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
+            .put("thaumcraft.common.entities.ai.fluid.AILiquidGather", new TransformerFactory(AILiquidGatherVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
             .put("thaumcraft.common.entities.golems.EntityGolemBase", new TransformerFactory(EntityGolemBaseVisitor::new))
             .put("thaumcraft.common.entities.golems.ItemGolemBell", ReadMarkerNoCastVisitor.createFactory("getMarkers", "(Lnet/minecraft/item/ItemStack;)Ljava/util/ArrayList;"))

@@ -1,7 +1,13 @@
 package net.glease.tc4tweak.asm;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -23,6 +29,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
@@ -32,10 +39,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidBlock;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import thaumcraft.api.BlockCoordinates;
@@ -53,6 +67,7 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.container.ContainerDummy;
+import thaumcraft.common.entities.ai.fluid.AILiquidGather;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
@@ -464,5 +479,52 @@ public class ASMCallhookServer {
             chunks = 12;
         }
         return chunks * 16D;
+    }
+
+    @Callhook(adder = AILiquidGatherVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static void getConnectedFluidBlocks(AILiquidGather thiz, World world, int x, int y, int z, Fluid fluid, ArrayList<Object> sources, float pumpDist, MethodHandle ctor) throws Throwable {
+        if (fluid == null) return;
+        Set<ChunkCoordinates> seen = new HashSet<>();  // ChunkCoordinates has quite terrible hash function, but there are multiple different optimization mod that optimize this. given the popularity of those I'd say it's fine to use it
+        Queue<ChunkCoordinates> toVisit = new ArrayDeque<>();
+        ChunkCoordinates origin = new ChunkCoordinates(x, y, z);
+        toVisit.add(origin);
+        while (!toVisit.isEmpty()) {
+            ChunkCoordinates v = toVisit.poll();
+            if (seen.contains(v)) continue;
+            seen.add(v);
+            float dist = v.getDistanceSquared(x, y, z);
+            if (dist > pumpDist) continue;
+            Block block = world.getBlock(v.posX, v.posY, v.posZ);
+            if (block == Blocks.flowing_lava)
+                block = Blocks.lava;
+            else if (block == Blocks.flowing_water)
+                block = Blocks.water;
+            Fluid f = FluidRegistry.lookupFluidForBlock(block);
+            if (f != fluid) continue;
+            if (validFluidBlock(world, fluid, v.posX, v.posY, v.posZ)) {
+                sources.add(ctor.invokeExact(thiz, origin, dist));
+                if (sources.size() >= ConfigurationHandler.INSTANCE.getDecantMaxBlocks())
+                    return;
+            }
+            for (ForgeDirection direction : ForgeDirection.VALID_DIRECTIONS) {
+                toVisit.add(new ChunkCoordinates(v.posX + direction.offsetX, v.posY + direction.offsetY, v.posZ + direction.offsetZ));
+            }
+        }
+    }
+
+    private static boolean validFluidBlock(World world, Fluid fluid, int i, int j, int k) {
+        Block bi = world.getBlock(i, j, k);
+        if(FluidRegistry.lookupFluidForBlock(bi) != fluid) {
+            return false;
+        } else {
+            if(bi instanceof BlockFluidBase && ((IFluidBlock)bi).canDrain(world, i, j, k)) {
+                FluidStack fs = ((IFluidBlock)bi).drain(world, i, j, k, false);
+                if(fs != null) {
+                    return true;
+                }
+            }
+
+            return (FluidRegistry.lookupFluidForBlock(bi) == FluidRegistry.WATER && fluid == FluidRegistry.WATER || FluidRegistry.lookupFluidForBlock(bi) == FluidRegistry.LAVA && fluid == FluidRegistry.LAVA) && world.getBlockMetadata(i, j, k) == 0;
+        }
     }
 }
