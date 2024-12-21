@@ -502,7 +502,7 @@ public class ASMCallhookServer {
             Fluid f = FluidRegistry.lookupFluidForBlock(block);
             if (f != fluid) continue;
             if (validFluidBlock(world, fluid, v.posX, v.posY, v.posZ)) {
-                sources.add(ctor.invokeExact(thiz, origin, dist));
+                sources.add(ctor.invokeExact(thiz, v, dist));
                 if (sources.size() >= ConfigurationHandler.INSTANCE.getDecantMaxBlocks())
                     return;
             }
