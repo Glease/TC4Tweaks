@@ -54,6 +54,7 @@ public enum ConfigurationHandler {
     private InfusionOreDictMode infusionOreDictMode = InfusionOreDictMode.Default;
     private List<String> categoryOrder = new ArrayList<>();
     private CompletionCounterStyle counterStyle = CompletionCounterStyle.Current;
+    private EarthShockHarmMode earthShockHarmMode = EarthShockHarmMode.OnlyLiving;
     private final TObjectDoubleMap<UUID> championMods = new TObjectDoubleHashMap<>();
 
     ConfigurationHandler() {
@@ -133,6 +134,7 @@ public enum ConfigurationHandler {
         addResearchSearch = config.getBoolean("addResearchSearch", "client", true, "If true, a search box will appear on the top right bar of thaumonomicon gui. This feature is taken from WitchingGadgets due to the said GUI is being upsized by this mod and without modifying its code, the search box would not be positioned correctly. Will disable WitchingGadget's search feature (if it is present) regardless of whether this is true.");
         counterStyle = CompletionCounterStyle.get(config.getString("completionCounterStyle", "client", counterStyle.name(), "Select the style of completion counter. None: disable completion progress counter. Current: display how many you have completed already, and only show the total count for this tab when everything here has been learnt. All: show all counters at all times.", Arrays.stream(CompletionCounterStyle.values()).map(Enum::name).toArray(String[]::new)));
         decantMaxBlocks = config.getInt("decantMaxBlocks", "general", 1000, 1, Integer.MAX_VALUE, "Max blocks in queue of decant golem. High values can lead to severe server lag if golem is marked to empty very large body of fluid and has very long visibility range");
+        earthShockHarmMode = EarthShockHarmMode.get(config.getString("earthShockHarmMode", "general", earthShockHarmMode.name(), "Select the entities to be damaged by earth shock. Note: certain entity (e.g. most projectiles) cannot be damaged even if it's on the list. OnlyLiving: only harm living entities, e.g. cows, players, zombies, the most intuitive behavior. ExceptItemXp: harm everything except items and xp orbs, e.g. item frames, all living entities like mentioned before. AllEntity: harm everything, like thaumcraft does out of box", Arrays.stream(EarthShockHarmMode.values()).map(Enum::name).toArray(String[]::new)));
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -159,7 +161,7 @@ public enum ConfigurationHandler {
             p.setMinValue(0.0D);
             this.championMods.put(UUID.fromString(championMods[i][0]), p.getDouble());
         }
-        config.getCategory("general.champion_mods").setComment("Do note that those boss buffs can stack. If 5 player is present then all of DAMAGE BUFF 1 to DAMAGE BUFF 5 will be applied!");
+        config.getCategory("general.champion_mods").setComment("Tweak the stat buffs applied to champion mobs. Do note that those boss buffs can stack. If 5 player is present then all of DAMAGE BUFF 1 to DAMAGE BUFF 5 will be applied!");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -288,6 +290,10 @@ public enum ConfigurationHandler {
         return decantMaxBlocks;
     }
 
+    public EarthShockHarmMode getEarthShockHarmMode() {
+        return earthShockHarmMode;
+    }
+
     public enum InfusionOreDictMode {
         Default {
             @SuppressWarnings("deprecation")
@@ -346,6 +352,21 @@ public enum ConfigurationHandler {
                     return value;
             }
             return Current;
+        }
+    }
+
+    public enum EarthShockHarmMode {
+        OnlyLiving,
+        ExceptItemXp,
+        AllEntity,
+        ;
+
+        public static EarthShockHarmMode get(String name) {
+            for (EarthShockHarmMode value : values()) {
+                if (value.name().equals(name))
+                    return value;
+            }
+            return OnlyLiving;
         }
     }
 }

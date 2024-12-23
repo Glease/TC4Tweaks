@@ -26,6 +26,9 @@ import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.glease.tc4tweak.network.TileHoleSyncPacket;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -525,6 +528,29 @@ public class ASMCallhookServer {
             }
 
             return (FluidRegistry.lookupFluidForBlock(bi) == FluidRegistry.WATER && fluid == FluidRegistry.WATER || FluidRegistry.lookupFluidForBlock(bi) == FluidRegistry.LAVA && fluid == FluidRegistry.LAVA) && world.getBlockMetadata(i, j, k) == 0;
+        }
+    }
+
+    @Callhook(adder = EntityShockOrdVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static Class<? extends Entity> getEarthShockEntityFilter() {
+        if (ConfigurationHandler.INSTANCE.getEarthShockHarmMode() == ConfigurationHandler.EarthShockHarmMode.OnlyLiving) {
+            return EntityLivingBase.class;
+        } else {
+            return Entity.class;
+        }
+    }
+
+    @Callhook(adder = EntityShockOrdVisitor.class, module = ASMConstants.Modules.Bugfix)
+    @Callhook(adder = BlockAiryVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static boolean canEarthShockHurt(Entity entity) {
+        switch (ConfigurationHandler.INSTANCE.getEarthShockHarmMode()) {
+            case OnlyLiving:
+                return entity instanceof EntityLivingBase;
+            case ExceptItemXp:
+                return !(entity instanceof EntityItem) && !(entity instanceof EntityXPOrb);
+            case AllEntity:
+            default:
+                return true;
         }
     }
 }

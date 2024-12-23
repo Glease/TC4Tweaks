@@ -7,7 +7,20 @@ A mod that adds a bit of functionality, a bit of performance and a bit of robust
 This project is hosted at https://maven.glease.net/repos/releases/. 
 Snapshot releases are also available at https://maven.glease.net/repos/snapshots/.
 
+Currently, there is nothing there actually being hosted, but once the age long oredict fix api comes out it will be there
+
 No HTTP browsing at the moment.
+
+## ASM conflict resolution
+
+In general, I will automatically disable my stuff if it's known conflict with another mod currently installed.
+If the other mod's asm/mixin is configurable, I'll only disable mine if the configuration is on.
+Otherwise, my asm will be unconditionally applied.
+Even if there is some sort of TC4Tweaks configuration that will advertise to disable part of the TC4Tweaks, the suggested ASM will still be applied when that part is disabled. 
+This is because those configurations can all be modified without a game restart.
+
+If you want more engaged compat with my ASMs, contact me via GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c) 
+or email.
 
 ## Creating derivation
 
