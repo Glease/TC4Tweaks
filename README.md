@@ -11,6 +11,13 @@ Currently, there is nothing there actually being hosted, but once the age long o
 
 No HTTP browsing at the moment.
 
+## Github
+
+Where I live have unstable internet connection, so I don't always immediately push new commits as releases are made.
+You might see entries in changelog point to nonexistent commits, sorry for that.
+If you need the source code, they are always available as additional files along with the main release jar and dev jar.
+If you really need the commit history, please reach me in person via GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c) or email.
+
 ## ASM conflict resolution
 
 In general, I will automatically disable my stuff if it's known conflict with another mod currently installed.
@@ -45,7 +52,12 @@ As long as you comply with the AGPL license you are free to do whatever you want
 
 ## Contributing
 
-Generally, please follow the usual github workflow. Do not try to contact me in person as it might fail :P
+Generally, please follow the usual github workflow.
+
+Like mentioned above, I only push to github occasionally (probably once a month, or less), so there is a very good chance code here is outdated.
+If you have a contribution that require newer code, please contact me via GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c) or email.
+You could as well just send me the PR regardless (even if it contains my code from unpushed commits). 
+I'll sort out the merging.
 
 ### Reporting issue
 
