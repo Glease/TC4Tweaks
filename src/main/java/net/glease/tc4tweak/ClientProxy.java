@@ -97,7 +97,7 @@ public class ClientProxy extends CommonProxy {
             mX += (screen.width - paneWidth) / 2;
             mY += (screen.height - paneHeight) / 2;
             try {
-                GuiResearchRecipeMouseClicked.invoke(screen, mX, mY, 1);
+                GuiResearchRecipeMouseClicked.invoke(screen, mX, mY, 0);
             } catch (ReflectiveOperationException err) {
                 System.err.println("Error scrolling through research page!");
                 err.printStackTrace();
