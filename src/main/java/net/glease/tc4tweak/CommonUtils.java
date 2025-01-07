@@ -1,5 +1,6 @@
 package net.glease.tc4tweak;
 
+import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -65,5 +66,9 @@ public class CommonUtils {
         } catch (ReflectiveOperationException e) {
             throw new AssertionError(e);
         }
+    }
+
+    public static <T> T deref(Reference<T> ref) {
+        return ref == null ? null : ref.get();
     }
 }

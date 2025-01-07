@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
@@ -22,6 +23,7 @@ import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
 import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
+import net.glease.tc4tweak.modules.visrelay.SavedLinkHandler;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
 import net.glease.tc4tweak.network.TileHoleSyncPacket;
 import net.minecraft.block.Block;
@@ -552,5 +554,20 @@ public class ASMCallhookServer {
             default:
                 return true;
         }
+    }
+
+    @Callhook(adder = TileVisNodeVisitor.class, module = ASMConstants.Modules.VisNetPersist)
+    public static void writeLoadedLink(TileVisNode thiz, NBTTagCompound tag) {
+        SavedLinkHandler.writeToNBT(thiz, tag);
+    }
+
+    @Callhook(adder = TileVisNodeVisitor.class, module = ASMConstants.Modules.VisNetPersist)
+    public static List<ChunkCoordinates> readLoadedLink(TileVisNode thiz, NBTTagCompound tag) {
+        return SavedLinkHandler.readFromNBT(thiz, tag);
+    }
+
+    @Callhook(adder = TileVisNodeVisitor.class, module = ASMConstants.Modules.VisNetPersist)
+    public static boolean processSavedLink(ITileVisNode visNode) {
+        return SavedLinkHandler.processSavedLink(visNode);
     }
 }

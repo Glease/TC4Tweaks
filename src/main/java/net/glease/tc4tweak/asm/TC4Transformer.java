@@ -49,6 +49,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.api.WorldCoordinates", new TransformerFactory(HashCodeVisitor::new))
             .put("thaumcraft.api.BlockCoordinates", new TransformerFactory(HashCodeVisitor::new))
             .put("thaumcraft.api.visnet.VisNetHandler", new TransformerFactory(VisNetHandlerVisitor::new))
+            .put("thaumcraft.api.visnet.TileVisNode", new TransformerFactory(TileVisNodeVisitor::new))
             .put("thaumcraft.api.crafting.InfusionRecipe", new TransformerFactory(InfusionRecipeVisitor::new))
             .put("thaumcraft.client.fx.beams.FXBeamPower", new TransformerFactory(FXBeamPowerVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.gui.GuiResearchBrowser", new TransformerFactory(GuiResearchBrowserVisitor::new, Side.CLIENT))

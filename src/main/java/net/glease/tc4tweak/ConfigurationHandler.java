@@ -48,6 +48,8 @@ public enum ConfigurationHandler {
     private boolean addClearButton;
     private boolean addResearchSearch;
     private int decantMaxBlocks;
+    private boolean savedLinkSaveWholeLink;
+    private boolean savedLink;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -135,6 +137,8 @@ public enum ConfigurationHandler {
         counterStyle = CompletionCounterStyle.get(config.getString("completionCounterStyle", "client", counterStyle.name(), "Select the style of completion counter. None: disable completion progress counter. Current: display how many you have completed already, and only show the total count for this tab when everything here has been learnt. All: show all counters at all times.", Arrays.stream(CompletionCounterStyle.values()).map(Enum::name).toArray(String[]::new)));
         decantMaxBlocks = config.getInt("decantMaxBlocks", "general", 1000, 1, Integer.MAX_VALUE, "Max blocks in queue of decant golem. High values can lead to severe server lag if golem is marked to empty very large body of fluid and has very long visibility range");
         earthShockHarmMode = EarthShockHarmMode.get(config.getString("earthShockHarmMode", "general", earthShockHarmMode.name(), "Select the entities to be damaged by earth shock. Note: certain entity (e.g. most projectiles) cannot be damaged even if it's on the list. OnlyLiving: only harm living entities, e.g. cows, players, zombies, the most intuitive behavior. ExceptItemXp: harm everything except items and xp orbs, e.g. item frames, all living entities like mentioned before. AllEntity: harm everything, like thaumcraft does out of box", Arrays.stream(EarthShockHarmMode.values()).map(Enum::name).toArray(String[]::new)));
+        savedLink = config.getBoolean("enable", "general.saved_link", true, "Enable this feature. When disabled, no additional data will be saved to disk");
+        savedLinkSaveWholeLink = config.getBoolean("saveCompleteLink", "general.saved_link", false, "When enabled, save the entire link up to source node. There is no actual benefit of this beyond more debug info. You probably don't want to change this.");
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -162,6 +166,7 @@ public enum ConfigurationHandler {
             this.championMods.put(UUID.fromString(championMods[i][0]), p.getDouble());
         }
         config.getCategory("general.champion_mods").setComment("Tweak the stat buffs applied to champion mobs. Do note that those boss buffs can stack. If 5 player is present then all of DAMAGE BUFF 1 to DAMAGE BUFF 5 will be applied!");
+        config.getCategory("general.saved_link").setComment("Persist the parents of vis relays into save file and use it as a hint for ");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -292,6 +297,14 @@ public enum ConfigurationHandler {
 
     public EarthShockHarmMode getEarthShockHarmMode() {
         return earthShockHarmMode;
+    }
+
+    public boolean isSavedLinkSaveWholeLink() {
+        return savedLinkSaveWholeLink;
+    }
+
+    public boolean isSavedLinkEnabled() {
+        return savedLink;
     }
 
     public enum InfusionOreDictMode {

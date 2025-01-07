@@ -20,6 +20,13 @@
         <File name="TC4Transform" fileName="logs/tc4transform.log" append="false">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger/%X{mod}]: %msg%n" />
         </File>
+        <RollingRandomAccessFile name="TC4Tweaks" fileName="logs/tc4tweaks.log" filePattern="logs/tc4tweaks-%i.log" append="true">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger/%X{mod}]: %msg%n" />
+            <DefaultRolloverStrategy max="3" fileIndex="max" />
+            <Policies>
+                <OnStartupTriggeringPolicy />
+            </Policies>
+        </RollingRandomAccessFile>
         <Routing name="FmlFile">
             <Routes pattern="$${ctx:side}">
                 <Route>
@@ -45,6 +52,12 @@
             <AppenderRef ref="ServerGuiConsole" level="INFO" />
             <AppenderRef ref="FmlFile"/>
             <AppenderRef ref="TC4Transform"/>
+        </Logger>
+        <Logger level="trace" name="TC4Tweaks" additivity="false">
+            <AppenderRef ref="FmlSysOut" level="INFO" />
+            <AppenderRef ref="ServerGuiConsole" level="INFO" />
+            <AppenderRef ref="FmlFile"/>
+            <AppenderRef ref="TC4Tweaks"/>
         </Logger>
         <Logger level="info" name="com.mojang" additivity="false">
             <AppenderRef ref="SysOut" level="INFO" />

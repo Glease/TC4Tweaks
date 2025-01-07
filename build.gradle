@@ -53,6 +53,21 @@ minecraft {
 }
 
 repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'glease'
+                url = 'https://maven.glease.net/repos/releases/'
+                metadataSources {
+                    artifact()
+                }
+            }
+        }
+        filter {
+            // pulls in api from azanor's repo in src jar for easy debugging, but otherwise same stuff from overmind's maven
+            includeGroup('thaumcraft_fixed')
+        }
+    }
     maven {
         name 'gt'
         url 'http://gregtech.overminddl1.com/'
@@ -91,8 +106,8 @@ configurations {
 
 dependencies {
     devOnlyNonPublishable "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
-    apiImplementation "thaumcraft:Thaumcraft:1.7.10-4.2.3.5:dev"
-    devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.3.54-GTNH:dev"
+    apiImplementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
+    devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.7.8-GTNH:dev"
     compileOnly "MineTweaker3:MineTweaker3-API:3.0.11.23"
 }
 

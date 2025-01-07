@@ -17,5 +17,6 @@ class ASMConstants {
         ObjectTagsLagFix,
         ItemHashLagFix,
         ChampionModConfig,
+        VisNetPersist,
     }
 }
