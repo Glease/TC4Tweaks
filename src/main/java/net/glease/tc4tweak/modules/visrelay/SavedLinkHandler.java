@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.visnet.VisNetHandler;
 
@@ -34,12 +35,17 @@ public class SavedLinkHandler {
         }
     }
 
+    private static String getNodeType(TileVisNode node) {
+        return node.isSource() ? "Source" : "Relay";
+    }
+
     // true -> RET, false -> resume
     public static boolean processSavedLink(ITileVisNode visNode) {
         TileVisNode node = (TileVisNode) visNode;
+        WorldCoordinates c = new WorldCoordinates(node);
         Action action = processSavedLink0(visNode);
         if (action != Action.DISABLED) {
-            log.info("Processed saved link for node {} at {},{},{}: {}", visNode.getClass().getSimpleName(), node.xCoord, node.yCoord, node.zCoord, action);
+            log.info("Processed saved link for node {} at {},{},{}: {}", getNodeType(node), c.x, c.y, c.z, action);
         }
         return action.returnValue();
     }
@@ -98,7 +104,7 @@ public class SavedLinkHandler {
             return null;
         }
         NBTTagList linkRaw = tag.getTagList("Link", Constants.NBT.TAG_COMPOUND);
-        log.trace("Reading link for node {} at {},{},{}. {} nodes.", thiz.getClass().getSimpleName(), thiz.xCoord, thiz.yCoord, thiz.zCoord, linkRaw.tagCount());
+        log.trace("Reading link for node {} at {},{},{}. {} nodes.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, linkRaw.tagCount());
         List<ChunkCoordinates> link = new ArrayList<>();
         int end = Math.min(linkRaw.tagCount(), 2);
         for (int i = 0; i < end; i++) {
@@ -122,7 +128,7 @@ public class SavedLinkHandler {
             node = CommonUtils.deref(node.getParent());
         }
         tag.setTag("Link", path);
-        log.trace("Written link for node {} at {},{},{}. {} element.", thiz.getClass().getSimpleName(), thiz.xCoord, thiz.yCoord, thiz.zCoord, path.tagCount());
+        log.trace("Written link for node {} at {},{},{}. {} element.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, path.tagCount());
     }
 
     private static NBTTagCompound writeOne(TileVisNode node) {
