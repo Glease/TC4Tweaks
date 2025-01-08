@@ -41,7 +41,7 @@ class TileVisNodeVisitor extends ClassVisitor {
     public void visitEnd() {
         cv.visitField(ACC_PRIVATE, FIELD_NAME, FIELD_DESC, "Ljava/util/List<Lnet/minecraft/util/ChunkCoordinates;>;", null).visitEnd();
         {
-            String methodName = dev ? "writeToNBT" : "func_145839_a";
+            String methodName = dev ? "readFromNBT" : "func_145839_a";
             MethodVisitor mv = cv.visitMethod(ACC_PUBLIC, methodName, "(Lnet/minecraft/nbt/NBTTagCompound;)V", null, null);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
