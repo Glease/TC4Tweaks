@@ -215,126 +215,129 @@ public class ASMCallhookServer {
         World world = source.getWorldObj();
         Vec3 v1 = Vec3.createVectorHelper((double) source.xCoord + 0.5D, (double) source.yCoord + 0.5D, (double) source.zCoord + 0.5D);
         Vec3 v2 = Vec3.createVectorHelper((double) target.xCoord + 0.5D, (double) target.yCoord + 0.5D, (double) target.zCoord + 0.5D);
-        if (Double.isNaN(v1.xCoord) || Double.isNaN(v1.yCoord) || Double.isNaN(v1.zCoord)) return false;
-        if (Double.isNaN(v2.xCoord) || Double.isNaN(v2.yCoord) || Double.isNaN(v2.zCoord)) return false;
-        int i = MathHelper.floor_double(v2.xCoord);
-        int j = MathHelper.floor_double(v2.yCoord);
-        int k = MathHelper.floor_double(v2.zCoord);
-        int l = MathHelper.floor_double(v1.xCoord);
-        int i1 = MathHelper.floor_double(v1.yCoord);
-        int j1 = MathHelper.floor_double(v1.zCoord);
-        int k1 = source.getRange() * 5; // mathematician please help. likely not * 5...
+        if (Double.isNaN(v1.xCoord) || Double.isNaN(v1.yCoord) || Double.isNaN(v1.zCoord)) return true;
+        if (Double.isNaN(v2.xCoord) || Double.isNaN(v2.yCoord) || Double.isNaN(v2.zCoord)) return true;
+        int x2 = MathHelper.floor_double(v2.xCoord);
+        int y2 = MathHelper.floor_double(v2.yCoord);
+        int z2 = MathHelper.floor_double(v2.zCoord);
+        int x1 = MathHelper.floor_double(v1.xCoord);
+        int y1 = MathHelper.floor_double(v1.yCoord);
+        int z1 = MathHelper.floor_double(v1.zCoord);
+        int maxStep = source.getRange() * 5; // mathematician please help. likely not * 5...
 
-        while (k1-- >= 0) {
+        while (maxStep-- >= 0) {
             if (Double.isNaN(v1.xCoord) || Double.isNaN(v1.yCoord) || Double.isNaN(v1.zCoord)) {
-                return false;
+                return true;
             }
 
-            if (l != i || i1 != j || j1 != k) {
-                boolean flag6 = true;
-                boolean flag3 = true;
-                boolean flag4 = true;
-                double d0 = 999.0D;
-                double d1 = 999.0D;
-                double d2 = 999.0D;
-                if (i > l) {
-                    d0 = (double) l + 1.0D;
-                } else if (i < l) {
-                    d0 = (double) l + 0.0D;
+            if (x1 != x2 || y1 != y2 || z1 != z2) {
+                boolean xDiff = true;
+                boolean yDIff = true;
+                boolean zDiff = true;
+                double x0 = 999.0D;
+                double y0 = 999.0D;
+                double z0 = 999.0D;
+                if (x2 > x1) {
+                    x0 = (double) x1 + 1.0D;
+                } else if (x2 < x1) {
+                    x0 = (double) x1 + 0.0D;
                 } else {
-                    flag6 = false;
+                    xDiff = false;
                 }
 
-                if (j > i1) {
-                    d1 = (double) i1 + 1.0D;
-                } else if (j < i1) {
-                    d1 = (double) i1 + 0.0D;
+                if (y2 > y1) {
+                    y0 = (double) y1 + 1.0D;
+                } else if (y2 < y1) {
+                    y0 = (double) y1 + 0.0D;
                 } else {
-                    flag3 = false;
+                    yDIff = false;
                 }
 
-                if (k > j1) {
-                    d2 = (double) j1 + 1.0D;
-                } else if (k < j1) {
-                    d2 = (double) j1 + 0.0D;
+                if (z2 > z1) {
+                    z0 = (double) z1 + 1.0D;
+                } else if (z2 < z1) {
+                    z0 = (double) z1 + 0.0D;
                 } else {
-                    flag4 = false;
+                    zDiff = false;
                 }
 
-                double d3 = 999.0D;
-                double d4 = 999.0D;
-                double d5 = 999.0D;
-                double d6 = v2.xCoord - v1.xCoord;
-                double d7 = v2.yCoord - v1.yCoord;
-                double d8 = v2.zCoord - v1.zCoord;
-                if (flag6) {
-                    d3 = (d0 - v1.xCoord) / d6;
+                double xpercent = 999.0D;
+                double ypercent = 999.0D;
+                double zpercent = 999.0D;
+                double dx = v2.xCoord - v1.xCoord;
+                double dy = v2.yCoord - v1.yCoord;
+                double dz = v2.zCoord - v1.zCoord;
+                if (xDiff) {
+                    xpercent = (x0 - v1.xCoord) / dx;
                 }
 
-                if (flag3) {
-                    d4 = (d1 - v1.yCoord) / d7;
+                if (yDIff) {
+                    ypercent = (y0 - v1.yCoord) / dy;
                 }
 
-                if (flag4) {
-                    d5 = (d2 - v1.zCoord) / d8;
+                if (zDiff) {
+                    zpercent = (z0 - v1.zCoord) / dz;
                 }
 
-                byte b0;
-                if (d3 < d4 && d3 < d5) {
-                    if (i > l) {
-                        b0 = 4;
+                byte checkType;
+                if (xpercent < ypercent && xpercent < zpercent) {
+                    // x changes next
+                    if (x2 > x1) {
+                        checkType = 4;
                     } else {
-                        b0 = 5;
+                        checkType = 5;
                     }
 
-                    v1.xCoord = d0;
-                    v1.yCoord += d7 * d3;
-                    v1.zCoord += d8 * d3;
-                } else if (d4 < d5) {
-                    if (j > i1) {
-                        b0 = 0;
+                    v1.xCoord = x0;
+                    v1.yCoord += dy * xpercent;
+                    v1.zCoord += dz * xpercent;
+                } else if (ypercent < zpercent) {
+                    // y changes next
+                    if (y2 > y1) {
+                        checkType = 0;
                     } else {
-                        b0 = 1;
+                        checkType = 1;
                     }
 
-                    v1.xCoord += d6 * d4;
-                    v1.yCoord = d1;
-                    v1.zCoord += d8 * d4;
+                    v1.xCoord += dx * ypercent;
+                    v1.yCoord = y0;
+                    v1.zCoord += dz * ypercent;
                 } else {
-                    if (k > j1) {
-                        b0 = 2;
+                    // z changes next
+                    if (z2 > z1) {
+                        checkType = 2;
                     } else {
-                        b0 = 3;
+                        checkType = 3;
                     }
 
-                    v1.xCoord += d6 * d5;
-                    v1.yCoord += d7 * d5;
-                    v1.zCoord = d2;
+                    v1.xCoord += dx * zpercent;
+                    v1.yCoord += dy * zpercent;
+                    v1.zCoord = z0;
                 }
 
-                l = MathHelper.floor_double(v1.xCoord);
-                if (b0 == 5) {
-                    --l;
+                x1 = MathHelper.floor_double(v1.xCoord);
+                if (checkType == 5) {
+                    --x1;
                 }
 
-                i1 = MathHelper.floor_double(v1.yCoord);
-                if (b0 == 1) {
-                    --i1;
+                y1 = MathHelper.floor_double(v1.yCoord);
+                if (checkType == 1) {
+                    --y1;
                 }
 
-                j1 = MathHelper.floor_double(v1.zCoord);
-                if (b0 == 3) {
-                    --j1;
+                z1 = MathHelper.floor_double(v1.zCoord);
+                if (checkType == 3) {
+                    --z1;
                 }
 
-                if (l == target.xCoord && i1 == target.yCoord && j1 == target.zCoord)
+                if (x1 == target.xCoord && y1 == target.yCoord && z1 == target.zCoord)
                     return true;
 
-                Block block1 = world.getBlock(l, i1, j1);
-                int l1 = world.getBlockMetadata(l, i1, j1);
-                if (block1.canCollideCheck(l1, false)) {
-                    if (block1.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) {
-                        MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, l, i1, j1, v1, v2);
+                Block block = world.getBlock(x1, y1, z1);
+                int meta = world.getBlockMetadata(x1, y1, z1);
+                if (block.canCollideCheck(meta, false)) {
+                    if (block.getCollisionBoundingBoxFromPool(world, x1, y1, z1) != null) {
+                        MovingObjectPosition movingobjectposition1 = block.collisionRayTrace(world, x1, y1, z1, v1, v2);
                         if (movingobjectposition1 != null && movingobjectposition1.typeOfHit != MovingObjectPosition.MovingObjectType.MISS) {
                             return false;
                         }
@@ -342,7 +345,7 @@ public class ASMCallhookServer {
                 }
             }
         }
-        return false;
+        return true;
     }
 
     @Callhook(adder = BlockJarVisitor.class, module = ASMConstants.Modules.Misc)
