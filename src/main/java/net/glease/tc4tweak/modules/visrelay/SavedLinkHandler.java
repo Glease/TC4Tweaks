@@ -1,6 +1,8 @@
 package net.glease.tc4tweak.modules.visrelay;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import net.glease.tc4tweak.CommonUtils;
@@ -43,7 +45,14 @@ public class SavedLinkHandler {
     public static boolean processSavedLink(ITileVisNode visNode) {
         TileVisNode node = (TileVisNode) visNode;
         WorldCoordinates c = new WorldCoordinates(node);
-        Action action = processSavedLink0(visNode);
+        Action action;
+        try {
+            action = processSavedLink0(visNode);
+        } catch (Exception e) {
+            log.error("Failed to process saved link. Defaulting to no saved link!", e);
+            visNode.clearSavedLink();
+            return false;
+        }
         if (action != Action.DISABLED) {
             log.info("Processed saved link for node {} at {},{},{}: {}", getNodeType(node), c.x, c.y, c.z, action);
         }
@@ -61,8 +70,15 @@ public class SavedLinkHandler {
         }
         TileEntity tile = w.getTileEntity(c.posX, c.posY, c.posZ);
         if (!canConnect(node, tile)) {
-            visNode.clearSavedLink();
-            return Action.CLEAR_CONTINUE;
+            // ThE uses a fake TE for cv p2p that is not retrievable via getTileEntity
+            // however it's accessible via VisNetHandler.sources
+            HashMap<WorldCoordinates, WeakReference<TileVisNode>> sourcelist = VisNetHandler.sources.get(w.provider.dimensionId);
+            TileVisNode sourcenode = CommonUtils.deref(sourcelist.get(new WorldCoordinates(c.posX, c.posY, c.posZ, w.provider.dimensionId)));
+            if (sourcenode == null) {
+                visNode.clearSavedLink();
+                return Action.CLEAR_CONTINUE;
+            }
+            tile = sourcenode;
         }
         TileVisNode next = (TileVisNode) tile;
         if (next.isSource()) {
@@ -85,7 +101,7 @@ public class SavedLinkHandler {
                 return Action.CLEAR_CONTINUE;
             }
         }
-        if (nextLink.get(0).equals(link.get(1))) {
+        if (link.size() == 1 || nextLink.get(0).equals(link.get(1))) {
             return Action.RETURN;
         }
         visNode.clearSavedLink();
