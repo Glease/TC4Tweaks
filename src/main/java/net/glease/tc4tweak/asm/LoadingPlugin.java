@@ -44,6 +44,9 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        if (!TC4Transformer.initialized) {
+            throw new IllegalStateException("TC4Tweaks class transformer failed to be initialized");
+        }
         dev = !(boolean) data.get("runtimeDeobfuscationEnabled");
         gt6 = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Greg-ASM"));
         hodgepodge = ((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().toLowerCase(Locale.ROOT).contains("hodgepodge"));

@@ -40,6 +40,7 @@ import static org.objectweb.asm.Opcodes.ASM5;
  */
 public class TC4Transformer implements IClassTransformer {
     static final Logger log = LogManager.getLogger("TC4TweakTransformer");
+    static boolean initialized;
     private static final ConcurrentMap<String, Integer> transformCounts = new ConcurrentHashMap<>();
     private final Map<String, TransformerFactory> transformers = ImmutableMap.<String, TransformerFactory>builder()
             .put("net.minecraft.util.ChunkCoordinates", ChunkCoordinatesVisitor.createFactory())
@@ -121,6 +122,10 @@ public class TC4Transformer implements IClassTransformer {
             exception = new RuntimeException("Transforming class", e);
         }
         throw exception;
+    }
+
+    public TC4Transformer() {
+        initialized = true;
     }
 
     @Override
