@@ -14,6 +14,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import net.glease.tc4tweak.asm.ASMCallhook;
 import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.modules.hudNotif.HUDNotification;
+import net.glease.tc4tweak.modules.particleEngine.ParticleEngineFix;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.glease.tc4tweak.modules.researchBrowser.DrawResearchCompletionCounter;
 import net.glease.tc4tweak.modules.researchBrowser.ThaumonomiconIndexSearcher;
@@ -145,6 +146,7 @@ public class ClientProxy extends CommonProxy {
                 }
             });
         }
+        ParticleEngineFix.init();
     }
 
     @Override
