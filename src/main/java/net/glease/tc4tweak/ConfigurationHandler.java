@@ -50,6 +50,7 @@ public enum ConfigurationHandler {
     private int decantMaxBlocks;
     private boolean savedLinkSaveWholeLink;
     private boolean savedLink;
+    private boolean savedLinkDebug;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -139,6 +140,7 @@ public enum ConfigurationHandler {
         earthShockHarmMode = EarthShockHarmMode.get(config.getString("earthShockHarmMode", "general", earthShockHarmMode.name(), "Select the entities to be damaged by earth shock. Note: certain entity (e.g. most projectiles) cannot be damaged even if it's on the list. OnlyLiving: only harm living entities, e.g. cows, players, zombies, the most intuitive behavior. ExceptItemXp: harm everything except items and xp orbs, e.g. item frames, all living entities like mentioned before. AllEntity: harm everything, like thaumcraft does out of box", Arrays.stream(EarthShockHarmMode.values()).map(Enum::name).toArray(String[]::new)));
         savedLink = config.getBoolean("enable", "general.saved_link", true, "Enable this feature. When disabled, no additional data will be saved to disk");
         savedLinkSaveWholeLink = config.getBoolean("saveCompleteLink", "general.saved_link", false, "When enabled, save the entire link up to source node. There is no actual benefit of this beyond more debug info. You probably don't want to change this.");
+        savedLinkDebug = config.getBoolean("debug", "general.saved_link", false, "When enabled, print more debug info for this feature. You probably don't want to change this.");
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -305,6 +307,10 @@ public enum ConfigurationHandler {
 
     public boolean isSavedLinkEnabled() {
         return savedLink;
+    }
+
+    public boolean isSavedLinkDebugEnabled() {
+        return savedLinkDebug;
     }
 
     public enum InfusionOreDictMode {

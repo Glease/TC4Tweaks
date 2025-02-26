@@ -53,7 +53,7 @@ public class SavedLinkHandler {
             visNode.clearSavedLink();
             return false;
         }
-        if (action != Action.DISABLED) {
+        if (ConfigurationHandler.INSTANCE.isSavedLinkDebugEnabled() && action != Action.DISABLED) {
             log.info("Processed saved link for node {} at {},{},{}: {}", getNodeType(node), c.x, c.y, c.z, action);
         }
         return action.returnValue();
