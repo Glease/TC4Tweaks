@@ -71,14 +71,11 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
-import thaumcraft.common.container.ContainerDummy;
 import thaumcraft.common.entities.ai.fluid.AILiquidGather;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
-import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
-import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileResearchTable;
 
 import static net.glease.tc4tweak.TC4Tweak.log;
@@ -137,22 +134,12 @@ public class ASMCallhookServer {
      * Called from {@link thaumcraft.common.container.ContainerArcaneWorkbench#onCraftMatrixChanged(IInventory)}
      */
     @Callhook(adder = ContainerArcaneWorkbenchVisitor.class, module = ASMConstants.Modules.WorkbenchLagFix)
-    public static void onArcaneWorkbenchChanged(TileArcaneWorkbench tileEntity, InventoryPlayer ip) {
+    public static ItemStack getNormalCraftingRecipeOutput(CraftingManager inst, InventoryCrafting ic, World world) {
         // only check synced config if in remote world
-        if (ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes() && (!tileEntity.getWorldObj().isRemote || NetworkedConfiguration.isCheckWorkbenchRecipes())) {
-            InventoryCrafting ic = new InventoryCrafting(new ContainerDummy(), 3, 3);
-            for (int a = 0; a < 9; ++a) {
-                ic.setInventorySlotContents(a, tileEntity.getStackInSlot(a));
-            }
-            tileEntity.setInventorySlotContentsSoftly(9, CraftingManager.getInstance().findMatchingRecipe(ic, tileEntity.getWorldObj()));
+        if (ConfigurationHandler.INSTANCE.isCheckWorkbenchRecipes() && (!world.isRemote || NetworkedConfiguration.isCheckWorkbenchRecipes())) {
+            return inst.findMatchingRecipe(ic, world);
         } else {
-            tileEntity.setInventorySlotContentsSoftly(9, null);
-        }
-        if (tileEntity.getStackInSlot(9) == null && tileEntity.getStackInSlot(10) != null && tileEntity.getStackInSlot(10).getItem() instanceof ItemWandCasting) {
-            ItemWandCasting wand = (ItemWandCasting) tileEntity.getStackInSlot(10).getItem();
-            if (wand.consumeAllVisCrafting(tileEntity.getStackInSlot(10), ip.player, ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(tileEntity, ip.player), false)) {
-                tileEntity.setInventorySlotContentsSoftly(9, ThaumcraftCraftingManager.findMatchingArcaneRecipe(tileEntity, ip.player));
-            }
+            return null;
         }
     }
 

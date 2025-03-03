@@ -2,7 +2,10 @@ package net.glease.tc4tweak.asm;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.config.Configuration;
@@ -72,6 +75,38 @@ final class ASMUtils {
         mv.visitMaxs(base, Type.VOID_TYPE.equals(methodType.getReturnType()) ? base : Math.max(1, base));
 
         mv.visitEnd();
+    }
+
+    /**
+     * Write one INVOKESTATIC to redirect the method call to another class. This assumes the stack is properly setup.
+     *
+     * @param mv          The output destination
+     * @param targetClass Internal name of class that the call gets delegated to
+     * @param targetName  Name of the method that the call gets delegated to
+     * @param clazz       The internal name of the owner class.
+     * @param desc        The descriptor of this method.
+     * @param append      Additional parameters to add at the end of original method desc
+     */
+    public static void writeRedirect(MethodVisitor mv, String targetClass, String targetName, String clazz, String origName, String desc, Type... append) {
+        String targetDesc;
+        if (append == null || append.length == 0) {
+            if (clazz == null) {
+                targetDesc = desc;
+            } else {
+                targetDesc = '(' + Type.getObjectType(clazz).getDescriptor() + desc.substring(1);
+            }
+        } else {
+            Type orig = Type.getMethodType(desc);
+            List<Type> args = new ArrayList<>();
+            if (clazz != null) {
+                args.add(Type.getObjectType(clazz));
+            }
+            Collections.addAll(args, orig.getArgumentTypes());
+            Collections.addAll(args, append);
+            targetDesc = Type.getMethodDescriptor(orig.getReturnType(), args.toArray(new Type[0]));
+        }
+        log.trace("Redirecting {}#{}{} to {}#{}{}", clazz, origName, desc, targetClass, targetName, targetDesc);
+        mv.visitMethodInsn(INVOKESTATIC, targetClass, targetName, targetDesc, false);
     }
 
     static <T> T[] arrayAppend(T[] arr, T newLast) {
