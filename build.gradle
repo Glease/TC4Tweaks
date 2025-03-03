@@ -222,6 +222,15 @@ tasks.register('createSignedJarDir') {
     }
 }
 
+tasks.register('gitTag', Exec) {
+    onlyIf {
+        !new File(projectDir, ".git/refs/tags/${version}").exists()
+    }
+    workingDir projectDir
+    executable "git"
+    args "tag", version
+}
+
 tasks.register('generateGitChangelog', GitChangelogTask) {
     file = new File("CHANGELOG.md")
     toRef = "HEAD"
