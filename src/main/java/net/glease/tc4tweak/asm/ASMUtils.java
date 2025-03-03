@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import net.minecraft.launchwrapper.Launch;
@@ -76,6 +77,14 @@ final class ASMUtils {
     static <T> T[] arrayAppend(T[] arr, T newLast) {
         T[] out = Arrays.copyOf(arr, arr.length + 1);
         out[arr.length]  = newLast;
+        return out;
+    }
+
+    static <T> T[] arrayPrepend(T[] arr, T newLast) {
+        @SuppressWarnings("unchecked")
+        T[] out = (T[]) Array.newInstance(arr.getClass().getComponentType(), arr.length + 1);
+        out[0]  = newLast;
+        System.arraycopy(arr, 0, out, 1, arr.length);
         return out;
     }
 

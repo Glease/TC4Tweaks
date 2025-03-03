@@ -51,6 +51,7 @@ public enum ConfigurationHandler {
     private boolean savedLinkSaveWholeLink;
     private boolean savedLink;
     private boolean savedLinkDebug;
+    private boolean alternativeAddStack;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -141,6 +142,7 @@ public enum ConfigurationHandler {
         savedLink = config.getBoolean("enable", "general.saved_link", true, "Enable this feature. When disabled, no additional data will be saved to disk");
         savedLinkSaveWholeLink = config.getBoolean("saveCompleteLink", "general.saved_link", false, "When enabled, save the entire link up to source node. There is no actual benefit of this beyond more debug info. You probably don't want to change this.");
         savedLinkDebug = config.getBoolean("debug", "general.saved_link", false, "When enabled, print more debug info for this feature. You probably don't want to change this.");
+        alternativeAddStack = config.getBoolean("alternativeAddStack", "general", true, "When enabled, using a phial will cause the new stack to be added to current player inventory using an alternative rule that prefers partial stacks and current slot.");
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -311,6 +313,10 @@ public enum ConfigurationHandler {
 
     public boolean isSavedLinkDebugEnabled() {
         return savedLinkDebug;
+    }
+
+    public boolean isAlternativeAddStack() {
+        return alternativeAddStack;
     }
 
     public enum InfusionOreDictMode {

@@ -573,4 +573,28 @@ public class ASMCallhookServer {
     public static boolean processSavedLink(ITileVisNode visNode) {
         return SavedLinkHandler.processSavedLink(visNode);
     }
+
+    @Callhook(adder = ItemEssenceVisitor.class, module = ASMConstants.Modules.Misc)
+    public static boolean addItemStackToInventory(InventoryPlayer inv, ItemStack itemStack) {
+        if (!ConfigurationHandler.INSTANCE.isAlternativeAddStack()) return inv.addItemStackToInventory(itemStack);
+        // first check if a partial stack exists
+        for (ItemStack stack : inv.mainInventory) {
+            // empty or same stack
+            if (stack == null || !stack.isItemEqual(itemStack) || !ItemStack.areItemStackTagsEqual(itemStack, stack) ||
+                    // space left
+                    stack.stackSize <= 0 || stack.stackSize >= stack.getMaxStackSize()) continue;
+            int toAdd = Math.min(stack.getMaxStackSize() - stack.stackSize, itemStack.stackSize);
+            itemStack.stackSize -= toAdd;
+            stack.stackSize += toAdd;
+            if (itemStack.stackSize <= 0) return true;
+        }
+        // then try to add to current active slot if it's now empty
+        ItemStack currentStack = inv.mainInventory[inv.currentItem];
+        if (currentStack == null || currentStack.getItem() == null || currentStack.stackSize <= 0) {
+            inv.mainInventory[inv.currentItem] = itemStack;
+            return true;
+        }
+        // fallback to vanilla logic if both failed
+        return inv.addItemStackToInventory(itemStack);
+    }
 }
