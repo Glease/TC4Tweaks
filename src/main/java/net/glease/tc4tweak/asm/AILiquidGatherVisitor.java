@@ -7,6 +7,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMUtils.writeRedirect;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
@@ -20,9 +21,12 @@ class AILiquidGatherVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
+        log.debug("Adding MethodHandle field {}", MH_CTOR);
         visitField(ACC_PRIVATE | ACC_STATIC | ACC_FINAL, MH_CTOR, Type.getDescriptor(MethodHandle.class), null, null).visitEnd();
+        log.debug("Adding MethodHandle initializer by adding a <clinit>");
         MethodVisitor mv = visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
         mv.visitCode();
+        // this method handle is the handle to construct the inner class
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;", false);
         mv.visitLdcInsn(Type.getObjectType("thaumcraft/common/entities/ai/fluid/AILiquidGather$SourceBlock"));
         mv.visitFieldInsn(GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
@@ -76,15 +80,7 @@ class AILiquidGatherVisitor extends ClassVisitor {
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitFieldInsn(GETFIELD, owner, "pumpDist", "F");
                 mv.visitFieldInsn(GETSTATIC, owner, MH_CTOR, Type.getDescriptor(MethodHandle.class));
-                Type[] args = Type.getArgumentTypes(desc);
-                Type[] newArgs = new Type[args.length + 3];
-                System.arraycopy(args, 0, newArgs, 1, args.length);
-                newArgs[0] = Type.getObjectType(owner);
-                newArgs[newArgs.length - 2] = Type.FLOAT_TYPE;
-                newArgs[newArgs.length - 1] = Type.getType(MethodHandle.class);
-                String newDesc = Type.getMethodType(Type.VOID_TYPE, newArgs).getDescriptor();
-                log.trace("Redirecting {}, new desc {}", name, newDesc);
-                mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "getConnectedFluidBlocks", newDesc, false);
+                writeRedirect(mv, ASMCALLHOOKSERVER_INTERNAL_NAME, "getConnectedFluidBlocks", owner, name, desc, Type.FLOAT_TYPE, Type.getType(MethodHandle.class));
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }

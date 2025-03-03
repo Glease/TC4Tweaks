@@ -26,7 +26,7 @@ class ThaumcraftCraftingManagerVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (METHODS_TO_DEFLECT.getOrDefault(name, "").equals(desc)) {
             log.debug("Replacing {}", name);
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
             return null;
         } else if ("generateTagsFromCrucibleRecipes".equals(name)) {
             log.debug("Visiting {}", name);

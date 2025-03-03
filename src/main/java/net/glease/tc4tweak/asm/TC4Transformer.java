@@ -17,9 +17,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
-import static net.glease.tc4tweak.asm.LoadingPlugin.getDebugOutputDir;
-import static net.glease.tc4tweak.asm.LoadingPlugin.isDebug;
+import static net.glease.tc4tweak.asm.LoadingPlugin.*;
 import static org.objectweb.asm.Opcodes.ASM5;
 
 /*

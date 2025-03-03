@@ -4,9 +4,9 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
+import static net.glease.tc4tweak.asm.ASMUtils.writeRedirect;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 class BlockMetalDeviceVisitor extends ClassVisitor {
@@ -28,8 +28,7 @@ class BlockMetalDeviceVisitor extends ClassVisitor {
                             owner.equals("net/minecraft/entity/player/InventoryPlayer") &&
                             name.equals(dev ? "addItemStackToInventory" : "func_70441_a") &&
                             desc.equals("(Lnet/minecraft/item/ItemStack;)Z")) {
-                        log.trace("Redirecting {}", name);
-                        super.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "addToPlayerInventoryBiased", "(Lnet/minecraft/entity/player/InventoryPlayer;Lnet/minecraft/item/ItemStack;)Z", false);
+                        writeRedirect(mv, ASMCALLHOOKSERVER_INTERNAL_NAME, "addToPlayerInventoryBiased", owner, name, desc);
                         visited = true;
                     } else {
                         super.visitMethodInsn(opcode, owner, name, desc, itf);

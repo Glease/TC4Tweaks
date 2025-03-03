@@ -18,7 +18,7 @@ class ScanManagerVisitor extends ClassVisitor {
             log.debug("Replacing generateItemHash(Lnet/minecraft/item/Item;I)I");
             mv.visitParameter("item", 0);
             mv.visitParameter("meta", 0);
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, name, mv, null, desc);
             return null;
         } else {
             return mv;

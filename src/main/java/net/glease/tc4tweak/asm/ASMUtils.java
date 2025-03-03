@@ -49,7 +49,7 @@ final class ASMUtils {
      * @param clazz       The internal name of the owner class. NULL if static method
      * @param desc        The descriptor of this method.
      */
-    public static void writeMethodDeflected(String targetClass, String targetName, MethodVisitor mv, String clazz, String desc) {
+    public static void writeOverwrite(String targetClass, String targetName, MethodVisitor mv, String clazz, String desc) {
         int base;
         String targetDesc;
         if (clazz == null) {

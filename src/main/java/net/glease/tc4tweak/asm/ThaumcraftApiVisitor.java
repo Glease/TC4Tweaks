@@ -21,7 +21,7 @@ class ThaumcraftApiVisitor extends ClassVisitor {
             return new ClinitVisitor(api, mv);
         } else if ("getCrucibleRecipeFromHash".equals(name) && "(I)Lthaumcraft/api/crafting/CrucibleRecipe;".equals(desc)) {
             log.debug("Replacing getCrucibleRecipeFromHash(I)Lthaumcraft/api/crafting/CrucibleRecipe;");
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "getCrucibleRecipeFromHash", mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, "getCrucibleRecipeFromHash", mv, null, desc);
             return null;
         } else {
             return mv;

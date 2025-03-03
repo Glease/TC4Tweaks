@@ -33,7 +33,7 @@ class MazeHandlerVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("writeNBT") && desc.equals("()Lnet/minecraft/nbt/NBTTagCompound;")) {
             log.debug("Replacing writeNBT()Lnet/minecraft/nbt/NBTTagCompound;");
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "writeMazeToNBT", mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, "writeMazeToNBT", mv, null, desc);
             return null;
         } else if (mutators.contains(name)) {
             log.debug("Transforming {}{}", name, desc);

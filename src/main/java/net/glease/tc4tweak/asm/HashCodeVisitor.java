@@ -39,7 +39,7 @@ class HashCodeVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("hashCode") && desc.equals("()I")) {
             log.debug("Replacing {}#hashCode()I", className);
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, targetName, mv, className, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, targetName, mv, className, desc);
             visited = true;
             return null;
         }
@@ -51,7 +51,7 @@ class HashCodeVisitor extends ClassVisitor {
         if (!visited) {
             log.debug("Adding {}#hashCode()I", className);
             MethodVisitor mv = super.visitMethod(ACC_PUBLIC, "hashCode", "()I", null, null);
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, targetName, mv, className, null);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, targetName, mv, className, null);
             visited = true;
         }
         super.visitEnd();

@@ -16,7 +16,7 @@ class InfusionRecipeVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("areItemStacksEqual".equals(name)) {
             log.debug("Replacing {}{}", name, desc);
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "infusionItemMatches", mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, "infusionItemMatches", mv, null, desc);
             return null;
         }
         return mv;

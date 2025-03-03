@@ -14,7 +14,7 @@ class UtilsFXVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("getParticleTexture")) {
-            ASMUtils.writeMethodDeflected(ASMCALLHOOK_INTERNAL_NAME, name, mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOK_INTERNAL_NAME, name, mv, null, desc);
             return null;
         }
         return mv;

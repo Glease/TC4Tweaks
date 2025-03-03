@@ -14,7 +14,7 @@ class VisNetHandlerVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("canNodeBeSeen".equals(name)) {
-            ASMUtils.writeMethodDeflected(ASMCALLHOOKSERVER_INTERNAL_NAME, "canNodeBeSeen", mv, null, desc);
+            ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, "canNodeBeSeen", mv, null, desc);
             return null;
         }
         return mv;
