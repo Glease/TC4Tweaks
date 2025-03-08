@@ -32,7 +32,7 @@ class ContainerArcaneWorkbenchVisitor extends ClassVisitor {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (owner.equals("net/minecraft/item/crafting/CraftingManager") && name.equals(dev ? "findMatchingRecipe" : "func_82787_a")) {
-                writeRedirect(mv, ASMCALLHOOKSERVER_INTERNAL_NAME, "addItemStackToInventory", owner, name, desc);
+                writeRedirect(mv, ASMCALLHOOKSERVER_INTERNAL_NAME, "getNormalCraftingRecipeOutput", owner, name, desc);
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
