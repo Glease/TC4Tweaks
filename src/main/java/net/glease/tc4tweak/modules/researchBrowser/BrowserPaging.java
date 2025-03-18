@@ -29,9 +29,9 @@ public class BrowserPaging {
     public static final int BUTTON_WIDTH = 24;
     private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     private static final int NAVIGATION_BUTTON_Z_LEVEL = -50;
-    private static int currentPageIndex;
-    private static int maxPageIndex;
-    private static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
+    public static int currentPageIndex;
+    public static int maxPageIndex;
+    public static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
 
     public static int getTabPerSide() {
         return ConfigurationHandler.INSTANCE.getBrowserHeight() / BUTTON_WIDTH;
@@ -80,14 +80,19 @@ public class BrowserPaging {
         return currentPageTabs;
     }
 
-    static void nextPage() {
+    public static void nextPage() {
         int tabsPerPage = getTabPerSide() * 2;
         currentPageIndex = Math.min(currentPageIndex + 1, (ResearchCategories.researchCategories.size() + tabsPerPage) / tabsPerPage - 1);
         currentPageTabs = null;
     }
 
-    static void prevPage() {
+    public static void prevPage() {
         currentPageIndex = Math.max(currentPageIndex - 1, 0);
+        currentPageTabs = null;
+    }
+
+    public static void setPage(int page) {
+        currentPageIndex = Math.max(0, Math.min(page, maxPageIndex));
         currentPageTabs = null;
     }
 
