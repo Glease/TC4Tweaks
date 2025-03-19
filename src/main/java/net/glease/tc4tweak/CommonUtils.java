@@ -71,4 +71,8 @@ public class CommonUtils {
     public static <T> T deref(Reference<T> ref) {
         return ref == null ? null : ref.get();
     }
+
+    public static int clamp(int val, int min, int max) {
+        return Math.min(Math.max(min, val), max);
+    }
 }

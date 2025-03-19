@@ -10,7 +10,9 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.glease.tc4tweak.ClientUtils;
+import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.api.BrowserPagingAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -29,9 +31,10 @@ public class BrowserPaging {
     public static final int BUTTON_WIDTH = 24;
     private static final Field fieldPlayer = ReflectionHelper.findField(GuiResearchBrowser.class, "player");
     private static final int NAVIGATION_BUTTON_Z_LEVEL = -50;
-    private static int currentPageIndex;
-    private static int maxPageIndex;
-    private static LinkedHashMap<String, ResearchCategoryList> currentPageTabs;
+    static int currentPageIndex;
+    static int maxPageIndex;
+    private static final LinkedHashMap<String, ResearchCategoryList> currentPageTabs = new LinkedHashMap<>();
+    private static boolean recalculateCurrentTabs = true;
 
     public static int getTabPerSide() {
         return ConfigurationHandler.INSTANCE.getBrowserHeight() / BUTTON_WIDTH;
@@ -51,17 +54,17 @@ public class BrowserPaging {
         if (newMaxPageIndex != maxPageIndex) {
             maxPageIndex = newMaxPageIndex;
             currentPageIndex = Math.min(currentPageIndex, BrowserPaging.maxPageIndex);
-            currentPageTabs = null;
+            recalculateCurrentTabs = true;
         }
     }
 
     public static LinkedHashMap<String, ResearchCategoryList> getTabsOnCurrentPage(String player) {
-        if (currentPageTabs == null) {
+        if (recalculateCurrentTabs) {
             int tabsPerPage = getTabPerSide() * 2;
             // reset in case tab count changed
             if (currentPageIndex > maxPageIndex)
                 currentPageIndex = 0;
-            currentPageTabs = new LinkedHashMap<>();
+            currentPageTabs.clear();
             int toSkip = tabsPerPage * currentPageIndex;
             for (Map.Entry<String, ResearchCategoryList> e : ResearchCategories.researchCategories.entrySet()) {
                 // pretend eldritch tab doesn't exist if ELDRITCHMINOR is not complete
@@ -81,14 +84,17 @@ public class BrowserPaging {
     }
 
     static void nextPage() {
-        int tabsPerPage = getTabPerSide() * 2;
-        currentPageIndex = Math.min(currentPageIndex + 1, (ResearchCategories.researchCategories.size() + tabsPerPage) / tabsPerPage - 1);
-        currentPageTabs = null;
+        setPage(currentPageIndex + 1);
     }
 
     static void prevPage() {
-        currentPageIndex = Math.max(currentPageIndex - 1, 0);
-        currentPageTabs = null;
+        setPage(currentPageIndex - 1);
+    }
+
+    static void setPage(int nextIndex) {
+        int tabsPerPage = getTabPerSide() * 2;
+        currentPageIndex = CommonUtils.clamp(nextIndex, 0, (ResearchCategories.researchCategories.size() + tabsPerPage) / tabsPerPage - 1);
+        recalculateCurrentTabs = true;
     }
 
     public static void init() {
@@ -98,7 +104,7 @@ public class BrowserPaging {
     }
 
     public static void flushCache() {
-        currentPageTabs = null;
+        recalculateCurrentTabs = true;
     }
 
     // region Poor man's way of hooking into research browser.
@@ -228,7 +234,7 @@ public class BrowserPaging {
                 ReflectionHelper.setPrivateValue(GuiResearchBrowser.class, gui, ConfigurationHandler.INSTANCE.getBrowserWidth(), "paneWidth");
                 ReflectionHelper.setPrivateValue(GuiResearchBrowser.class, gui, ConfigurationHandler.INSTANCE.getBrowserHeight(), "paneHeight");
 
-                currentPageTabs = null;
+                recalculateCurrentTabs = true;
                 updateMaxPageIndex(gui);
             }
         }
@@ -241,6 +247,43 @@ public class BrowserPaging {
                     updateMaxPageIndex((GuiResearchBrowser) e.gui);
                 }
             }
+        }
+    }
+
+    public static class APIImpl implements BrowserPagingAPI {
+        @Override
+        public Map<String, ResearchCategoryList> getTabsOnCurrentPage(GuiResearchBrowser gui, String player) {
+            return BrowserPaging.getTabsOnCurrentPage(player);
+        }
+    
+        @Override
+        public void setPage(GuiResearchBrowser gui, int page) {
+            BrowserPaging.setPage(page);
+        }
+
+        @Override
+        public void moveNextPage(GuiResearchBrowser gui) {
+            nextPage();
+        }
+
+        @Override
+        public void movePreviousPage(GuiResearchBrowser gui) {
+            prevPage();
+        }
+
+        @Override
+        public int getCurrentPage(GuiResearchBrowser gui) {
+            return currentPageIndex;
+        }
+
+        @Override
+        public int getTotalPages(GuiResearchBrowser gui) {
+            return maxPageIndex;
+        }
+
+        @Override
+        public int getTabsPerPage(GuiResearchBrowser gui) {
+            return getTabPerSide() * 2;
         }
     }
 }
