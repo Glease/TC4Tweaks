@@ -52,6 +52,7 @@ public enum ConfigurationHandler {
     private boolean savedLink;
     private boolean savedLinkDebug;
     private boolean alternativeAddStack;
+    private boolean sendSupplementaryS35;
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -143,6 +144,7 @@ public enum ConfigurationHandler {
         savedLinkSaveWholeLink = config.getBoolean("saveCompleteLink", "general.saved_link", false, "When enabled, save the entire link up to source node. There is no actual benefit of this beyond more debug info. You probably don't want to change this.");
         savedLinkDebug = config.getBoolean("debug", "general.saved_link", false, "When enabled, print more debug info for this feature. You probably don't want to change this.");
         alternativeAddStack = config.getBoolean("alternativeAddStack", "general", true, "When enabled, using a phial will cause the new stack to be added to current player inventory using an alternative rule that prefers partial stacks and current slot.");
+        sendSupplementaryS35 = config.getBoolean("sendSupplementaryS35", "general", true, "When enabled, will try harder at sending server side states for some particular tile entities. Enabling this might leads to very slight bandwidth usage increase, but can fix some rare desync.");
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -317,6 +319,10 @@ public enum ConfigurationHandler {
 
     public boolean isAlternativeAddStack() {
         return alternativeAddStack;
+    }
+
+    public boolean isSendSupplementaryS35() {
+        return sendSupplementaryS35;
     }
 
     public enum InfusionOreDictMode {

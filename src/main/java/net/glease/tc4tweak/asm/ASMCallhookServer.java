@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.glease.tc4tweak.CommonUtils;
 import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.TC4Tweak;
 import net.glease.tc4tweak.asm.PacketAspectCombinationToServerVisitor.PacketAspectCombinationToServerAccess;
@@ -44,6 +45,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -583,5 +585,15 @@ public class ASMCallhookServer {
         }
         // fallback to vanilla logic if both failed
         return inv.addItemStackToInventory(itemStack);
+    }
+
+    @Callhook(adder = TileVisRelayVisitor.class, module = ASMConstants.Modules.VisNetPersist)
+    public static boolean checkVisRelayParentLoaded(World world, int x, int y, int z) {
+        return CommonUtils.isChunkLoaded(world, x, y, z);
+    }
+
+    @Callhook(adder = TileVisRelayVisitor.class, module = ASMConstants.Modules.VisNetPersist)
+    public static void sendUpdate(TileEntity te) {
+        CommonUtils.sendSupplementaryS35(te);
     }
 }

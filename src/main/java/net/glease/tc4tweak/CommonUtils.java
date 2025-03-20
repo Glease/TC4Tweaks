@@ -7,6 +7,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.Packet;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.research.ResearchCategories;
@@ -74,5 +79,39 @@ public class CommonUtils {
 
     public static int clamp(int val, int min, int max) {
         return Math.min(Math.max(min, val), max);
+    }
+
+    public static boolean isChunkLoaded(World world, int x, int y, int z) {
+        if (world.isRemote) {
+            // client world lies about chunk existence
+            return !world.getChunkFromBlockCoords(x, z).isEmpty();
+        }
+        return world.blockExists(x, y, z);
+    }
+
+    /**
+     * Send a S35 update packet if given tile is very close to the end of player's view distance
+     * When player is moving very fast this might lead to some missed update somehow and this should fix it.
+     */
+    public static void sendSupplementaryS35(TileEntity te) {
+        if (!ConfigurationHandler.INSTANCE.isSendSupplementaryS35()) return;
+        World w = te.getWorldObj();
+        if (w.isRemote) return;
+        Packet packet = te.getDescriptionPacket();
+        if (packet == null) return;
+        // here we send a little further out in case player is moving very fast
+        int viewDistance = MinecraftServer.getServer().getConfigurationManager().getViewDistance();
+        int sendDistanceLo = viewDistance - 2;
+        int sendDistanceHi = viewDistance + 4;
+        for (Object o : w.playerEntities) {
+            if (!(o instanceof EntityPlayerMP)) continue;
+            EntityPlayerMP player = (EntityPlayerMP) o;
+            int dx = (((int) player.posX) >> 4) - (te.xCoord >> 4);
+            int dz = (((int) player.posZ) >> 4) - (te.zCoord >> 4);
+            int dist = Math.max(Math.abs(dx), Math.abs(dz));
+            if (dist >= sendDistanceLo && dist <= sendDistanceHi) {
+                player.playerNetServerHandler.sendPacket(packet);
+            }
+        }
     }
 }

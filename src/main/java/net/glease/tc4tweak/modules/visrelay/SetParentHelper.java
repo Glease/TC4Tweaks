@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.glease.tc4tweak.CommonUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.visnet.TileVisNode;
@@ -31,5 +32,6 @@ public class SetParentHelper {
         parent.getChildren().add(ref);
         nearbyNodes.clear();
         cache.clear();
+        CommonUtils.sendSupplementaryS35(parent);
     }
 }

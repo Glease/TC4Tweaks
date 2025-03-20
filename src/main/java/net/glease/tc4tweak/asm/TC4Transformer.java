@@ -108,7 +108,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.tiles.TileHole", new TransformerFactory(TileHoleVisitor::new))
             .put("thaumcraft.common.tiles.TileTube", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
             .put("thaumcraft.common.tiles.TileJarFillable", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
-//            .put("", new TransformerFactory(AddOnDataPacketMarkBlockForRenderUpdateVisitor::new))
+            .put("thaumcraft.common.tiles.TileVisRelay", new TransformerFactory(TileVisRelayVisitor::new))
             .put("thaumcraft.common.Thaumcraft", new TransformerFactory(ThaumcraftVisitor::new))
             .build();
 
