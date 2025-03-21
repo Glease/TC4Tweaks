@@ -23,6 +23,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.glease.tc4tweak.asm.LoadingPlugin;
 import net.glease.tc4tweak.network.MessageSendConfiguration;
 import net.glease.tc4tweak.network.MessageSendConfigurationV2;
+import net.glease.tc4tweak.network.MyNet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,7 +41,7 @@ public class TC4Tweak {
     public static TC4Tweak INSTANCE;
     @SidedProxy(serverSide = "net.glease.tc4tweak.CommonProxy", clientSide = "net.glease.tc4tweak.ClientProxy")
     static CommonProxy proxy;
-    public final SimpleNetworkWrapper CHANNEL = new SimpleNetworkWrapper(MOD_ID);
+    public final MyNet CHANNEL = new MyNet(MOD_ID);
     private boolean allowAll = true;
 
     public TC4Tweak() {
