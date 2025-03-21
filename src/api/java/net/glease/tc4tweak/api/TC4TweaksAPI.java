@@ -41,6 +41,7 @@ public class TC4TweaksAPI {
     /**
      * Get an {@link BrowserPagingAPI}. Will provide a fallback version in case of main mod absence.
      * The dummy will respond to API calls as if TC4Tweaks does not exist, e.g. every tab will be on the same page
+     * @return api instance
      */
     public static BrowserPagingAPI getBrowserPagingAPI() {
         if (browserPagingAPI == null) {

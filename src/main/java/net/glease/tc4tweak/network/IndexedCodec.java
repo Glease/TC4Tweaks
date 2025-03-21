@@ -30,18 +30,17 @@ import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import io.netty.util.AttributeKey;
 
+import static cpw.mods.fml.common.network.FMLIndexedMessageToMessageCodec.INBOUNDPACKETTRACKER;
 import static net.glease.tc4tweak.TC4Tweak.log;
 
+@ChannelHandler.Sharable
 public class IndexedCodec extends MessageToMessageCodec<FMLProxyPacket, IMessage> {
     private final TByteObjectMap<Class<? extends IMessage>> discriminators = new TByteObjectHashMap<>();
     private final TObjectByteMap<Class<? extends IMessage>> types = new TObjectByteHashMap<>();
-
-
-    public static final AttributeKey<ThreadLocal<WeakReference<FMLProxyPacket>>> INBOUNDPACKETTRACKER = new AttributeKey<>("fml:inboundpacket");
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
