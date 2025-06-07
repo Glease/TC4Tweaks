@@ -22,7 +22,7 @@ public class DumpObjectTags extends TC4TweaksDataDump {
                 .filter(e -> e.getKey().getItem() != null && e.getValue() != null)
                 .map(e -> new String[]{
                         safeGetDisplayName(e.getKey()),
-                        e.getKey().getItem().getUnlocalizedName(),
+                        e.getKey().getUnlocalizedName(),
                         String.valueOf(Item.getIdFromItem(e.getKey().getItem())),
                         String.valueOf(Items.feather.getDamage(e.getKey())),
                         CommonUtils.toString(e.getValue())
