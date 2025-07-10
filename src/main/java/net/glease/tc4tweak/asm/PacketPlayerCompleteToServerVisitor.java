@@ -25,7 +25,7 @@ class PacketPlayerCompleteToServerVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        if ("onMessage".equals(name) && "(Lthaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer;Lcpw/mods/fml/common/network/simpleimpl/MessageContext;)Lcpw/mods/fml/common/network/simpleimpl/IMessage;".equals(desc)) {
+        if ("onMessage".equals(name) && "(Lthaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer;Lcpw/mods/fml/common/network/simpleimpl/MessageContext;)Lcpw/mods/fml/common/network/simpleimpl/IMessage;".equals(desc)) {
             log.debug("Visiting {}{}", name, desc);
             return new PacketSanityMethodVisitor(api, mv, "sanityPlayerComplete", "(Lnet/glease/tc4tweak/asm/PacketPlayerCompleteToServerVisitor$PacketPlayerCompleteToServerAccess;Lcpw/mods/fml/common/network/simpleimpl/MessageContext;)Z");
         }
