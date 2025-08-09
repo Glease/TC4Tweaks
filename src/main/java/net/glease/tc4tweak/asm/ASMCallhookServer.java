@@ -23,6 +23,7 @@ import net.glease.tc4tweak.modules.findCrucibleRecipe.FindCrucibleRecipe;
 import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
 import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
+import net.glease.tc4tweak.modules.infusionRecipe.InfusionRecipeGetOutput;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.glease.tc4tweak.modules.visrelay.SavedLinkHandler;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
@@ -67,6 +68,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.crafting.IArcaneRecipe;
+import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.ItemFocusBasic;
@@ -451,7 +453,7 @@ public class ASMCallhookServer {
         if (recipeSpec == null) return false;
         if (!ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(playerInput, recipeSpec)) return false;
         if (fuzzy) {
-            if (ConfigurationHandler.INSTANCE.getInfusionOreDictMode().test(playerInput, recipeSpec)) {
+            if (NetworkedConfiguration.getInfusionOreDictMode().test(playerInput, recipeSpec)) {
                 return true;
             }
         }
@@ -595,5 +597,10 @@ public class ASMCallhookServer {
     @Callhook(adder = TileVisRelayVisitor.class, module = ASMConstants.Modules.VisNetPersist)
     public static void sendUpdate(TileEntity te) {
         CommonUtils.sendSupplementaryS35(te);
+    }
+
+    @Callhook(adder = TileInfusionMatrixVisitor.class, module = ASMConstants.Modules.InfusionEnhance)
+    public static ItemStack modifyInfusionOutput(ItemStack output, InfusionRecipe thiz, ItemStack input) {
+        return InfusionRecipeGetOutput.getOutput(thiz, input, output);
     }
 }

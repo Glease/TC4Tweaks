@@ -18,5 +18,6 @@ class ASMConstants {
         ItemHashLagFix,
         ChampionModConfig,
         VisNetPersist,
+        InfusionEnhance,
     }
 }

@@ -7,9 +7,14 @@ A mod that adds a bit of functionality, a bit of performance and a bit of robust
 This project is hosted at https://maven.glease.net/repos/releases/. 
 Snapshot releases are also available at https://maven.glease.net/repos/snapshots/.
 
-Currently, there is nothing there actually being hosted, but once the age long oredict fix api comes out it will be there
+## API
 
-No HTTP browsing at the moment.
+The API of TC4Tweaks is available as a separate jar download both on maven and on mod distribution sites such as curseforge.
+You are not expected to shade it under any condition. 
+You are supposed to tell user to download and install the full TC4Tweaks jar.
+
+If you only need the recipe lib, it's available as a separate library that you can shade.
+Refer to its documentation for details.
 
 ## Github
 

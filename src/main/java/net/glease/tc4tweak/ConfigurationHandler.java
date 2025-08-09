@@ -14,16 +14,13 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.set.hash.TIntHashSet;
+import net.glease.tc4tweak.modules.infusionRecipe.InfusionOreDictMode;
 import net.glease.tc4tweak.config.StringOrderingEntry;
 import net.glease.tc4tweak.modules.FlushableCache;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.oredict.OreDictionary;
-import thaumcraft.api.ThaumcraftApiHelper;
 
 public enum ConfigurationHandler {
     INSTANCE;
@@ -323,52 +320,6 @@ public enum ConfigurationHandler {
 
     public boolean isSendSupplementaryS35() {
         return sendSupplementaryS35;
-    }
-
-    public enum InfusionOreDictMode {
-        Default {
-            @SuppressWarnings("deprecation")
-            @Override
-            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
-                int od = OreDictionary.getOreID(playerInput);
-                if (od == -1) return false;
-                ItemStack[] ores = OreDictionary.getOres(od).toArray(new ItemStack[0]);
-                return ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{recipeSpec}, ores);
-            }
-        },
-        Strict {
-            @Override
-            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
-                return new TIntHashSet(OreDictionary.getOreIDs(playerInput)).equals(new TIntHashSet(OreDictionary.getOreIDs(recipeSpec)));
-            }
-        },
-        Relaxed {
-            @Override
-            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
-                TIntHashSet set = new TIntHashSet(OreDictionary.getOreIDs(playerInput));
-                for (int i : OreDictionary.getOreIDs(recipeSpec)) {
-                    if (set.contains(i))
-                        return true;
-                }
-                return false;
-            }
-        },
-        None {
-            @Override
-            public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
-                return false;
-            }
-        };
-
-        public abstract boolean test(ItemStack playerInput, ItemStack recipeSpec);
-
-        public static InfusionOreDictMode get(String name) {
-            for (InfusionOreDictMode value : values()) {
-                if (value.name().equals(name))
-                    return value;
-            }
-            return Default;
-        }
     }
 
     public enum CompletionCounterStyle {

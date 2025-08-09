@@ -28,15 +28,17 @@ import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import thaumcraft.api.crafting.InfusionRecipe;
 
 public class TC4TweaksAPI {
     /**
      * The API version. API version will not necessarily advance along with main mod, but rather the every time
      * API has changed.
      */
-    public static final String VERSION = "1.5.32";
+    public static final String VERSION = "1.5.37";
     private static final Logger log = LogManager.getLogger("TC4TweaksAPI");
     private static BrowserPagingAPI browserPagingAPI;
+    private static InfusionExtAPI infusionExtAPI;
 
     /**
      * Get an {@link BrowserPagingAPI}. Will provide a fallback version in case of main mod absence.
@@ -56,6 +58,25 @@ public class TC4TweaksAPI {
         return browserPagingAPI;
     }
 
+    /**
+     * Get an {@link InfusionExtAPI}. Will provide a fallback version in case of main mod absence.
+     * The dummy will respond to API calls as if TC4Tweaks does not exist, e.g. {@link InfusionExtAPI#setRecipeNBTBehavior(InfusionRecipe, InfusionExtAPI.RecipeNBTBehavior)}
+     * will become a no-op.
+     * @return api instance
+     */
+    public static InfusionExtAPI getInfusionExtAPI() {
+        if (infusionExtAPI == null) {
+            InfusionExtAPI api = getService(InfusionExtAPI.class);
+            if (api == null) {
+                log.warn("InfusionExt API not available! Using dummy Infusion Ext API.");
+                infusionExtAPI = new DummyInfusionExtAPI();
+            } else  {
+                infusionExtAPI = api;
+            }
+        }
+        return infusionExtAPI;
+    }
+
     private static <T> T getService(Class<T> serviceClass) {
         ServiceLoader<T> loader = ServiceLoader.load(serviceClass);
         T first = null;
@@ -63,7 +84,7 @@ public class TC4TweaksAPI {
             if (first == null) {
                 first = t;
             }
-            if (t.getClass().getName().startsWith("net.gase.tc4tweak")) {
+            if (t.getClass().getName().startsWith("net.glease.tc4tweak.modules.")) {
                 return t;
             }
         }

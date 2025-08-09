@@ -10,8 +10,12 @@ buildscript {
         }
         maven {
             // GTNH ForgeGradle Fork
-            name = "GTNH Maven"
-            url = "http://jenkins.usrv.eu:8081/nexus/content/groups/public/"
+            name "GTNH Maven"
+            url 'https://nexus.gtnewhorizons.com/repository/public/'
+        }
+        maven {
+            name = 'glease'
+            url = 'https://maven.glease.net/repos/snapshots/'
         }
         maven {
             name 'sonatype'
@@ -27,6 +31,12 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.11'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         classpath "se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.65"
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'org.eclipse.jdt:org.eclipse.jdt.core:3.12.2+' // the old version is gone again
+        }
     }
 }
 
@@ -52,6 +62,8 @@ minecraft {
     runDir = "run"
 }
 
+final isSnapshot = version.endsWith('SNAPSHOT')
+
 repositories {
     exclusiveContent {
         forRepository {
@@ -66,15 +78,33 @@ repositories {
         filter {
             // pulls in api from azanor's repo in src jar for easy debugging, but otherwise same stuff from overmind's maven
             includeGroup('thaumcraft_fixed')
+            if (!isSnapshot)
+                includeGroup('net.glease')
+        }
+    }
+    if (isSnapshot) {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'glease'
+                    url = 'https://maven.glease.net/repos/snapshots/'
+                    metadataSources {
+                        artifact()
+                    }
+                }
+            }
+            filter {
+                includeGroup('net.glease')
+            }
         }
     }
     maven {
         name 'gt'
-        url 'http://gregtech.overminddl1.com/'
+        url 'https://gregtech.overminddl1.com/'
     }
     maven {
         name 'GTNH Maven'
-        url 'http://jenkins.usrv.eu:8081/nexus/content/groups/public/'
+        url 'https://nexus.gtnewhorizons.com/repository/public/'
     }
     maven {
         name 'minetweaker'
@@ -95,20 +125,41 @@ configurations {
         canBeResolved = false
     }
 
+    create("recipeLib") {
+        description = "For recipelib only. Will be shadowed into final jar. dependent mods will not see it. dev jars."
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+    create("recipeLibSrc") {
+        description = "For recipelib only. Will be shadowed into final jar. dependent mods will not see it. src jars."
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
     compileOnly.extendsFrom(devOnlyNonPublishable)
     runtimeOnlyNonPublishable.extendsFrom(devOnlyNonPublishable)
 
     runtimeClasspath.extendsFrom(runtimeOnlyNonPublishable)
     testRuntimeClasspath.extendsFrom(runtimeOnlyNonPublishable)
 
-    implementation.extendsFrom(apiImplementation)
+    apiCompile.extendsFrom(implementation)
+    implementation.extendsFrom(recipeLib)
 }
 
 dependencies {
     devOnlyNonPublishable "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
-    apiImplementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
+    implementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
     devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev"
     compileOnly "MineTweaker3:MineTweaker3-API:3.0.11.23"
+    recipeLib("net.glease:tc4recipelib:${version}:dev") {
+        transitive = false
+    }
+    // gradle is very unsure what to do in artifact views when we manually specified :dev classifier and this appears to
+    // be the easiest way out
+    recipeLibSrc("net.glease:tc4recipelib:${version}:sources") {
+        transitive = false
+    }
 }
 
 processResources
@@ -118,17 +169,21 @@ processResources
     inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
+    filesMatching("mcmod.info") {
         expand 'version':project.version, 'mcversion':project.minecraft.version
+
     }
-        
-    // copy everything else, thats not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+//    from(sourceSets.main.resources.srcDirs) {
+//        include 'mcmod.info'
+//
+//        // replace version and mcversion
+//        expand 'version':project.version, 'mcversion':project.minecraft.version
+//    }
+//
+//    // copy everything else, thats not the mcmod.info
+//    from(sourceSets.main.resources.srcDirs) {
+//        exclude 'mcmod.info'
+//    }
 
     from(layout.projectDirectory) {
         include 'COPYING'
@@ -138,6 +193,11 @@ processResources
 
 jar {
     from sourceSets.api.output
+    configurations.recipeLib.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
     manifest {
         attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
         attributes "FMLCorePluginContainsFMLMod": true
@@ -164,6 +224,7 @@ tasks.register('sourceJar', Jar) {
         include 'COPYING'
         include 'LICENSE*'
     }
+    from project.configurations.recipeLibSrc.files.collect { zipTree(it) }
     archiveClassifier = 'sources'
     manifest {
         attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
@@ -174,6 +235,11 @@ tasks.register('sourceJar', Jar) {
 tasks.register('devJar', Jar) {
     from sourceSets.main.output
     from sourceSets.api.output
+    configurations.recipeLib.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
     archiveClassifier = 'dev'
     manifest {
         attributes "FMLCorePlugin": "net.glease.tc4tweak.asm.LoadingPlugin"
@@ -184,6 +250,11 @@ tasks.register('devJar', Jar) {
 tasks.register('apiJar', Jar) {
     from sourceSets.api.output
     from sourceSets.api.allSource
+    configurations.recipeLib.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
     archiveClassifier = 'api'
 }
 
@@ -314,7 +385,7 @@ publishing {
                     def root = project.hasProperty('mavenRoot') ? project.mavenRoot : 'build/maven'
                     def releasesRepoUrl = "${root}/repos/releases"
                     def snapshotsRepoUrl = "${root}/repos/snapshots"
-                    url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                    url = isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
                     if (project.hasProperty('mavenUser') && project.hasProperty('mavenPass')) {
                         credentials {
                             username project.mavenUser
@@ -336,8 +407,6 @@ tasks.configureEach { it->
         }
     }
 }
-
-install.dependsOn reobf
 
 idea {
     module {

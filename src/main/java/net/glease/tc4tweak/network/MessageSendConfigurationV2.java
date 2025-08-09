@@ -6,6 +6,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.glease.tc4tweak.ConfigurationHandler;
+import net.glease.tc4tweak.modules.infusionRecipe.InfusionOreDictMode;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class MessageSendConfigurationV2 implements IMessage,  IMessageHandler<MessageSendConfigurationV2, IMessage>  {
@@ -16,6 +17,7 @@ public class MessageSendConfigurationV2 implements IMessage,  IMessageHandler<Me
         // yeah I said NBT is an unfortunate piece of tech, but it does give us a bit of flexibility over network
         // protocol
         tag.setBoolean("sj", ConfigurationHandler.INSTANCE.isSmallerJars());
+        tag.setString("om", ConfigurationHandler.INSTANCE.getInfusionOreDictMode().name());
     }
 
     @Override
@@ -31,6 +33,7 @@ public class MessageSendConfigurationV2 implements IMessage,  IMessageHandler<Me
     @Override
     public IMessage onMessage(MessageSendConfigurationV2 message, MessageContext ctx) {
         NetworkedConfiguration.smallerJar = message.tag.getBoolean("sj");
+        NetworkedConfiguration.infusionOreDictMode = InfusionOreDictMode.get(message.tag.getString("om"));
         return null;
     }
 }
