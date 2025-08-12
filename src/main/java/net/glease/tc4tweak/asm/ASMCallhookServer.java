@@ -419,11 +419,11 @@ public class ASMCallhookServer {
     }
 
     private static boolean hasAspect(TileResearchTable table, EntityPlayerMP player, Aspect aspect) {
-        return hasAspect(player, aspect, 0) || table.bonusAspects.getAmount(aspect) > 0;
+        return hasAspect(player, aspect, 1) || table.bonusAspects.getAmount(aspect) > 0;
     }
 
     private static boolean hasAspect(EntityPlayerMP player, Aspect aspect, int threshold) {
-        return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) > threshold;
+        return Thaumcraft.proxy.playerKnowledge.getAspectPoolFor(player.getCommandSenderName(), aspect) >= threshold;
     }
 
     @Callhook(adder = UtilsVisitor.class, module = ASMConstants.Modules.Bugfix)
