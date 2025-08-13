@@ -5,11 +5,13 @@ import minetweaker.MineTweakerAPI;
 import minetweaker.MineTweakerImplementationAPI;
 import minetweaker.MineTweakerImplementationAPI.ReloadEvent;
 import net.glease.tc4tweak.modules.FlushableCache;
+import net.glease.tc4tweak.modules.infusionRecipe.MTCompatForInfusionExt;
 
 public class MTCompat {
     public static void preInit() {
         MineTweakerImplementationAPI.onReloadEvent(e -> FlushableCache.disableAll());
         MineTweakerImplementationAPI.onPostReload(MTCompat::onPostReload);
+        MineTweakerAPI.registerClass(MTCompatForInfusionExt.class);
     }
 
     private static void onPostReload(ReloadEvent e) {

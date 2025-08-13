@@ -600,7 +600,10 @@ public class ASMCallhookServer {
     }
 
     @Callhook(adder = TileInfusionMatrixVisitor.class, module = ASMConstants.Modules.InfusionEnhance)
-    public static ItemStack modifyInfusionOutput(ItemStack output, InfusionRecipe thiz, ItemStack input) {
-        return InfusionRecipeGetOutput.getOutput(thiz, input, output);
+    public static Object modifyInfusionOutput(Object output, InfusionRecipe thiz, ItemStack input) {
+        if (output instanceof ItemStack) {
+            return InfusionRecipeGetOutput.getOutput(thiz, input, (ItemStack) output);
+        }
+        return output;
     }
 }

@@ -17,6 +17,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import net.glease.tc4tweak.modules.infusionRecipe.InfusionOreDictMode;
 import net.glease.tc4tweak.config.StringOrderingEntry;
 import net.glease.tc4tweak.modules.FlushableCache;
+import net.glease.tc4tweak.modules.infusionRecipe.InfusionRecipeGetOutput;
 import net.glease.tc4tweak.modules.researchBrowser.BrowserPaging;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -50,6 +51,9 @@ public enum ConfigurationHandler {
     private boolean savedLinkDebug;
     private boolean alternativeAddStack;
     private boolean sendSupplementaryS35;
+    private boolean infusionRecipeNBTModifyArmorToolOnly;
+    private boolean infusionRecipeNBTCarryOver;
+    private List<String> infusionRecipeNBTWhitelist =  new ArrayList<>();
 
     private int browserHeight = 230;
     private int browserWidth = 256;
@@ -129,7 +133,7 @@ public enum ConfigurationHandler {
         inferBrowserScaleConsiderSearch = config.getBoolean("considerSearchArea", "client.browser_scale", true, "The search result area, even if it's not disabled, will be considered while inferring browserScale.");
         smallerJars = config.getBoolean("smallerJars", "general", FMLLaunchHandler.side().isServer(), "If true, jars (brain in jar, essentia jars, etc) will have a collision box the same as block outline. Otherwise it will have a collision box of 1x1x1, which is the vanilla tc4 behavior.");
         moreRandomizedLoot = config.getBoolean("moreRandomizedLoot", "general", true, "If true, enchanted books will have randomized enchantment and vis stone will have different vis stored even without server restart.");
-        infusionOreDictMode = InfusionOreDictMode.get(config.getString("infusionOreDictMode", "general", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
+        infusionOreDictMode = InfusionOreDictMode.get(config.getString("oreDictMode", "general.infusion_recipes", infusionOreDictMode.name(), "Select the infusion oredict mode. Default: vanilla TC4 behavior. Strict: all oredict names must match to count as oredict substitute. Relaxed: oredict names needs only overlaps to count as oredict substitute. None: no oredict substitute at all.", Arrays.stream(InfusionOreDictMode.values()).map(Enum::name).toArray(String[]::new)));
         categoryOrder = ImmutableList.copyOf(config.getStringList("categoryOrder", "client", new String[]{"BASICS", "THAUMATURGY", "ALCHEMY", "ARTIFICE", "GOLEMANCY", "ELDRITCH",}, "Specify a full sorting order of research tabs. An empty list here means the feature is disabled. any research tab not listed here will be appended to the end in their original order. Use NEI utility to dump a list of all research tabs. Default is the list of all vanilla thaumcraft tabs."));
         dispenserShootPrimalArrow = config.getBoolean("dispenserShootPrimalArrow", "general", false, "If true, dispenser will shoot primal arrow instead of dropping it into world.");
         addClearButton = config.getBoolean("addClearButton", "client", true, "If true, a button will be shown when there is any amount of tc4 notifications AND when sending chat.");
@@ -142,6 +146,9 @@ public enum ConfigurationHandler {
         savedLinkDebug = config.getBoolean("debug", "general.saved_link", false, "When enabled, print more debug info for this feature. You probably don't want to change this.");
         alternativeAddStack = config.getBoolean("alternativeAddStack", "general", true, "When enabled, using a phial will cause the new stack to be added to current player inventory using an alternative rule that prefers partial stacks and current slot.");
         sendSupplementaryS35 = config.getBoolean("sendSupplementaryS35", "general", true, "When enabled, will try harder at sending server side states for some particular tile entities. Enabling this might leads to very slight bandwidth usage increase, but can fix some rare desync.");
+        infusionRecipeNBTCarryOver = config.getBoolean("enable", "general.infusion_recipes.nbtcarryover", true, "Set to true to enable this feature. Typically, this would carry over enchantments and custom names, but can also carry over stuff like runic shielding");
+        infusionRecipeNBTModifyArmorToolOnly = config.getBoolean("armorToolOnly", "general.infusion_recipes.nbtcarryover", true, "When enabled, will only affect inputs and outputs that are both armor/tools. If you need more custom behavior, then calling TC4Tweaks api via java or ZenScript would become necessary.");
+        infusionRecipeNBTWhitelist = Arrays.asList(config.getStringList("carryOverWhitelist", "general.infusion_recipes.nbtcarryover", new String[0], "When not empty, will only carry over named NBT values."));
 
         String[][] championMods = new String[][]{
                 {"a62bef38-48cc-42a6-ac5e-ef913841c4fd", "Champion health buff", "Champion health buff. Plain add.",},
@@ -169,7 +176,9 @@ public enum ConfigurationHandler {
             this.championMods.put(UUID.fromString(championMods[i][0]), p.getDouble());
         }
         config.getCategory("general.champion_mods").setComment("Tweak the stat buffs applied to champion mobs. Do note that those boss buffs can stack. If 5 player is present then all of DAMAGE BUFF 1 to DAMAGE BUFF 5 will be applied!");
-        config.getCategory("general.saved_link").setComment("Persist the parents of vis relays into save file and use it as a hint for ");
+        config.getCategory("general.saved_link").setComment("Persist the parents of vis relays into save file and use it as a hint when it is loaded back to memory.");
+        config.getCategory("general.infusion_recipes").setComment("Tweak how TC4Tweaks changes the behavior of infusion recipes.");
+        config.getCategory("general.infusion_recipes.nbtcarryover").setComment("Tweak how TC4Tweaks make NBT tags present on center item to be carried over to output item.");
 
         // validation
         if (inferBrowserScaleLowerBound > inferBrowserScaleUpperBound)
@@ -179,6 +188,7 @@ public enum ConfigurationHandler {
         browserHeight = (int) (browserScale * 230);
         // it has been proven that the lack of this mod on client side is not a concern at all, for now
         TC4Tweak.INSTANCE.setAllowAll(true);
+        InfusionRecipeGetOutput.reload();
         if (send) {
             TC4Tweak.INSTANCE.detectAndSendConfigChanges();
             BrowserPaging.flushCache();
@@ -320,6 +330,18 @@ public enum ConfigurationHandler {
 
     public boolean isSendSupplementaryS35() {
         return sendSupplementaryS35;
+    }
+
+    public List<String> getInfusionRecipeNBTWhitelist() {
+        return infusionRecipeNBTWhitelist;
+    }
+
+    public boolean isInfusionRecipeNBTModifyArmorToolOnly() {
+        return infusionRecipeNBTModifyArmorToolOnly;
+    }
+
+    public boolean isInfusionRecipeNBTCarryOver() {
+        return infusionRecipeNBTCarryOver;
     }
 
     public enum CompletionCounterStyle {

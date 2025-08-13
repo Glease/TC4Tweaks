@@ -48,6 +48,13 @@ enum ConfigurationVersion {
                 c.renameProperty("client.browser_scale", name.getKey(), name.getValue());
             }
         }
+    },
+    V3 {
+        @Override
+        protected void step(Configuration c) {
+            c.moveProperty("general", "infusionOreDictMode", "general.infusion_recipes");
+            c.renameProperty("general.infusion_recipes", "infusionOreDictMode", "oreDictMode");
+        }
     };
 
     private static final ConfigurationVersion[] VALUES = values();
@@ -64,6 +71,7 @@ enum ConfigurationVersion {
 
     public static void migrateToLatest(Configuration c) {
         for (int i = identify(c).ordinal() + 1; i < VALUES.length; i++) {
+            TC4Tweak.log.info("Migrating config to {}", VALUES[i].getVersionMarker());
             VALUES[i].step(c);
         }
     }

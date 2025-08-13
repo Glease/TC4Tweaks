@@ -1,7 +1,10 @@
 package net.glease.tc4tweak.modules.infusionRecipe;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.WeakHashMap;
 
+import net.glease.tc4tweak.ConfigurationHandler;
 import net.glease.tc4tweak.api.InfusionExtAPI;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -24,24 +27,33 @@ public class InfusionRecipeGetOutput {
             return false;
         }
     };
-    private static final WeakHashMap<InfusionRecipe, InfusionExtAPI.RecipeNBTBehavior> overrides = new WeakHashMap<>();
-    private static final InfusionExtAPI.RecipeNBTBehavior MERGER = InfusionExtAPI.RecipeNBTBehavior.mergeNBT();
+    static final WeakHashMap<InfusionRecipe, InfusionExtAPI.RecipeNBTBehavior> overrides = new WeakHashMap<>();
+    private static InfusionExtAPI.RecipeNBTBehavior MERGER;
 
-    public static boolean shouldModify(InfusionRecipe recipe, ItemStack input) {
+    static {
+        reload();
+    }
+
+    public static boolean shouldModify(InfusionRecipe recipe, ItemStack input, ItemStack output) {
+        if (!ConfigurationHandler.INSTANCE.isInfusionRecipeNBTCarryOver()) {
+            return false;
+        }
         // if it ever overrides getRecipeOutput(), we'd assume it's doing something special
         // and we will allow its logic to take precedence
         if (CLASS_OVERRIDES_GETRECIPEOUTPUT.get(recipe.getClass())) {
             return false;
         }
-        if (armorToolOnly()) { // config
-            Item item = input.getItem();
-            return item instanceof ItemArmor || !item.getToolClasses(input).isEmpty();
+        if (ConfigurationHandler.INSTANCE.isInfusionRecipeNBTModifyArmorToolOnly()) { // config
+            if (!isArmorOrTool(input) || !isArmorOrTool(output)) {
+                return false;
+            }
         }
         return input.hasTagCompound() && !input.getTagCompound().hasNoTags();
     }
 
-    private static boolean armorToolOnly() {
-        return true;
+    private static boolean isArmorOrTool(ItemStack input) {
+        Item item = input.getItem();
+        return item instanceof ItemArmor || !item.getToolClasses(input).isEmpty();
     }
 
     public static ItemStack getOutput(InfusionRecipe thiz, ItemStack input, ItemStack output) {
@@ -49,11 +61,18 @@ public class InfusionRecipeGetOutput {
         if (overridingBehavior != null) {
             return overridingBehavior.getRecipeOutput(thiz, input, output);
         }
-        if (!shouldModify(thiz, input)) {
+        if (!shouldModify(thiz, input, output)) {
             return output;
         }
         // or maybe use a whitelist config
         return MERGER.getRecipeOutput(thiz, input, output);
+    }
+
+    public static void reload() {
+        // while this is not used in client mode, we have no idea whether we will run a SP server later on, so we just
+        // unconditionally refresh the merger instance
+        List<String> whitelist = ConfigurationHandler.INSTANCE.getInfusionRecipeNBTWhitelist();
+        MERGER = InfusionExtAPI.RecipeNBTBehavior.mergeNBT(whitelist.isEmpty() ? null : new HashSet<>(whitelist));
     }
 
     public static class APIImpl implements InfusionExtAPI {
