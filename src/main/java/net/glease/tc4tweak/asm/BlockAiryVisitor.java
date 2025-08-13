@@ -17,7 +17,7 @@ class BlockAiryVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("func_149670_a".equals(name) || "onEntityCollidedWithBlock".equals(name)) {
-            log.debug("Transforming {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new OnEntityCollidedWithBlockVisitor(BlockAiryVisitor.this.api, mv);
         }
         return mv;

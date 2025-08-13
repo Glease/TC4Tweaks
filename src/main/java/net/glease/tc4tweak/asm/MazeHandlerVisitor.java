@@ -36,13 +36,13 @@ class MazeHandlerVisitor extends ClassVisitor {
             ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, "writeMazeToNBT", mv, null, desc);
             return null;
         } else if (mutators.contains(name)) {
-            log.debug("Transforming {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new MarkDirtyMethodVisitor(mv);
         } else if ("loadMaze".equals(name)) {
-            log.debug("Transforming {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new ResetDirtyMethodVisitor(mv, Type.getReturnType(desc).getOpcode(Opcodes.IRETURN));
         } else if ("saveMaze".equals(name)) {
-            log.debug("Transforming {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new SaveMazeMethodVisitor(mv);
         }
         return mv;

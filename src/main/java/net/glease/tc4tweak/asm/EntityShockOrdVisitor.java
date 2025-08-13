@@ -17,7 +17,7 @@ public class EntityShockOrdVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("onImpact".equals(name) || "func_70184_a".equals(name)) {
-            log.debug("Transforming {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new OnImpactVisitor(api, mv);
         }
         return mv;

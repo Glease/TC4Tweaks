@@ -18,7 +18,7 @@ class ItemWandCastingVisitor extends ClassVisitor {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((("getFocus".equals(name) && "(Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/wands/ItemFocusBasic;".equals(desc))) ||
                 ("getFocusItem".equals(name) && "(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;".equals(desc))) {
-            log.debug("Visiting method {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new LoadItemStackNullCheckVisitor(api, mv);
         } else {
             return mv;

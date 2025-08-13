@@ -38,7 +38,7 @@ class HashCodeVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("hashCode") && desc.equals("()I")) {
-            log.debug("Replacing {}#hashCode()I", className);
+            log.debug("Replacing hashCode()I");
             ASMUtils.writeOverwrite(ASMCALLHOOKSERVER_INTERNAL_NAME, targetName, mv, className, desc);
             visited = true;
             return null;

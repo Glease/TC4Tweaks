@@ -25,7 +25,7 @@ class MappingThreadVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("run") && desc.equals("()V")) {
-            log.debug("Visiting method run()V");
+            log.debug("Visiting run()V");
             return new RunVisitor(api, mv);
         } else {
             return mv;

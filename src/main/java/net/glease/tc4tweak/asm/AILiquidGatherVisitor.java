@@ -1,6 +1,7 @@
 package net.glease.tc4tweak.asm;
 
 import java.lang.invoke.MethodHandle;
+import java.util.Map;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -14,6 +15,10 @@ import static org.objectweb.asm.Opcodes.*;
 class AILiquidGatherVisitor extends ClassVisitor {
 
     private static final String MH_CTOR = "tc4tweaks$a";
+    public static final int MH_INITIALIZER_MAX_STACK = 7;
+    public static final int MH_INITIALIZER_MAX_LOCALS = 1;
+
+    private boolean mhInitialized = false;
 
     public AILiquidGatherVisitor(int api, ClassVisitor cv) {
         super(api, cv);
@@ -23,9 +28,20 @@ class AILiquidGatherVisitor extends ClassVisitor {
     public void visitEnd() {
         log.debug("Adding MethodHandle field {}", MH_CTOR);
         visitField(ACC_PRIVATE | ACC_STATIC | ACC_FINAL, MH_CTOR, Type.getDescriptor(MethodHandle.class), null, null).visitEnd();
-        log.debug("Adding MethodHandle initializer by adding a <clinit>");
-        MethodVisitor mv = visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
-        mv.visitCode();
+        if (mhInitialized) {
+            log.debug("Not adding <clinit> since one is present already");
+        } else {
+            log.debug("Adding MethodHandle initializer by adding a <clinit>");
+            MethodVisitor mv = visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
+            mv.visitCode();
+            writeMHInitializer(mv);
+            mv.visitMaxs(MH_INITIALIZER_MAX_STACK, MH_INITIALIZER_MAX_LOCALS);
+            mv.visitEnd();
+        }
+        super.visitEnd();
+    }
+
+    private static void writeMHInitializer(MethodVisitor mv) {
         // this method handle is the handle to construct the inner class
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;", false);
         mv.visitLdcInsn(Type.getObjectType("thaumcraft/common/entities/ai/fluid/AILiquidGather$SourceBlock"));
@@ -53,18 +69,18 @@ class AILiquidGatherVisitor extends ClassVisitor {
         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandle", "asType", "(Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", false);
         mv.visitFieldInsn(PUTSTATIC, "thaumcraft/common/entities/ai/fluid/AILiquidGather", MH_CTOR, "Ljava/lang/invoke/MethodHandle;");
         mv.visitInsn(RETURN);
-        mv.visitMaxs(7, 1);
-        mv.visitEnd();
-
-        super.visitEnd();
     }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("rebuildQueue")) {
-            log.debug("Visiting {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new RebuildQueueVisitor(api, mv);
+        } else if (name.equals("<clinit>") && desc.equals("()V")) {
+            log.debug("Visiting {}{}", name, desc);
+            mhInitialized = true;
+            return new ClinitVisitor(api, mv);
         }
         return mv;
     }
@@ -84,6 +100,24 @@ class AILiquidGatherVisitor extends ClassVisitor {
             } else {
                 super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
+        }
+    }
+
+    private static class ClinitVisitor extends MethodVisitor {
+        public ClinitVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+        @Override
+        public void visitCode() {
+            super.visitCode();
+            log.trace("Adding method handler initializer");
+            writeMHInitializer(mv);
+        }
+
+        @Override
+        public void visitMaxs(int maxStack, int maxLocals) {
+            super.visitMaxs(Math.max(maxStack, MH_INITIALIZER_MAX_STACK), Math.max(maxLocals, MH_INITIALIZER_MAX_LOCALS));
         }
     }
 }

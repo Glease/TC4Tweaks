@@ -20,7 +20,7 @@ class TESRGetBlockTypeNullSafetyVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((name.equals("renderTileEntityAt") || name.equals("func_147500_a")) && desc.equals("(Lnet/minecraft/tileentity/TileEntity;DDDF)V")) {
-            log.debug("Visiting {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new RenderTileEntityAtVisitor(api, mv);
         }
         return mv;

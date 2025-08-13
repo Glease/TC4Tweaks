@@ -17,7 +17,7 @@ class BlockJarVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals(dev ? "onBlockActivated" : "func_149727_a")) {
-            log.debug("Modifying {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new MethodVisitor(api, mv) {
                 @Override
                 public void visitFieldInsn(int opcode, String owner, String name, String desc) {
@@ -35,7 +35,7 @@ class BlockJarVisitor extends ClassVisitor {
                 }
             };
         } else if (name.equals(dev ? "addCollisionBoxesToList" : "func_149743_a")) {
-            log.debug("Modifying {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new MethodVisitor(api, mv) {
                 private int visited = 0;
 

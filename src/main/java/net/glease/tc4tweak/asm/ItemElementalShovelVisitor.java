@@ -17,7 +17,7 @@ class ItemElementalShovelVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals(dev ? "onItemUse" : "func_77648_a")) {
-            log.debug("Modifying {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new OnItemUseVisitor(mv);
         }
         return mv;

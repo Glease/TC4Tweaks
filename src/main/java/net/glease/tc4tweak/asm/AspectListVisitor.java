@@ -16,7 +16,7 @@ class AspectListVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("add") && desc.equals("(Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;")) {
-            log.debug("Visiting {}#{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new AddVisitor(api, mv);
         }
         return mv;

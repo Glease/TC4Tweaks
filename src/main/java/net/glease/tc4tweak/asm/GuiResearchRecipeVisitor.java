@@ -15,10 +15,12 @@ class GuiResearchRecipeVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (("putToCache".equals(name) && "(ILnet/minecraft/item/ItemStack;)V".equals(desc))) {
-            log.debug("Removing ACC_SYNCHRONIZED from putToCache");
+            log.debug("Visiting {}{}", name, desc);
+            log.debug("Removing ACC_SYNCHRONIZED");
             return super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions);
         } else if ("getFromCache".equals(name) && "(I)Lnet/minecraft/item/ItemStack;".equals(desc)) {
-            log.debug("Removing ACC_SYNCHRONIZED from getFromCache");
+            log.debug("Visiting {}{}", name, desc);
+            log.debug("Removing ACC_SYNCHRONIZED");
             return new GetFromCacheVisitor(api, super.visitMethod(access & ~ACC_SYNCHRONIZED, name, desc, signature, exceptions));
         } else {
             return super.visitMethod(access, name, desc, signature, exceptions);

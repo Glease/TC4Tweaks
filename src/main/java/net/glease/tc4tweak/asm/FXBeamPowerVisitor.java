@@ -17,7 +17,7 @@ public class FXBeamPowerVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("func_70539_a") || name.equals("renderParticle") || name.equals("renderFlare")) {
-            log.debug("Visiting {}#{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new AddEnableBlendVisitor(api, mv);
         }
         return mv;

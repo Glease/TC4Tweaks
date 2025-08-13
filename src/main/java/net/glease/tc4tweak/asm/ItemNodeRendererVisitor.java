@@ -15,7 +15,7 @@ class ItemNodeRendererVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals("renderItemNode")) {
-            log.debug("Visiting renderNode");
+            log.debug("Visiting {}{}", name, desc);
             return new RenderNodeVisitor(api, mv);
         }
         return mv;

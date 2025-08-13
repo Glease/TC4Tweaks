@@ -18,7 +18,7 @@ class BlockMetalDeviceVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ((dev ? "onBlockActivated" : "func_149727_a").equals(name)) {
-            log.debug("Modifying {}", name);
+            log.debug("Visiting {}{}", name, desc);
             return new MethodVisitor(api, mv) {
                 private boolean visited = false;
 

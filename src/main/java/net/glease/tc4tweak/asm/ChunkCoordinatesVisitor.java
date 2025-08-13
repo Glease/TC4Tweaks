@@ -6,6 +6,8 @@ import org.objectweb.asm.MethodVisitor;
 import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.*;
 
+// this fix is included so in dev env without hodgepodge decanting core does not take multiple second to compute, which
+// uses a hash set of ChunkCoordinates
 class ChunkCoordinatesVisitor extends ClassVisitor {
 
     private String className;
@@ -21,8 +23,8 @@ class ChunkCoordinatesVisitor extends ClassVisitor {
                 if (super.isInactive()) return true;
                 if (ASMUtils.isHodgepodgeFixActive("speedups", "speedupChunkCoordinatesHashCode", true)) {
                     // technically not really stolen
-                    // I was among the discussion on this
-                    // and the multiply factors are stolen from ChunkPosition
+                    // I was among the discussion when hodgepodge's patch was made
+                    // the multiply factors in hashCode impl are stolen from ChunkPosition
                     log.warn("Disabling TC4Tweaks's stolen ChunkCoordinates hashCode fix to prevent conflict with hodgepodge.");
                     return true;
                 }
@@ -41,6 +43,7 @@ class ChunkCoordinatesVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if ("hashCode".equals(name)) {
+            log.debug("Overwriting {}{}", name, desc);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, className, "posX", "I");

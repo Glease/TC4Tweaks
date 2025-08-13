@@ -31,7 +31,7 @@ class BlockMagicalLeavesVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if (name.equals("func_149674_a") || name.equals("updateTick")) {
-            TC4Transformer.log.debug("Visiting {}{}", name, desc);
+            log.debug("Visiting {}{}", name, desc);
             return new MethodVisitor(api, super.visitMethod(access, name, desc, signature, exceptions)) {
                 private boolean foundNeedle;
                 @Override
@@ -39,14 +39,14 @@ class BlockMagicalLeavesVisitor extends ClassVisitor {
                     super.visitLineNumber(line, start);
                     if (line == 292) {
                         foundNeedle = true;
-                        TC4Transformer.log.trace("Found needle: Line 292");
+                        log.trace("Found needle: Line 292");
                     }
                 }
 
                 @Override
                 public void visitVarInsn(int opcode, int var) {
                     if (foundNeedle && opcode == ALOAD && var == 0) {
-                        TC4Transformer.log.trace("Removing ALOAD_0");
+                        log.trace("Removing ALOAD_0");
                         return;
                     }
                     super.visitVarInsn(opcode, var);
@@ -62,7 +62,7 @@ class BlockMagicalLeavesVisitor extends ClassVisitor {
                         } else {
                             realName = "setBlockMetadataWithNotify";
                         }
-                        TC4Transformer.log.debug("Replaced call {}#{}{} to {}#{}{}", owner, name, desc, owner, realName, realDesc);
+                        log.debug("Replacing call {}#{}{} to {}#{}{}", owner, name, desc, owner, realName, realDesc);
                         foundNeedle = false;
                     }
                     super.visitMethodInsn(opcode, owner, realName, realDesc, itf);

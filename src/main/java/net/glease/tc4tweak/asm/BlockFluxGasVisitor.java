@@ -21,14 +21,14 @@ class BlockFluxGasVisitor extends ClassVisitor {
 
     @Override
     public void visitEnd() {
-        log.debug("Adding canDrain to {}", className);
+        log.debug("Adding canDrain(Lnet/minecraft/world/World;III)Z to {}", className);
         MethodVisitor mv = super.visitMethod(ACC_PUBLIC, "canDrain", "(Lnet/minecraft/world/World;III)Z", null, null);
         mv.visitCode();
         mv.visitInsn(ICONST_0);
         mv.visitInsn(IRETURN);
         mv.visitMaxs(1, 5);
         mv.visitEnd();
-        log.debug("Adding drain to {}", className);
+        log.debug("Adding drain(Lnet/minecraft/world/World;IIIZ)Lnet/minecraftforge/fluids/FluidStack; to {}", className);
         mv = super.visitMethod(ACC_PUBLIC, "drain", "(Lnet/minecraft/world/World;IIIZ)Lnet/minecraftforge/fluids/FluidStack;", null, null);
         mv.visitCode();
         mv.visitInsn(ACONST_NULL);

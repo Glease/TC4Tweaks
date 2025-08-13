@@ -5,6 +5,7 @@ import org.objectweb.asm.MethodVisitor;
 import static net.glease.tc4tweak.asm.ASMConstants.ASMCALLHOOKSERVER_INTERNAL_NAME;
 import static net.glease.tc4tweak.asm.ASMUtils.writeRedirect;
 import static net.glease.tc4tweak.asm.LoadingPlugin.dev;
+import static net.glease.tc4tweak.asm.TC4Transformer.log;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
 class BetterAddItemStackToInventoryVisitor extends MethodVisitor {

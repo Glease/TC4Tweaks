@@ -23,7 +23,7 @@ class NodeLikeRendererVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals(target)) {
-            log.debug("Visiting {}", target);
+            log.debug("Visiting {}{}", name, desc);
             return new RenderNodeVisitor(api, mv);
         }
         return mv;

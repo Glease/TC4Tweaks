@@ -18,18 +18,24 @@ class TileHoleVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         if (name.equals(dev ? "getDescriptionPacket" : "func_145844_m")) {
-            log.debug("Modifying {}", name);
-            return new MethodVisitor(api, mv) {
-                @Override
-                public void visitInsn(int opcode) {
-                    if (opcode == ARETURN) {
-                        log.trace("Modifying return value");
-                        mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "createTileHoleSyncPacket", "(Lnet/minecraft/network/play/server/S35PacketUpdateTileEntity;)Lnet/minecraft/network/Packet;", false);
-                    }
-                    super.visitInsn(opcode);
-                }
-            };
+            log.debug("Visiting {}{}", name, desc);
+            return new GetDescriptionPacketVisitor(api, mv);
         }
         return mv;
+    }
+
+    private static class GetDescriptionPacketVisitor extends MethodVisitor {
+        public GetDescriptionPacketVisitor(int api, MethodVisitor mv) {
+            super(api, mv);
+        }
+
+        @Override
+        public void visitInsn(int opcode) {
+            if (opcode == ARETURN) {
+                log.trace("Modifying return value");
+                mv.visitMethodInsn(INVOKESTATIC, ASMCALLHOOKSERVER_INTERNAL_NAME, "createTileHoleSyncPacket", "(Lnet/minecraft/network/play/server/S35PacketUpdateTileEntity;)Lnet/minecraft/network/Packet;", false);
+            }
+            super.visitInsn(opcode);
+        }
     }
 }
