@@ -152,12 +152,13 @@ dependencies {
     implementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
     devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev"
     compileOnly "MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-3.0.11.23"
-    recipeLib("net.glease:tc4recipelib:${version}:dev") {
+    recipeLib("net.glease:tc4recipelib:${project.findProperty("version.tc4recipelib")}:dev") {
         transitive = false
     }
     // gradle is very unsure what to do in artifact views when we manually specified :dev classifier and this appears to
     // be the easiest way out
-    recipeLibSrc("net.glease:tc4recipelib:${version}:sources") {
+    // not to mention artifact view is really only useable in gradle 7
+    recipeLibSrc("net.glease:tc4recipelib:${project.findProperty("version.tc4recipelib")}:sources") {
         transitive = false
     }
 }
