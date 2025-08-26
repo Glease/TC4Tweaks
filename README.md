@@ -7,6 +7,9 @@ A mod that adds a bit of functionality, a bit of performance and a bit of robust
 This project is hosted at https://maven.glease.net/repos/releases/. 
 Snapshot releases are also available at https://maven.glease.net/repos/snapshots/.
 
+NOTE: This maven does not have sufficient bandwidth for distribution of the mod to end user.
+Please only use it as part of your development cycle or CI workflow. 
+
 ## API
 
 The API of TC4Tweaks is available as a separate jar download both on maven and on mod distribution sites such as curseforge.
