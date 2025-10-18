@@ -141,6 +141,7 @@ public class ASMCallhook {
      */
     @Callhook(adder = NodeLikeRendererVisitor.class, module = ASMConstants.Modules.NodeRenderUpperLimit)
     public static void renderFacingStrip(double px, double py, double pz, float angle, float scale, float alpha, int frames, int strip, int frame, float partialTicks, int color) {
+        if (scale < 0) scale = 0F;  // stupid industrial apiary
         UtilsFX.renderFacingStrip(px, py, pz, angle, Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, frame, partialTicks, color);
     }
 
@@ -150,6 +151,7 @@ public class ASMCallhook {
      */
     @Callhook(adder = ItemNodeRendererVisitor.class, module = ASMConstants.Modules.NodeRenderUpperLimit)
     public static void renderAnimatedQuadStrip(float scale, float alpha, int frames, int strip, int cframe, float partialTicks, int color) {
+        if (scale < 0) scale = 0F;  // stupid industrial apiary
         UtilsFX.renderAnimatedQuadStrip(Math.min(scale, ConfigurationHandler.INSTANCE.getNodeVisualSizeLimit()), alpha, frames, strip, cframe, partialTicks, color);
     }
 
