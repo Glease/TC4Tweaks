@@ -65,6 +65,21 @@ public class LoadingPlugin implements IFMLLoadingPlugin {
             log.error("#################################################################################");
             throw new RuntimeException(errorMessage);
         }
+        if (((List<?>) data.get("coremodList")).stream().anyMatch(o -> o.toString().contains("Thaumic Fixer"))) {
+            String errorMessage = "Remove ThaumicFixer. TC4Tweaks has roughly the same functionality and is incompatible with it.";
+            if (!GraphicsEnvironment.isHeadless())
+                JOptionPane.showMessageDialog(null, errorMessage);
+            log.error("#################################################################################");
+            log.error("#################################################################################");
+            log.error("#################################################################################");
+            log.error(errorMessage);
+            log.error(errorMessage);
+            log.error(errorMessage);
+            log.error("#################################################################################");
+            log.error("#################################################################################");
+            log.error("#################################################################################");
+            throw new RuntimeException(errorMessage);
+        }
         if (isDebug()) getDebugOutputDir();
         // mixingasm (or mods that include it) compat
         markTransformersSafe(data);
