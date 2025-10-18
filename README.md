@@ -45,7 +45,7 @@ See [COPYING](./COPYING).
 
 ### If you wish to upload to curseforge
 
-If this repo is archived, or you cannot reach me via GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c)
+If this repo is archived, or you cannot reach me via any of the GitHub Issues, [this discord server](https://discord.gg/EdVX8Srm2c)
 or email within 90 full days, you can safely assume I have give up maintaining this mod. 
 If I'm no longer maintaining this mod, and you happen to find an opportunity to improve it, you can create a fork of this
 mod and *upload it to curseforge under a different name*,
@@ -95,7 +95,7 @@ Monumental features falls in the category of item 4, thus bypassing the above re
 
 ### Thaumic Fixer
 
-Not compatible. It's compiled using an ancient version of thaumcraft (yes ancient even by 1.7.10 standards).
+Not compatible. It has similar functionality and thus modify similar files, resulting a hard conflict.
 
 ### NotEnoughThaumcraftTabs
 
@@ -103,24 +103,29 @@ Not compatible. This mod supersedes that mod anyway.
 
 ### WitchingGadgets
 
+Has explicit compatibility code.
 Takes over the WG thaumonomicon index search functionality, to change where its stuff got drawn on higher browser scale.
 
 ### Minetweaker 3
 
-Any kind of reload will invalidate any cache used
+Has explicit compatibility code.
+Any kind of reload will invalidate any cache used by TC4Tweaks
 
 ### Gregtech 6
 
+Has explicit compatibility code.
 My quick and dirty patch of `generateItemHash()` will disable itself when GT6 is detected.
 
 ### Other stuff
 
 The mod is tested under the following two configurations:
-1. GTNH latest dev pack
+1. GTNH latest (up to 2.7.3 as of writing)
 2. Only this mod and latest thaumcraft 4.
 
+Additionally, this mod comes by default in GTNH, so you can assume it to be compatible anyway. 
+
 I used to install GT6 into my test env, but that slows down client down too much and is hampering my development speed.
-Therefore, the compatibility with it would no longer comes as guarenteed.
+Therefore, the compatibility with it would no longer comes as guaranteed.
 However, I do wish to fix any future incompatibility if any more of these happens.
 
 Other mod combination should also work but is not guaranteed.

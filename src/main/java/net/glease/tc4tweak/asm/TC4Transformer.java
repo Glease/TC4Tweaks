@@ -64,6 +64,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.client.renderers.tile.TileNodeConverterRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileNodeStabilizerRenderer", TESRGetBlockTypeNullSafetyVisitor.FACTORY)
             .put("thaumcraft.client.renderers.tile.TileNodeRenderer", NodeLikeRendererVisitor.createFactory("renderNode"))
+            .put("thaumcraft.client.renderers.tile.TileRunicMatrixRenderer", new TransformerFactory(TileRunicMatrixRendererVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.TileThaumatoriumRenderer", new TransformerFactory(TileThaumatoriumRendererVisitor::new, Side.CLIENT))
             .put("thaumcraft.client.renderers.tile.ItemNodeRenderer", new TransformerFactory(ItemNodeRendererVisitor::new, Side.CLIENT))
             .put("thaumcraft.common.tiles.TileMagicWorkbench", new TransformerFactory(TileMagicWorkbenchVisitor::new, Side.CLIENT))

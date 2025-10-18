@@ -241,4 +241,14 @@ public class ASMCallhook {
             return null;
         }
     }
+
+    @Callhook(adder = TileRunicMatrixRendererVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static float infusionMatrixLimitInstability(float instability) {
+        float maxDrift = ConfigurationHandler.INSTANCE.getInfusionMatrixLimitDrift();
+        if (instability < -maxDrift)
+            return -maxDrift;
+        else if (instability > maxDrift)
+            return maxDrift;
+        return instability;
+    }
 }
