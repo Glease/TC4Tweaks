@@ -120,7 +120,9 @@ public class SavedLinkHandler {
             return null;
         }
         NBTTagList linkRaw = tag.getTagList("Link", Constants.NBT.TAG_COMPOUND);
-        log.trace("Reading link for node {} at {},{},{}. {} nodes.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, linkRaw.tagCount());
+        if (ConfigurationHandler.INSTANCE.isSavedLinkDebugEnabled()) {
+            log.trace("Reading link for node {} at {},{},{}. {} nodes.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, linkRaw.tagCount());
+        }
         List<ChunkCoordinates> link = new ArrayList<>();
         int end = Math.min(linkRaw.tagCount(), 2);
         for (int i = 0; i < end; i++) {
@@ -144,7 +146,9 @@ public class SavedLinkHandler {
             node = CommonUtils.deref(node.getParent());
         }
         tag.setTag("Link", path);
-        log.trace("Written link for node {} at {},{},{}. {} element.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, path.tagCount());
+        if (ConfigurationHandler.INSTANCE.isSavedLinkDebugEnabled()) {
+            log.trace("Written link for node {} at {},{},{}. {} element.", getNodeType(thiz), thiz.xCoord, thiz.yCoord, thiz.zCoord, path.tagCount());
+        }
     }
 
     private static NBTTagCompound writeOne(TileVisNode node) {
