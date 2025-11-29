@@ -382,6 +382,8 @@ public class ASMCallhookServer {
     public static boolean sanityPlayerComplete(PacketPlayerCompleteToServerAccess packet, MessageContext ctx) {
         if (packet.type() != 0) return true;
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+        // skip check for creative players. salis is using these to implement legit features for creative players
+        if (playerEntity.capabilities.isCreativeMode) return true;
         ResearchItem research = packet.research();
         if (research == null) return false;
         boolean secondary = isSecondaryResearch(research);
@@ -403,9 +405,11 @@ public class ASMCallhookServer {
 
     @Callhook(adder = PacketAspectCombinationToServerVisitor.class, module = ASMConstants.Modules.ExploitFix)
     public static boolean sanityCheckAspectCombination(PacketAspectCombinationToServerAccess packet, MessageContext ctx) {
+        EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+        // skip check for creative players. salis is using these to implement legit features for creative players
+        if (playerEntity.capabilities.isCreativeMode) return true;
         if (sanityCheckAspectCombination0(packet))
             return true;
-        EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
         log.info(securityMarker, "Player {} sent suspicious packet to get more aspects", playerEntity.getGameProfile());
         return false;
     }
