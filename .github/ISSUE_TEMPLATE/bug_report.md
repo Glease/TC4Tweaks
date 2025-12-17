@@ -24,7 +24,9 @@ Steps to reproduce the behavior:
 Your issue will not be considered until you added this section back.
 
 ## Expected behavior
-A clear and concise description of what you expected to happen.
+A clear and concise description of what you expected to happen. If this is a crash, just say
+
+don't crash
 
 ## Screenshots/Screencast
 If applicable, add screenshots or short videos to help explain your problem.
@@ -32,6 +34,12 @@ If applicable, add screenshots or short videos to help explain your problem.
 ## Crash Report
 
 If applicable, add crashreport via https://pastebin.com/, https://paste.ee/ or any similiar website.
+
+## List of TC4 addons used
+
+If using a modpack on curseforge/technic, you can link to it here directly
+
+Otherwise, please provide a full list of TC4 related mods you are using
 
 ## Additional context
 Add any other context about the problem here.
