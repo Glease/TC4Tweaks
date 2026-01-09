@@ -80,6 +80,7 @@ public class TC4Transformer implements IClassTransformer {
             .put("thaumcraft.common.container.ContainerArcaneWorkbench", new TransformerFactory(ContainerArcaneWorkbenchVisitor::new))
             .put("thaumcraft.common.entities.ai.fluid.AILiquidGather", new TransformerFactory(AILiquidGatherVisitor::new))
             .put("thaumcraft.common.entities.ai.inventory.AIItemPickup", new TransformerFactory(AIItemPickupVisitor::new))
+            .put("thaumcraft.common.entities.ai.interact.AIHarvestCrops", new TransformerFactory(AIHarvestCropsVisitor::new))
             .put("thaumcraft.common.entities.golems.EntityGolemBase", new TransformerFactory(EntityGolemBaseVisitor::new))
             .put("thaumcraft.common.entities.golems.ItemGolemBell", ReadMarkerNoCastVisitor.createFactory("getMarkers", "(Lnet/minecraft/item/ItemStack;)Ljava/util/ArrayList;"))
             .put("thaumcraft.common.entities.projectile.EntityShockOrb", new TransformerFactory(EntityShockOrdVisitor::new))
