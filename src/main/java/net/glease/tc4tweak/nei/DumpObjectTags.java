@@ -22,7 +22,7 @@ public class DumpObjectTags extends TC4TweaksDataDump {
                 .filter(e -> e.getKey().getItem() != null && e.getValue() != null)
                 .map(e -> new String[]{
                         safeGetDisplayName(e.getKey()),
-                        e.getKey().getUnlocalizedName(),
+                        safeGetUnlocalizedName(e.getKey()),
                         String.valueOf(Item.getIdFromItem(e.getKey().getItem())),
                         String.valueOf(Items.feather.getDamage(e.getKey())),
                         CommonUtils.toString(e.getValue())
@@ -32,6 +32,14 @@ public class DumpObjectTags extends TC4TweaksDataDump {
     private static String safeGetDisplayName(ItemStack is) {
         try {
             return is.getDisplayName();
+        } catch (Exception e) {
+            return "~~ERROR~~";
+        }
+    }
+
+    private static String safeGetUnlocalizedName(ItemStack is) {
+        try {
+            return is.getUnlocalizedName();
         } catch (Exception e) {
             return "~~ERROR~~";
         }
