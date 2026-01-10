@@ -24,6 +24,7 @@ import net.glease.tc4tweak.modules.findRecipes.FindRecipes;
 import net.glease.tc4tweak.modules.generateItemHash.GenerateItemHash;
 import net.glease.tc4tweak.modules.getResearch.GetResearch;
 import net.glease.tc4tweak.modules.infusionRecipe.InfusionRecipeGetOutput;
+import net.glease.tc4tweak.modules.manaBean.GolemPlantManaBeanFix;
 import net.glease.tc4tweak.modules.objectTag.GetObjectTags;
 import net.glease.tc4tweak.modules.visrelay.SavedLinkHandler;
 import net.glease.tc4tweak.network.NetworkedConfiguration;
@@ -609,5 +610,15 @@ public class ASMCallhookServer {
             return InfusionRecipeGetOutput.getOutput(thiz, input, (ItemStack) output);
         }
         return output;
+    }
+
+    @Callhook(adder = AIHarvestCropsVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static void saveManaBeanType(World world, int x, int y, int z) {
+        GolemPlantManaBeanFix.saveManaBeanType(world, x, y, z);
+    }
+
+    @Callhook(adder = AIHarvestCropsVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static boolean isBadManaBean(Entity entity) {
+        return GolemPlantManaBeanFix.isBadManaBean(entity);
     }
 }
