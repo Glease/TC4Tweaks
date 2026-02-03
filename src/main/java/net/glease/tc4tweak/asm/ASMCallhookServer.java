@@ -1,5 +1,6 @@
 package net.glease.tc4tweak.asm;
 
+import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
@@ -79,6 +80,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.ai.fluid.AILiquidGather;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileResearchTable;
@@ -620,5 +622,27 @@ public class ASMCallhookServer {
     @Callhook(adder = AIHarvestCropsVisitor.class, module = ASMConstants.Modules.Bugfix)
     public static boolean isBadManaBean(Entity entity) {
         return GolemPlantManaBeanFix.isBadManaBean(entity);
+    }
+
+    /*
+     * Apparently there are many iterations of TC4 save file naming.
+     * The first iteration (judging from comments, pre 1710??) is in World/players/playerName.thaum
+     * The second iteration moves to a forge supplied name, basically World/players/UUID.thaum
+     * The last iteration moves back to playerName.thaum, presumably due to playername-uuid mapping is not immutable,
+     * and the TC4 api ask for a playername not UUID.
+     *
+     * Because obviously no one would be moving a pre 1710 tc4 save to 1710 nowadays, we will just pretend it does not exist
+     */
+    @Callhook(adder = ResearchManagerVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static void fixOfflinePlayerDataLoad(EntityPlayer player, File file1, File file2, boolean legacy, String playerName) {
+        File folder = file1.getParentFile();
+        File newFile1 = new File(folder, playerName + ".thaum");
+        File newFile2 = new File(folder, playerName + ".thaumback");
+        if (newFile1.exists() && newFile2.exists()) {
+            file1 = newFile1;
+            file2 = newFile2;
+            legacy = false;
+        }
+        ResearchManager.loadPlayerData(player, file1, file2, legacy);
     }
 }
