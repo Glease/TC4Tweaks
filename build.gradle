@@ -394,6 +394,21 @@ publishing {
                         }
                     }
                 }
+                if (project.hasProperty('gtnhMavenRoot')) {
+                    maven {
+                        name = 'gtnh'
+                        def root = project.hasProperty('gtnhMavenRoot') ? project.gtnhMavenRoot : 'build/maven'
+                        def releasesRepoUrl = "${root}/repository/releases"
+                        def snapshotsRepoUrl = "${root}/repository/snapshots"
+                        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                        if (project.hasProperty('gtnhMavenUser') && project.hasProperty('gtnhMavenPass')) {
+                            credentials {
+                                username project.gtnhMavenUser
+                                password project.gtnhMavenPass
+                            }
+                        }
+                    }
+                }
             }
         }
     }
