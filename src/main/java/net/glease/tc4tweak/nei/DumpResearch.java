@@ -16,7 +16,7 @@ public class DumpResearch extends TC4TweaksDataDump {
 
     @Override
     public String[] header() {
-        return new String[]{"Category", "Name", "Key", "Parents", "ParentsHidden", "Siblings", "PermWarp", "StickyWarp", "Tag", "ItemTrigger", "EntityTrigger", "AspectTrigger"};
+        return new String[]{"Category", "Name", "Key", "Parents", "ParentsHidden", "Siblings", "PermWarp", "StickyWarp", "Tag", "ItemTrigger", "EntityTrigger", "AspectTrigger", "DisplayColumn", "DisplayRow"};
     }
 
     @Override
@@ -35,6 +35,8 @@ public class DumpResearch extends TC4TweaksDataDump {
                         toString(i.getItemTriggers()),
                         toString(i.getEntityTriggers()),
                         toString(i.getAspectTriggers()),
+                        String.valueOf(i.displayColumn),
+                        String.valueOf(i.displayRow),
                 }).iterator();
     }
 
