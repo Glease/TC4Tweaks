@@ -2,7 +2,6 @@ package net.glease.tc4tweak.nei;
 
 import java.io.File;
 
-import codechicken.lib.vec.Rectangle4i;
 import codechicken.nei.config.DataDumper;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.*;
@@ -23,12 +22,6 @@ abstract class TC4TweaksDataDump extends DataDumper {
         } catch (Exception ex) {
             return msg.appendSibling(new ChatComponentText("Error preparing chat message: " + ex.getLocalizedMessage()));
         }
-    }
-
-    @Override
-    public Rectangle4i dumpButtonSize() {
-        int width = 50;
-        return new Rectangle4i(slot.slotWidth() - width, 0, width, 20);
     }
 
     @Override

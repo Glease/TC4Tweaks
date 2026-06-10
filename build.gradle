@@ -28,7 +28,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.11'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.11.dirty'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
         classpath "se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.65"
     }
@@ -150,7 +150,7 @@ configurations {
 dependencies {
     devOnlyNonPublishable "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
     implementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
-    devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev"
+    devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.8.101-GTNH:dev"
     compileOnly "MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-3.0.11.23"
     recipeLib("net.glease:tc4recipelib:${project.findProperty("version.tc4recipelib")}:dev") {
         transitive = false
