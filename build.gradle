@@ -313,7 +313,7 @@ tasks.register('gitTag', Exec) {
 }
 
 tasks.register('generateGitChangelog', GitChangelogTask) {
-    file.set(new File("CHANGELOG.md"))
+    file.set(project.file("CHANGELOG.md"))
     toRevision.set("HEAD")
     templateContent.set("""<!-- Generated file. DO NOT HAND EDIT!!! -->
 # Change log
