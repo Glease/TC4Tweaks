@@ -104,6 +104,23 @@ repositories {
             }
         }
     }
+    exclusiveContent {
+        forRepository {
+            ivy {
+                name = 'tabbychat github releases'
+                url = 'https://github.com/mist475/tabbychat/releases/download/'
+                patternLayout {
+                    artifact '[revision]/[artifact]-[revision](-[classifier])(.[ext])'
+                }
+                metadataSources {
+                    artifact()
+                }
+            }
+        }
+        filter {
+            includeModule('mist475', 'tabbychat')
+        }
+    }
     maven {
         name 'gt'
         url 'https://gregtech.overminddl1.com/'
@@ -157,6 +174,7 @@ dependencies {
     devOnlyNonPublishable "com.azanor.baubles:Baubles:1.7.10-1.0.1.10:deobf"
     implementation "thaumcraft_fixed:Thaumcraft:1.7.10-4.2.3.5:dev"
     devOnlyNonPublishable "com.github.GTNewHorizons:NotEnoughItems:2.7.4-GTNH:dev"
+    devOnlyNonPublishable "mist475:tabbychat:1.12.2:dev"
     compileOnly "MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-3.0.11.23"
     recipeLib("net.glease:tc4recipelib:${project.findProperty("version.tc4recipelib")}:dev") {
         transitive = false
