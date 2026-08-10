@@ -14,7 +14,7 @@ body:
   attributes:
     label: Link to said mod
     description: A link to download said incompatible mod.
-    placeholder: "https://legacy.curseforge.com/minecraft/mc-mods/tc4tweaks/files/8469102"
+    placeholder: "https://legacy.curseforge.com/minecraft/mc-mods/mymod/files/11111111"
   validations:
     required: true
 - type: input
