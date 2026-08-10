@@ -7,21 +7,23 @@ body:
     label: Incompatible mod
     description: The name of mod that is incompatible
     placeholder: "MyAwesomeThaumcraftAddon"
-validtions:
-  required: true
+  validations:
+    required: true
 - type: input
   id: targetmodlink
   attributes:
     label: Link to said mod
     description: A link to download said incompatible mod.
     placeholder: "https://legacy.curseforge.com/minecraft/mc-mods/tc4tweaks/files/8469102"
-validtions:
-  required: true
+  validations:
+    required: true
 - type: input
   id: tc4tweaksversion
   attributes:
     label: TC4Tweaks Version used
     placeholder: "1.5.22"
+  validations:
+    required: true
 - type: textarea
   id: problem
   attributes:
@@ -31,6 +33,5 @@ validtions:
       Game crash at start...
       When using X item from this mod Y is supposed to happen but instead Z happens when TC4Tweaks is installed...
       Severe unexplained lag...
-      
-validtions:
-  required: true
+  validations:
+    required: true
