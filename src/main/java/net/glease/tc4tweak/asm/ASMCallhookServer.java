@@ -83,6 +83,7 @@ import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
+import thaumcraft.common.tiles.TileCrystal;
 import thaumcraft.common.tiles.TileResearchTable;
 
 import static net.glease.tc4tweak.TC4Tweak.log;
@@ -644,5 +645,21 @@ public class ASMCallhookServer {
             legacy = false;
         }
         ResearchManager.loadPlayerData(player, file1, file2, legacy);
+    }
+
+    /*
+     * SOMEHOW the TileCrystal will not be there when doing world gen. We will feed it a dummy TE so the downstream
+     * code work without an NPE
+     */
+    @Callhook(adder = GenCommonVisitor.class, module = ASMConstants.Modules.Bugfix)
+    public static TileEntity genCommonGetCrystalTileEntity(World world, int x, int y, int z) {
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te == null) {
+            Block block = world.getBlock(x, y, z);
+            int meta = world.getBlockMetadata(x, y, z);
+            log.warn("Expecting a TileCrystal @ ({}, {}, {}) in dim {} but none was found. A dummy will be used but this will not work very well! Please report this (this log line is enough to https://github.com/Glease/TC4Tweaks/issues). Block {} meta {}.", x, y, z, world.provider.dimensionId, block, meta);
+            te = new TileCrystal(); // give it a dummy to suppress NPE
+        }
+        return te;
     }
 }
