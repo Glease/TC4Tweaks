@@ -16,10 +16,24 @@ public enum InfusionOreDictMode {
     Default {
         @Override
         public boolean test(ItemStack playerInput, ItemStack recipeSpec) {
-            int od = OreDictionary.getOreID(playerInput);
-            if (od == -1) return false;
-            ItemStack[] ores = OreDictionary.getOres(od).toArray(new ItemStack[0]);
-            return ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{recipeSpec}, ores);
+            if (playerInput == null && recipeSpec != null) return false;
+            if (playerInput != null && recipeSpec == null) return false;
+            if (playerInput == null && recipeSpec == null) return true;
+
+            if (!ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(playerInput, recipeSpec)) return false;
+
+            int oreID = OreDictionary.getOreID(playerInput);
+            if (oreID != -1) {
+                ItemStack[] ores = OreDictionary.getOres(oreID).toArray(new ItemStack[]{});
+                if (ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{recipeSpec}, ores))
+                    return true;
+            }
+
+
+            if (playerInput.getItem() != recipeSpec.getItem()) return false;
+            if (playerInput.getItemDamage() != recipeSpec.getItemDamage() &&
+                    recipeSpec.getItemDamage() != OreDictionary.WILDCARD_VALUE) return false;
+            return playerInput.stackSize <= playerInput.getMaxStackSize();
         }
 
         @Override
@@ -44,7 +58,8 @@ public enum InfusionOreDictMode {
                 return Collections.emptyList();
             }
             List<ItemStack> newStacks = new ArrayList<>();
-            next: for (ItemStack stack : stacks) {
+            next:
+            for (ItemStack stack : stacks) {
                 for (ItemStack toMatch : all) {
                     if (stack.isItemEqual(toMatch)) {
                         newStacks.add(stack);
