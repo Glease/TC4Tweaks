@@ -24,9 +24,12 @@ public enum InfusionOreDictMode {
 
         @Override
         public RecipeIngredient get(ItemStack recipeSpec) {
-            int oreID = OreDictionary.getOreID(recipeSpec);
-            if (oreID == -1) return RecipeIngredient.item(false, recipeSpec);
-            return RecipeIngredient.oredict(OreDictionary.getOreName(oreID));
+            ItemStack[] ores = Arrays.stream(OreDictionary.getOreIDs(recipeSpec))
+                    .mapToObj(OreDictionary::getOres)
+                    .flatMap(List::stream)
+                    .filter(stack -> test(stack, recipeSpec))
+                    .toArray(ItemStack[]::new);
+            return RecipeIngredient.item(false, recipeSpec).or(RecipeIngredient.items(false, ores));
         }
     },
     Strict {
