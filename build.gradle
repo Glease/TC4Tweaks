@@ -20,7 +20,7 @@ buildscript {
         }
         maven {
             name = 'glease-release'
-            url = 'https://maven.glease.net/repos/release/'
+            url = 'https://maven.glease.net/repos/releases/'
         }
         maven {
             name 'sonatype'
@@ -33,7 +33,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.14-glease-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2.15-glease'
         classpath "se.bjurr.gitchangelog:git-changelog-gradle-plugin:3.1.2"
     }
 
